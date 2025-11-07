@@ -59,8 +59,8 @@
                         Features & Benefits
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="featuresDropdown">
-                        <li><a class="dropdown-item text-uzimate-purple" href="#features">All Features</a></li>
-                        <li><a class="dropdown-item text-uzimate-purple" href="#how-it-works">How It Works</a></li>
+                        <li><a class="dropdown-item text-uzimate-purple" href="{{ route('features') }}">All Features</a></li>
+                        <li><a class="dropdown-item text-uzimate-purple" href="{{ route('how-it-works') }}">How It Works</a></li>
                     </ul>
                 </li>
                 <li class="nav-item dropdown dropdown-hover">
@@ -68,8 +68,8 @@
                         How Does It Work?
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="howItWorksDropdown">
-                        <li><a class="dropdown-item text-uzimate-purple" href="#how-it-works">Overview</a></li>
-                        <li><a class="dropdown-item text-uzimate-purple" href="#watch">Watch Video</a></li>
+                        <li><a class="dropdown-item text-uzimate-purple" href="{{ route('how-it-works') }}">Overview</a></li>
+                        <li><a class="dropdown-item text-uzimate-purple" href="{{ route('watch-video') }}">Watch Video</a></li>
                     </ul>
                 </li>
                 <li class="nav-item dropdown dropdown-hover">
@@ -77,9 +77,9 @@
                         Resources
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="resourcesDropdown">
-                        <li><a class="dropdown-item text-uzimate-purple" href="#">Documentation</a></li>
-                        <li><a class="dropdown-item text-uzimate-purple" href="#">FAQ</a></li>
-                        <li><a class="dropdown-item text-uzimate-purple" href="#">Support</a></li>
+                        <li><a class="dropdown-item text-uzimate-purple" href="{{ route('resources') }}">Documentation</a></li>
+                        <li><a class="dropdown-item text-uzimate-purple" href="{{ route('resources') }}#faq">FAQ</a></li>
+                        <li><a class="dropdown-item text-uzimate-purple" href="{{ route('contact') }}">Support</a></li>
                     </ul>
                 </li>
                 <li class="nav-item">

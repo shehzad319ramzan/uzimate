@@ -50,6 +50,10 @@ Route::group(
             Route::get('about', 'about')->name('about');
             Route::get('contact', 'contact')->name('contact');
             Route::get('retail-sector/{sector}', 'retailSector')->name('retail.sector');
+            Route::get('features', 'features')->name('features');
+            Route::get('how-it-works', 'howItWorks')->name('how-it-works');
+            Route::get('resources', 'resources')->name('resources');
+            Route::get('watch-video', 'watchVideo')->name('watch-video');
         });
 
         Route::prefix('/account/')->middleware('CheckRegister')->group(function () {

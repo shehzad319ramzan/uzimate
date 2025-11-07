@@ -48,4 +48,24 @@ class FrontendController extends Controller
         
         return view('frontend.retail-sector', compact('sector', 'sectorName'));
     }
+
+    public function features()
+    {
+        return view('frontend.features');
+    }
+
+    public function howItWorks()
+    {
+        return view('frontend.how-it-works');
+    }
+
+    public function resources()
+    {
+        return view('frontend.resources');
+    }
+
+    public function watchVideo()
+    {
+        return view('frontend.watch-video');
+    }
 }
