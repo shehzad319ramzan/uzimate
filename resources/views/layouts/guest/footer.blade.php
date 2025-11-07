@@ -21,27 +21,27 @@
                 <h5>Company</h5>
                 <ul class="footer-links">
                     <li><a href="{{ route('about') }}">About Us</a></li>
-                    <li><a href="{{ route('welcome') }}#features">Features</a></li>
-                    <li><a href="{{ route('welcome') }}#how-it-works">How It Works</a></li>
+                    <li><a href="{{ route('features') }}">Features</a></li>
+                    <li><a href="{{ route('how-it-works') }}">How It Works</a></li>
                     <li><a href="{{ route('contact') }}">Contact</a></li>
                 </ul>
             </div>
             <div class="col-lg-3 col-md-4 mb-4 mb-lg-0">
                 <h5>Retail Sectors</h5>
                 <ul class="footer-links">
-                    <li><a href="#">Beauty & Personal Care</a></li>
-                    <li><a href="#">Food & Hospitality</a></li>
-                    <li><a href="#">Healthcare Providers</a></li>
-                    <li><a href="#">Fitness & Wellness</a></li>
+                    <li><a href="{{ route('retail.sector', 'beauty-personal-care') }}">Beauty & Personal Care</a></li>
+                    <li><a href="{{ route('retail.sector', 'food-hospitality') }}">Food & Hospitality</a></li>
+                    <li><a href="{{ route('retail.sector', 'healthcare-providers') }}">Healthcare Providers</a></li>
+                    <li><a href="{{ route('retail.sector', 'fitness-wellness') }}">Fitness & Wellness</a></li>
                 </ul>
             </div>
             <div class="col-lg-3 col-md-4 mb-4 mb-lg-0">
                 <h5>Categories & Confectionaries</h5>
                 <ul class="footer-links">
-                    <li><a href="#">Bakeries</a></li>
-                    <li><a href="#">Cafes & Dessert Parlors</a></li>
-                    <li><a href="#">Confectioneries</a></li>
-                    <li><a href="#">Takeaway Food</a></li>
+                    <li><a href="{{ route('retail.sector', 'bakeries-confectioneries') }}">Bakeries</a></li>
+                    <li><a href="{{ route('retail.sector', 'cafes-dessert-parlors') }}">Cafes & Dessert Parlors</a></li>
+                    <li><a href="{{ route('retail.sector', 'bakeries-confectioneries') }}">Confectioneries</a></li>
+                    <li><a href="{{ route('retail.sector', 'takeaway-food-outlet') }}">Takeaway Food</a></li>
                 </ul>
             </div>
         </div>
@@ -58,7 +58,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p class="mb-2">Copyright 2024 © Uzimate | Built with ❤️ to help you ✌️</p>
+            <p class="mb-2">Copyright 2025 © Uzimate | Built with ❤️ to help you ✌️</p>
             <div>
                 <a href="#">Terms & Conditions</a> |
                 <a href="#">Privacy Policy</a> |
