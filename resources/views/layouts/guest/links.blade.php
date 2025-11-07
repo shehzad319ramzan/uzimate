@@ -1,7 +1,12 @@
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+    @if(!request()->is('account/signin') && !request()->is('account/signup'))
     class="light-style layout-navbar-fixed layout-menu-fixed layout-compact" dir="ltr" data-theme="theme-default"
-    data-template="vertical-menu-template-starter" data-style="light" data-assets-path="{{ asset('assets') }}/">
+    data-template="vertical-menu-template-starter" data-style="light" data-assets-path="{{ asset('assets') }}/"
+    @else
+    dir="ltr"
+    @endif
+    >
 
 <head>
     <meta charset="utf-8">
@@ -19,5 +24,9 @@
     @yield('styles')
 </head>
 
+@if(!request()->is('account/signin') && !request()->is('account/signup'))
 <body class="body_theme1">
     {{-- <x-splash-screen /> --}}
+@else
+<body>
+@endif

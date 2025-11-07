@@ -8,14 +8,12 @@ use Illuminate\View\Component;
 
 class Guest extends Component
 {
-    public $pageTitle = '';
-
     /**
      * Create a new component instance.
      */
-    public function __construct($pageTitle)
+    public function __construct(public $pageTitle = '')
     {
-        $this->pageTitle = $pageTitle;
+        //
     }
 
     /**

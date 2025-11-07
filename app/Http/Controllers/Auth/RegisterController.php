@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Constants\Constants;
-use App\Events\NewFamilyMemberJoined;
-use App\Helper\GenerateFamilyCode;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -45,7 +43,7 @@ class RegisterController extends Controller
 
     public function showRegistrationForm()
     {
-        return view('auth.register');
+        return view('frontend.signup');
     }
 
     /**
@@ -78,7 +76,6 @@ class RegisterController extends Controller
             'last_name' => $data['last_name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'family_code' => $familyCode,
         ];
 
         $user = User::create($userArr);

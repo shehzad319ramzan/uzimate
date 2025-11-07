@@ -1,0 +1,117 @@
+/*
+ * Uzimate Brand Colors - Reusable Color System
+ * This file can be easily integrated into Laravel projects
+ * Use these CSS variables throughout your project for consistent branding
+ */
+
+:root {
+  /* Primary Brand Colors */
+  --uzimate-purple: #4A148D;
+  --uzimate-purple-dark: #4A246F;
+  --uzimate-purple-light: #F8F5FC;
+
+  /* Accent Colors */
+  --uzimate-yellow: #FFD700;
+  --uzimate-yellow-bright: #FFC107;
+
+  /* Text Colors */
+  --uzimate-text-dark: #333333;
+  --uzimate-text-light: #666666;
+  --uzimate-text-white: #FFFFFF;
+
+  /* Background Colors */
+  --uzimate-bg-white: #FFFFFF;
+  --uzimate-bg-light: #F8F5FC;
+  --uzimate-bg-dark: #4A148D;
+
+  /* Status Colors */
+  --uzimate-success: #28A745;
+  --uzimate-error: #DC3545;
+  --uzimate-info: #17A2B8;
+
+  /* Border Colors */
+  --uzimate-border-light: #E0E0E0;
+  --uzimate-border-medium: #CCCCCC;
+
+  /* Hover States */
+  --uzimate-purple-hover: #4A246F;
+  --uzimate-yellow-hover: #FFC107;
+}
+
+/* Utility Classes for Brand Colors - Easy to use anywhere */
+.bg-uzimate-purple {
+  background-color: var(--uzimate-purple) !important;
+}
+
+.bg-uzimate-purple-dark {
+  background-color: var(--uzimate-purple-dark) !important;
+}
+
+.bg-uzimate-purple-light {
+  background-color: var(--uzimate-purple-light) !important;
+}
+
+.bg-uzimate-yellow {
+  background-color: var(--uzimate-yellow) !important;
+}
+
+.text-uzimate-purple {
+  color: var(--uzimate-purple) !important;
+}
+
+.text-uzimate-yellow {
+  color: var(--uzimate-yellow) !important;
+}
+
+.text-uzimate-dark {
+  color: var(--uzimate-text-dark) !important;
+}
+
+.text-uzimate-light {
+  color: var(--uzimate-text-light) !important;
+}
+
+.border-uzimate-purple {
+  border-color: var(--uzimate-purple) !important;
+}
+
+.border-uzimate-yellow {
+  border-color: var(--uzimate-yellow) !important;
+}
+
+/* Button Color Classes */
+.btn-uzimate-purple {
+  background-color: var(--uzimate-purple);
+  color: var(--uzimate-text-white);
+  border: none;
+}
+
+.btn-uzimate-purple:hover {
+  background-color: var(--uzimate-purple-hover);
+  color: var(--uzimate-text-white);
+}
+
+.btn-uzimate-yellow {
+  background-color: var(--uzimate-yellow);
+  color: var(--uzimate-text-white);
+  border: none;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.btn-uzimate-yellow:hover {
+  background-color: var(--uzimate-yellow-hover);
+  color: var(--uzimate-text-white);
+}
+
+.btn-uzimate-outline {
+  background-color: transparent;
+  color: var(--uzimate-purple);
+  border: 2px solid var(--uzimate-purple);
+}
+
+.btn-uzimate-outline:hover {
+  background-color: var(--uzimate-purple);
+  color: var(--uzimate-text-white);
+}
+

@@ -1,3 +1,8 @@
+{{-- Bootstrap 5 JS Bundle --}}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+{{-- Dashboard Scripts (for admin pages only) --}}
+@if(request()->is('my-account*'))
 <!-- Toastr CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
@@ -31,3 +36,4 @@
         showToaster('warning', '{{ session('warning') }}', 'Warning');
     @endif
 </script>
+@endif

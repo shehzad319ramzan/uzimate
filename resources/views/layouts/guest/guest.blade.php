@@ -1,20 +1,21 @@
 @include('layouts.guest.links')
 
-<main>
-    @include('layouts.guest.top-bar')
-    @include('layouts.guest.navigation')
+<body>
+    @if(!request()->is('account/signin') && !request()->is('account/signup'))
+        @include('layouts.guest.navigation')
+    @endif
 
-    <div class="">
+    <main>
         {{ $slot }}
-    </div>
+    </main>
 
-    @include('layouts.guest.footer')
-</main>
+    @if(!request()->is('account/signin') && !request()->is('account/signup'))
+        @include('layouts.guest.footer')
+    @endif
+</body>
 
 @include('layouts.guest.scripts')
 
 @stack('scripts')
-
-</body>
 
 </html>

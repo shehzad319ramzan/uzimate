@@ -30,6 +30,16 @@ class LoginController extends Controller
     protected $redirectTo = Constants::DASHBOARD_URL;
 
     /**
+     * Show the application's login form.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showLoginForm()
+    {
+        return view('frontend.login');
+    }
+
+    /**
      * Create a new controller instance.
      *
      * @return void

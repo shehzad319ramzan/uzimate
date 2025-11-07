@@ -31,6 +31,6 @@ class SettingSeeder extends Seeder
 
         $setting->save();
 
-        $setting->file()->create(['name' => 'logo.png', 'path' => 'settings/logo.png', 'type' => 'logo']);
+        $setting->file()->create(['name' => 'logo.webp', 'path' => 'settings/logo.webp', 'type' => 'logo']);
     }
 }
