@@ -224,6 +224,9 @@ h1, h2, h3, h4, h5, h6 {
   left: 0;
   right: auto;
   transform: none;
+  margin-top: 0;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
 .navbar-uzimate .dropdown-item:hover {
@@ -231,12 +234,12 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--uzimate-purple);
 }
 
-/* Hover dropdown functionality */
+/* Hover dropdown functionality - improved for better hover experience */
 .navbar-uzimate .dropdown-hover:hover > .dropdown-menu,
 .navbar-uzimate .dropdown-hover .dropdown-menu:hover {
   display: block !important;
-  opacity: 1;
-  visibility: visible;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .navbar-uzimate .dropdown-hover .dropdown-menu {
@@ -244,12 +247,22 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.2s ease, visibility 0.2s ease;
+  pointer-events: auto;
 }
 
 .navbar-uzimate .dropdown-hover:hover .dropdown-menu {
   display: block !important;
-  opacity: 1;
-  visibility: visible;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Ensure there's no gap between dropdown trigger and menu */
+.navbar-uzimate .dropdown-hover .dropdown-toggle::after {
+  transition: transform 0.2s ease;
+}
+
+.navbar-uzimate .dropdown-hover:hover .dropdown-toggle::after {
+  transform: rotate(180deg);
 }
 
 .navbar-uzimate .dropdown-item img {

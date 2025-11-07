@@ -407,7 +407,7 @@
                     setTimeout(function() {
                         dropdownMenu.style.display = 'none';
                     }, 200);
-                }, 100);
+                }, 300); // Increased timeout to 300ms for better hover experience
             }
             
             dropdown.addEventListener('mouseenter', showDropdown);

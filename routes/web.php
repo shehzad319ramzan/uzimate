@@ -47,6 +47,9 @@ Route::group(
     function () {
         Route::controller(FrontendController::class)->group(function () {
             Route::get('/', 'welcome')->name('welcome');
+            Route::get('about', 'about')->name('about');
+            Route::get('contact', 'contact')->name('contact');
+            Route::get('retail-sector/{sector}', 'retailSector')->name('retail.sector');
         });
 
         Route::prefix('/account/')->middleware('CheckRegister')->group(function () {

@@ -12,10 +12,10 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#home">Home</a>
+                    <a class="nav-link active" href="{{ route('welcome') }}">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#about">About</a>
+                    <a class="nav-link" href="{{ route('about') }}">About</a>
                 </li>
                 <li class="nav-item dropdown dropdown-hover">
                     <a class="nav-link dropdown-toggle" href="#" id="retailDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -29,26 +29,26 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <ul class="list-unstyled mb-0">
-                                    <li><a class="dropdown-item text-uzimate-purple" href="#">Beauty & Personal Care</a></li>
-                                    <li><a class="dropdown-item text-uzimate-purple" href="#">Food & Hospitality</a></li>
-                                    <li><a class="dropdown-item text-uzimate-purple" href="#">Healthcare Providers</a></li>
-                                    <li><a class="dropdown-item text-uzimate-purple" href="#">Recreation & Leisure</a></li>
+                                    <li><a class="dropdown-item text-uzimate-purple" href="{{ route('retail.sector', 'beauty-personal-care') }}">Beauty & Personal Care</a></li>
+                                    <li><a class="dropdown-item text-uzimate-purple" href="{{ route('retail.sector', 'food-hospitality') }}">Food & Hospitality</a></li>
+                                    <li><a class="dropdown-item text-uzimate-purple" href="{{ route('retail.sector', 'healthcare-providers') }}">Healthcare Providers</a></li>
+                                    <li><a class="dropdown-item text-uzimate-purple" href="{{ route('retail.sector', 'recreation-leisure') }}">Recreation & Leisure</a></li>
                                 </ul>
                             </div>
                             <div class="col-md-4">
                                 <ul class="list-unstyled mb-0">
-                                    <li><a class="dropdown-item text-uzimate-purple" href="#">Fitness & Wellness</a></li>
-                                    <li><a class="dropdown-item text-uzimate-purple" href="#">Wholesale & Suppliers</a></li>
-                                    <li><a class="dropdown-item text-uzimate-purple" href="#">Bakeries & Confectioneries</a></li>
-                                    <li><a class="dropdown-item text-uzimate-purple" href="#">Cafes & Dessert Parlors</a></li>
+                                    <li><a class="dropdown-item text-uzimate-purple" href="{{ route('retail.sector', 'fitness-wellness') }}">Fitness & Wellness</a></li>
+                                    <li><a class="dropdown-item text-uzimate-purple" href="{{ route('retail.sector', 'wholesale-suppliers') }}">Wholesale & Suppliers</a></li>
+                                    <li><a class="dropdown-item text-uzimate-purple" href="{{ route('retail.sector', 'bakeries-confectioneries') }}">Bakeries & Confectioneries</a></li>
+                                    <li><a class="dropdown-item text-uzimate-purple" href="{{ route('retail.sector', 'cafes-dessert-parlors') }}">Cafes & Dessert Parlors</a></li>
                                 </ul>
                             </div>
                             <div class="col-md-4">
                                 <ul class="list-unstyled mb-0">
-                                    <li><a class="dropdown-item text-uzimate-purple" href="#">Retail Outlets</a></li>
-                                    <li><a class="dropdown-item text-uzimate-purple" href="#">Automotive Services</a></li>
-                                    <li><a class="dropdown-item text-uzimate-purple" href="#">Fashion & Jewelry</a></li>
-                                    <li><a class="dropdown-item text-uzimate-purple" href="#">Takeaway Food Outlet</a></li>
+                                    <li><a class="dropdown-item text-uzimate-purple" href="{{ route('retail.sector', 'retail-outlets') }}">Retail Outlets</a></li>
+                                    <li><a class="dropdown-item text-uzimate-purple" href="{{ route('retail.sector', 'automotive-services') }}">Automotive Services</a></li>
+                                    <li><a class="dropdown-item text-uzimate-purple" href="{{ route('retail.sector', 'fashion-jewelry') }}">Fashion & Jewelry</a></li>
+                                    <li><a class="dropdown-item text-uzimate-purple" href="{{ route('retail.sector', 'takeaway-food-outlet') }}">Takeaway Food Outlet</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -83,7 +83,7 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#contact">Contact</a>
+                    <a class="nav-link" href="{{ route('contact') }}">Contact</a>
                 </li>
             </ul>
             

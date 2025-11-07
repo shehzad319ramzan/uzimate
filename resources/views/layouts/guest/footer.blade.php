@@ -20,10 +20,10 @@
             <div class="col-lg-2 col-md-4 mb-4 mb-lg-0">
                 <h5>Company</h5>
                 <ul class="footer-links">
-                    <li><a href="#about">About Us</a></li>
-                    <li><a href="#features">Features</a></li>
-                    <li><a href="#how-it-works">How It Works</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="{{ route('about') }}">About Us</a></li>
+                    <li><a href="{{ route('welcome') }}#features">Features</a></li>
+                    <li><a href="{{ route('welcome') }}#how-it-works">How It Works</a></li>
+                    <li><a href="{{ route('contact') }}">Contact</a></li>
                 </ul>
             </div>
             <div class="col-lg-3 col-md-4 mb-4 mb-lg-0">
