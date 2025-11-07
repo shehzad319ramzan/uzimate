@@ -12,9 +12,9 @@
                 <div class="container">
                     <div class="row justify-content-center">
                         <div class="col-md-8 col-lg-10">
-                            <div class="mb-4 text-center">
+                            {{-- <div class="mb-4 text-center">
                                 <x-logo />
-                            </div>
+                            </div> --}}
 
                             <h1 class="mb-2 fw-bold text-uzimate-dark">Reset Your Password</h1>
                             <p class="text-uzimate-light mb-4">Enter your new password below to complete the reset process.</p>
@@ -26,11 +26,11 @@
                                 <div class="mb-3">
                                     <label for="password" class="form-label">New Password <span class="text-danger">*</span></label>
                                     <div class="position-relative">
-                                        <input type="password" class="form-control mb-0 @error('password') is-invalid @enderror" 
-                                            id="password" name="password" placeholder="Enter new password" required 
+                                        <input type="password" class="form-control mb-0 @error('password') is-invalid @enderror"
+                                            id="password" name="password" placeholder="Enter new password" required
                                             value="{{ old('password') }}" autocomplete="off" style="padding-right: 45px;">
-                                        <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y pe-3" 
-                                            onclick="togglePassword('password', 'toggleIcon1')" 
+                                        <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y pe-3"
+                                            onclick="togglePassword('password', 'toggleIcon1')"
                                             style="text-decoration: none; color: var(--uzimate-text-light); border: none; background: none; z-index: 10; height: 100%; display: flex; align-items: center; padding: 0;">
                                             <i class="fas fa-eye" id="toggleIcon1"></i>
                                         </button>
@@ -44,11 +44,11 @@
                                 <div class="mb-3">
                                     <label for="password_confirmation" class="form-label">Confirm Password <span class="text-danger">*</span></label>
                                     <div class="position-relative">
-                                        <input type="password" class="form-control mb-0 @error('password_confirmation') is-invalid @enderror" 
-                                            id="password_confirmation" name="password_confirmation" placeholder="Confirm new password" required 
+                                        <input type="password" class="form-control mb-0 @error('password_confirmation') is-invalid @enderror"
+                                            id="password_confirmation" name="password_confirmation" placeholder="Confirm new password" required
                                             value="{{ old('password_confirmation') }}" autocomplete="off" style="padding-right: 45px;">
-                                        <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y pe-3" 
-                                            onclick="togglePassword('password_confirmation', 'toggleIcon2')" 
+                                        <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y pe-3"
+                                            onclick="togglePassword('password_confirmation', 'toggleIcon2')"
                                             style="text-decoration: none; color: var(--uzimate-text-light); border: none; background: none; z-index: 10; height: 100%; display: flex; align-items: center; padding: 0;">
                                             <i class="fas fa-eye" id="toggleIcon2"></i>
                                         </button>
@@ -107,7 +107,7 @@
     function togglePassword(inputId, iconId) {
         const passwordInput = document.getElementById(inputId);
         const toggleIcon = document.getElementById(iconId);
-        
+
         if (passwordInput.type === 'password') {
             passwordInput.type = 'text';
             toggleIcon.classList.remove('fa-eye');

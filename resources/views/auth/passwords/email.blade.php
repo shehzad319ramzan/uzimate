@@ -12,9 +12,9 @@
                 <div class="container">
                     <div class="row justify-content-center">
                         <div class="col-md-8 col-lg-10">
-                            <div class="mb-4 text-center">
+                            {{-- <div class="mb-4 text-center">
                                 <x-logo />
-                            </div>
+                            </div> --}}
 
                             <h1 class="mb-2 fw-bold text-uzimate-dark">Forgot Your Password?</h1>
                             <p class="text-uzimate-light mb-4">No worries! Enter your email address and we'll send you a link to reset your password.</p>
