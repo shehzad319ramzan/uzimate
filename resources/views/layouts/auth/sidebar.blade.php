@@ -74,12 +74,12 @@
             </li>
             @endcanany
             {{--  --}}
-            <li class="sidebar-item {{ request()->is('messages*') ? 'active' : '' }}">
+            {{-- <li class="sidebar-item {{ request()->is('messages*') ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ route('messages.seen') }}">
                     <i class="align-middle me-2 fas fa-comments"></i>
                     <span class="align-middle">Communication</span>
                 </a>
-            </li>
+            </li> --}}
             {{-- USER ACCOUNT --}}
             <li class="sidebar-header">Account</li>
             <li

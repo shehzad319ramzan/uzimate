@@ -5,8 +5,10 @@ namespace App\Constants;
 class Constants
 {
     //roles
-    const SUPERADMIN = 'admin';
-    const USER = 'user';
+    const SUPERADMIN = 'super_admin';
+    const BUSINESS_ADMIN = 'business_admin';
+    const MANAGER = 'manager';
+    const CUSTOMER = 'customer';
 
     const DASHBOARD_URL = 'my-account';
 

@@ -27,7 +27,7 @@ class RoleRepository extends BaseRepository
 
     public function get_staff_roles()
     {
-        return $this->_model->whereNotIn('name', [Constants::SUPERADMIN, Constants::USER])->get();
+        return $this->_model->whereNotIn('name', [Constants::SUPERADMIN, Constants::CUSTOMER])->get();
     }
 
     /**

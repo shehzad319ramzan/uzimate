@@ -18,7 +18,7 @@ class RoleList extends Component
      */
     public function __construct($existingId = null)
     {
-        $this->list = Role::whereNotIn('name', [Constants::SUPERADMIN, Constants::USER])->select('name', 'id')->get();
+        $this->list = Role::whereNotIn('name', [Constants::SUPERADMIN, Constants::CUSTOMER])->select('name', 'id')->get();
         $this->existingId = $existingId;
     }
 

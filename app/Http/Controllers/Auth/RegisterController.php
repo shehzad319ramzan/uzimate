@@ -82,7 +82,7 @@ class RegisterController extends Controller
         ];
 
         $user = User::create($userArr);
-        $user->assignRole(Constants::USER);
+        $user->assignRole(Constants::CUSTOMER);
 
         return $user;
     }
