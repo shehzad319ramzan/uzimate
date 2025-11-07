@@ -3,7 +3,7 @@
         <div class="footer-container d-flex align-items-center justify-content-between py-4 flex-md-row flex-column">
             <div class="text-body">
                 Copyright &copy;
-                {{ date('Y') }} developed by <a href="{{ route('welcome') }}" class="text-muted">Inaam ul haq</a>
+                {{ date('Y') }} developed by <a href="{{ route('welcome') }}" class="text-muted">M Shehzad</a>
             </div>
             <div class="d-none d-lg-inline-block">
             </div>
