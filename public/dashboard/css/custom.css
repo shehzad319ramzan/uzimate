@@ -1,104 +1,841 @@
+/* ============================================
+   Uzimate Brand Colors - Using brand-colors.css
+   ============================================ */
 :root {
+    /* Old colors - keeping for backward compatibility */
     --primary-color: #174b79;
-    /* --secondary-color: #cf9c1e; */
     --secondary-color: #ffd600;
+
+    /* Uzimate Brand Colors */
+    --uzimate-purple: #4A148D;
+    --uzimate-purple-dark: #4A246F;
+    --uzimate-purple-light: #F8F5FC;
+    --uzimate-yellow: #FFD700;
+    --uzimate-yellow-bright: #FFC107;
+    --uzimate-text-dark: #333333;
+    --uzimate-text-light: #666666;
+    --uzimate-text-white: #FFFFFF;
+    --uzimate-bg-white: #FFFFFF;
+    --uzimate-bg-light: #F8F5FC;
+    --uzimate-bg-dark: #4A148D;
+    --uzimate-success: #28A745;
+    --uzimate-error: #DC3545;
+    --uzimate-info: #17A2B8;
+}
+
+/* ============================================
+   SIDEBAR - Dark Purple Design
+   ============================================ */
+/* Sidebar - Dark Blue-Gray Background - Override modern.css transparent */
+.sidebar,
+#sidebar,
+nav#sidebar {
+    background-color: #202938 !important;
+    background: #202938 !important;
+    color: var(--uzimate-text-white) !important;
+    box-shadow: none !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Override modern.css .sidebar-content background: #fff */
+.sidebar-content,
+#sidebar .sidebar-content,
+nav#sidebar .sidebar-content {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* Sidebar User Section - Override modern.css background: #fff and color: #153d77 */
+.sidebar-user,
+#sidebar .sidebar-user,
+nav#sidebar .sidebar-user {
+    background-color: #202938 !important;
+    background: #202938 !important;
+    color: var(--uzimate-text-white) !important;
+    padding: 1.5rem 1rem !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.sidebar-user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.uzimate-logo-icon {
+    width: 48px;
+    height: 48px;
+    background-color: var(--uzimate-yellow);
+    color: var(--uzimate-purple);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.user-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.user-role {
+    color: var(--uzimate-text-white);
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.user-email {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Sidebar Navigation - Override modern.css white background */
+.sidebar-nav,
+#sidebar .sidebar-nav,
+nav#sidebar .sidebar-nav,
+.sidebar .sidebar-nav {
+    background: transparent !important;
+    background-color: transparent !important;
+    padding: 1rem 0.75rem !important;
+    color: var(--uzimate-text-white) !important;
+    visibility: visible !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.sidebar-header {
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 1rem 0.75rem 0.5rem !important;
+    margin: 0 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    visibility: visible !important;
+    display: list-item !important;
+    opacity: 1 !important;
+}
+
+/* Sidebar Links - Override all conflicting styles */
+.sidebar .sidebar-link,
+.sidebar a.sidebar-link,
+#sidebar .sidebar-link,
+#sidebar a.sidebar-link,
+nav#sidebar .sidebar-link,
+nav#sidebar a.sidebar-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 8px !important;
+    margin: 0.25rem 0 !important;
+    transition: all 0.2s ease !important;
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+.sidebar .sidebar-link:hover,
+.sidebar a.sidebar-link:hover,
+#sidebar .sidebar-link:hover,
+#sidebar a.sidebar-link:hover,
+nav#sidebar .sidebar-link:hover,
+nav#sidebar a.sidebar-link:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: var(--uzimate-text-white) !important;
+}
+
+.sidebar .sidebar-item.active > .sidebar-link,
+.sidebar .sidebar-item.active > a.sidebar-link,
+#sidebar .sidebar-item.active > .sidebar-link,
+#sidebar .sidebar-item.active > a.sidebar-link,
+nav#sidebar .sidebar-item.active > .sidebar-link,
+nav#sidebar .sidebar-item.active > a.sidebar-link {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    color: var(--uzimate-text-white) !important;
+}
+
+/* Override icon colors - Force white */
+.sidebar .sidebar-link i,
+.sidebar a.sidebar-link i,
+.sidebar .sidebar-link .fab,
+.sidebar .sidebar-link .fal,
+.sidebar .sidebar-link .far,
+.sidebar .sidebar-link .fas,
+.sidebar .sidebar-link svg,
+.sidebar a.sidebar-link .fab,
+.sidebar a.sidebar-link .fal,
+.sidebar a.sidebar-link .far,
+.sidebar a.sidebar-link .fas,
+.sidebar a.sidebar-link svg,
+#sidebar i,
+#sidebar .fas,
+#sidebar .far,
+#sidebar .fab,
+#sidebar .fal,
+#sidebar .sidebar-link i,
+#sidebar a.sidebar-link i,
+nav#sidebar i,
+nav#sidebar .fas,
+nav#sidebar .far,
+nav#sidebar .fab,
+nav#sidebar .fal,
+nav#sidebar .sidebar-link i,
+nav#sidebar a.sidebar-link i {
+    color: rgba(255, 255, 255, 0.8) !important;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar .sidebar-item.active > .sidebar-link i,
+.sidebar .sidebar-item.active > a.sidebar-link i,
+#sidebar .sidebar-item.active > .sidebar-link i,
+#sidebar .sidebar-item.active > a.sidebar-link i,
+nav#sidebar .sidebar-item.active > .sidebar-link i,
+nav#sidebar .sidebar-item.active > a.sidebar-link i {
+    color: var(--uzimate-text-white) !important;
+}
+
+/* Sidebar Dropdown - Override modern.css white background and color: #6c757d */
+.sidebar .sidebar-dropdown,
+#sidebar .sidebar-dropdown,
+nav#sidebar .sidebar-dropdown {
+    padding-left: 1.5rem !important;
+    margin-top: 0.5rem;
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* Override modern.css .sidebar-dropdown .sidebar-link { background: #fff; color: #6c757d; } */
+.sidebar .sidebar-dropdown .sidebar-link,
+.sidebar .sidebar-dropdown a.sidebar-link,
+.sidebar-dropdown .sidebar-link,
+.sidebar-dropdown a.sidebar-link,
+#sidebar .sidebar-dropdown .sidebar-link,
+#sidebar .sidebar-dropdown a.sidebar-link,
+nav#sidebar .sidebar-dropdown .sidebar-link,
+nav#sidebar .sidebar-dropdown a.sidebar-link {
+    padding: 0.5rem 1rem !important;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.9) !important;
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* Override modern.css .sidebar-dropdown .sidebar-item .sidebar-link:hover { background: #fff; color: #212529; } */
+.sidebar .sidebar-dropdown .sidebar-item .sidebar-link:hover,
+.sidebar .sidebar-dropdown .sidebar-item.active .sidebar-link,
+.sidebar-dropdown .sidebar-item .sidebar-link:hover,
+.sidebar-dropdown .sidebar-item.active .sidebar-link,
+#sidebar .sidebar-dropdown .sidebar-item .sidebar-link:hover,
+#sidebar .sidebar-dropdown .sidebar-item.active .sidebar-link,
+nav#sidebar .sidebar-dropdown .sidebar-item .sidebar-link:hover,
+nav#sidebar .sidebar-dropdown .sidebar-item.active .sidebar-link {
+    background: rgba(255, 255, 255, 0.1) !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.sidebar .sidebar-dropdown .sidebar-link:hover,
+.sidebar .sidebar-dropdown a.sidebar-link:hover,
+.sidebar-dropdown .sidebar-link:hover,
+.sidebar-dropdown a.sidebar-link:hover,
+#sidebar .sidebar-dropdown .sidebar-link:hover,
+#sidebar .sidebar-dropdown a.sidebar-link:hover,
+nav#sidebar .sidebar-dropdown .sidebar-link:hover,
+nav#sidebar .sidebar-dropdown a.sidebar-link:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: var(--uzimate-text-white) !important;
+}
+
+.sidebar .sidebar-dropdown .sidebar-item.active .sidebar-link,
+.sidebar .sidebar-dropdown .sidebar-item.active a.sidebar-link,
+.sidebar-dropdown .sidebar-item.active .sidebar-link,
+.sidebar-dropdown .sidebar-item.active a.sidebar-link,
+#sidebar .sidebar-dropdown .sidebar-item.active .sidebar-link,
+#sidebar .sidebar-dropdown .sidebar-item.active a.sidebar-link,
+nav#sidebar .sidebar-dropdown .sidebar-item.active .sidebar-link,
+nav#sidebar .sidebar-dropdown .sidebar-item.active a.sidebar-link {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    color: var(--uzimate-text-white) !important;
+}
+
+.sidebar .sidebar-dropdown .sidebar-link i,
+.sidebar .sidebar-dropdown a.sidebar-link i,
+.sidebar-dropdown .sidebar-link i,
+.sidebar-dropdown a.sidebar-link i,
+#sidebar .sidebar-dropdown .sidebar-link i,
+#sidebar .sidebar-dropdown a.sidebar-link i,
+nav#sidebar .sidebar-dropdown .sidebar-link i,
+nav#sidebar .sidebar-dropdown a.sidebar-link i {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.sidebar .sidebar-dropdown .sidebar-link span,
+.sidebar .sidebar-dropdown a.sidebar-link span,
+.sidebar-dropdown .sidebar-link span,
+.sidebar-dropdown a.sidebar-link span,
+#sidebar .sidebar-dropdown .sidebar-link span,
+#sidebar .sidebar-dropdown a.sidebar-link span,
+nav#sidebar .sidebar-dropdown .sidebar-link span,
+nav#sidebar .sidebar-dropdown a.sidebar-link span {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: #202938;
+}
+
+.uzimate-footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.uzimate-logo-icon-small {
+    width: 32px;
+    height: 32px;
+    background-color: var(--uzimate-yellow);
+    color: var(--uzimate-purple);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.uzimate-text {
+    color: var(--uzimate-text-white);
+    font-weight: 600;
+    font-size: 16px;
+}
+
+/* Ensure sidebar content is visible */
+.sidebar .sidebar-content,
+#sidebar .sidebar-content,
+nav#sidebar .sidebar-content {
+    position: relative;
+    min-height: 100vh;
+    padding-bottom: 100px;
+}
+
+.sidebar *,
+#sidebar *,
+nav#sidebar * {
+    visibility: visible !important;
+}
+
+.sidebar .sidebar-item,
+#sidebar .sidebar-item,
+nav#sidebar .sidebar-item {
+    color: var(--uzimate-text-white) !important;
+    visibility: visible !important;
+    display: list-item !important;
+    opacity: 1 !important;
+    margin-bottom: 0.3rem !important;
+}
+
+/* ============================================
+   CRITICAL OVERRIDES - Must override modern.css completely
+   ============================================ */
+/* Force white text on all sidebar elements - Highest specificity */
+#sidebar,
+#sidebar *,
+nav#sidebar,
+nav#sidebar * {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+#sidebar .sidebar-header,
+nav#sidebar .sidebar-header {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Override modern.css .sidebar-link color: #6c757d */
+.sidebar-link,
+a.sidebar-link,
+#sidebar .sidebar-link,
+#sidebar a.sidebar-link,
+nav#sidebar .sidebar-link,
+nav#sidebar a.sidebar-link,
+.sidebar .sidebar-link,
+.sidebar a.sidebar-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+#sidebar a,
+#sidebar .sidebar-link,
+#sidebar span,
+#sidebar .align-middle,
+nav#sidebar a,
+nav#sidebar .sidebar-link,
+nav#sidebar span,
+nav#sidebar .align-middle {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Override modern.css .sidebar-link:hover { background: #fff; color: #212529; } */
+.sidebar-link:hover,
+a.sidebar-link:hover,
+#sidebar .sidebar-link:hover,
+#sidebar a.sidebar-link:hover,
+nav#sidebar .sidebar-link:hover,
+nav#sidebar a.sidebar-link:hover,
+.sidebar .sidebar-link:hover,
+.sidebar a.sidebar-link:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #FFFFFF !important;
+}
+
+/* Override modern.css .sidebar-item.active>.sidebar-link { background: #e9ecef; color: #212529; } */
+.sidebar-item.active .sidebar-link:hover,
+.sidebar-item.active > .sidebar-link,
+.sidebar-item.active > a.sidebar-link,
+#sidebar .sidebar-item.active .sidebar-link:hover,
+#sidebar .sidebar-item.active > .sidebar-link,
+#sidebar .sidebar-item.active > a.sidebar-link,
+nav#sidebar .sidebar-item.active .sidebar-link:hover,
+nav#sidebar .sidebar-item.active > .sidebar-link,
+nav#sidebar .sidebar-item.active > a.sidebar-link {
+    background: rgba(255, 255, 255, 0.15) !important;
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    color: #FFFFFF !important;
+}
+
+/* Override modern.css .sidebar-link .fas color: #153d77 */
+.sidebar-link .fab,
+.sidebar-link .fal,
+.sidebar-link .far,
+.sidebar-link .fas,
+.sidebar-link svg,
+.sidebar-link i,
+a.sidebar-link .fab,
+a.sidebar-link .fal,
+a.sidebar-link .far,
+a.sidebar-link .fas,
+a.sidebar-link svg,
+a.sidebar-link i,
+#sidebar .sidebar-link .fab,
+#sidebar .sidebar-link .fal,
+#sidebar .sidebar-link .far,
+#sidebar .sidebar-link .fas,
+#sidebar .sidebar-link svg,
+#sidebar .sidebar-link i,
+#sidebar a.sidebar-link .fab,
+#sidebar a.sidebar-link .fal,
+#sidebar a.sidebar-link .far,
+#sidebar a.sidebar-link .fas,
+#sidebar a.sidebar-link svg,
+#sidebar a.sidebar-link i,
+nav#sidebar .sidebar-link .fab,
+nav#sidebar .sidebar-link .fal,
+nav#sidebar .sidebar-link .far,
+nav#sidebar .sidebar-link .fas,
+nav#sidebar .sidebar-link svg,
+nav#sidebar .sidebar-link i,
+nav#sidebar a.sidebar-link .fab,
+nav#sidebar a.sidebar-link .fal,
+nav#sidebar a.sidebar-link .far,
+nav#sidebar a.sidebar-link .fas,
+nav#sidebar a.sidebar-link svg,
+nav#sidebar a.sidebar-link i {
+    color: rgba(255, 255, 255, 0.8) !important;
+    margin-right: .75rem;
+}
+
+/* Override modern.css .sidebar-link:hover .fas color: #153d77 */
+.sidebar-link:hover .fab,
+.sidebar-link:hover .fal,
+.sidebar-link:hover .far,
+.sidebar-link:hover .fas,
+.sidebar-link:hover svg,
+.sidebar-link:hover i,
+a.sidebar-link:hover .fab,
+a.sidebar-link:hover .fal,
+a.sidebar-link:hover .far,
+a.sidebar-link:hover .fas,
+a.sidebar-link:hover svg,
+a.sidebar-link:hover i,
+#sidebar .sidebar-link:hover .fab,
+#sidebar .sidebar-link:hover .fal,
+#sidebar .sidebar-link:hover .far,
+#sidebar .sidebar-link:hover .fas,
+#sidebar .sidebar-link:hover svg,
+#sidebar .sidebar-link:hover i,
+#sidebar a.sidebar-link:hover .fab,
+#sidebar a.sidebar-link:hover .fal,
+#sidebar a.sidebar-link:hover .far,
+#sidebar a.sidebar-link:hover .fas,
+#sidebar a.sidebar-link:hover svg,
+#sidebar a.sidebar-link:hover i,
+nav#sidebar .sidebar-link:hover .fab,
+nav#sidebar .sidebar-link:hover .fal,
+nav#sidebar .sidebar-link:hover .far,
+nav#sidebar .sidebar-link:hover .fas,
+nav#sidebar .sidebar-link:hover svg,
+nav#sidebar .sidebar-link:hover i,
+nav#sidebar a.sidebar-link:hover .fab,
+nav#sidebar a.sidebar-link:hover .fal,
+nav#sidebar a.sidebar-link:hover .far,
+nav#sidebar a.sidebar-link:hover .fas,
+nav#sidebar a.sidebar-link:hover svg,
+nav#sidebar a.sidebar-link:hover i {
+    color: #FFFFFF !important;
+}
+
+/* Override modern.css .sidebar-item.active>.sidebar-link background: #e9ecef */
+.sidebar-item.active .sidebar-link:hover,
+.sidebar-item.active > .sidebar-link,
+.sidebar-item.active > a.sidebar-link,
+#sidebar .sidebar-item.active .sidebar-link:hover,
+#sidebar .sidebar-item.active > .sidebar-link,
+#sidebar .sidebar-item.active > a.sidebar-link,
+nav#sidebar .sidebar-item.active .sidebar-link:hover,
+nav#sidebar .sidebar-item.active > .sidebar-link,
+nav#sidebar .sidebar-item.active > a.sidebar-link {
+    background: rgba(255, 255, 255, 0.15) !important;
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    color: #FFFFFF !important;
+}
+
+/* Ensure z-index doesn't hide sidebar */
+#sidebar,
+nav#sidebar {
+    z-index: 1000 !important;
+    position: relative !important;
+}
+
+/* ============================================
+   TOP NAVIGATION BAR - Purple
+   ============================================ */
+.navbar-theme {
+    background-color: #4A148D !important;
+    color: var(--uzimate-text-white) !important;
+    padding: 0.75rem 1.5rem !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.navbar-theme .navbar-nav {
+    align-items: center;
+}
+
+.navbar-theme .sidebar-toggle {
+    color: var(--uzimate-text-white) !important;
+    margin-right: 1rem;
+}
+
+.navbar-theme .hamburger {
+    color: var(--uzimate-text-white) !important;
+}
+
+.navbar-theme .navbar-brand,
+.navbar-theme .header-title-nav {
+    color: var(--uzimate-purple-dark) !important;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.advance-mode-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--uzimate-text-white);
+    font-size: 14px;
+    margin-right: 1rem;
+}
+
+.super-admin-badge {
+    background-color: var(--uzimate-success) !important;
+    color: var(--uzimate-text-white) !important;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    margin-right: 1rem;
+}
+
+.logout-icon {
+    color: var(--uzimate-text-white) !important;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.logout-icon:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================
+   MAIN CONTENT AREA
+   ============================================ */
+.content {
+    background-color: #f1f1f1 !important;
+    padding: 1.5rem !important;
+    margin-top: 1rem !important;
 }
 
 .header {
     margin-bottom: 1rem !important;
 }
 
-.border-bottom {
-    border-bottom: 1px solid var(--primary-color) !important;
-}
-
-.content {
-    margin-top: 1rem !important;
-}
-
 .wrapper:before {
-    height: 10rem !important;
+    display: none !important;
 }
 
+/* ============================================
+   DASHBOARD CARDS
+   ============================================ */
+.dashboard-card {
+    background: var(--uzimate-bg-white);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.dashboard-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.dashboard-card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--uzimate-text-dark);
+    margin: 0;
+}
+
+.dashboard-card-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #4A148D;
+    margin: 0.5rem 0;
+}
+
+.dashboard-card-metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.dashboard-metric {
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-metric-label {
+    font-size: 12px;
+    color: var(--uzimate-text-light);
+    margin-bottom: 4px;
+}
+
+.dashboard-metric-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--uzimate-text-dark);
+}
+
+.dashboard-card.purple {
+    background: linear-gradient(135deg, var(--uzimate-purple-light) 0%, #E8D5F2 100%);
+}
+
+.dashboard-card.green {
+    background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+}
+
+/* ============================================
+   CHART/GRAPH SECTION
+   ============================================ */
+.chart-section {
+    background: var(--uzimate-bg-white);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-top: 1.5rem;
+}
+
+.chart-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.chart-tab {
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--uzimate-text-light);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: -2px;
+}
+
+.chart-tab.active {
+    color: #4A148D;
+    border-bottom-color: #4A148D;
+    background-color: var(--uzimate-purple-light);
+}
+
+.chart-filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+/* ============================================
+   OTHER STYLES (Keeping existing)
+   ============================================ */
+.border-bottom {
+    border-bottom: 1px solid #4A148D !important;
+}
+
+/* ============================================
+   BUTTONS & INTERACTIVE ELEMENTS - Purple Brand Color
+   ============================================ */
+/* Primary Buttons */
 .btn-primary,
 .list-group-item.active,
 .bg-primary-dark,
-.splash .splash-icon {
-    background-color: var(--primary-color) !important;
-    color: var(--secondary-color) !important;
-    border-color: var(--primary-color) !important;
+.splash .splash-icon,
+button.btn-primary,
+a.btn-primary {
+    background-color: #4A148D !important;
+    color: #FFFFFF !important;
+    border-color: #4A148D !important;
 }
 
 .btn-primary,
 .list-group-item.active,
 .bg-primary-dark {
-    border: var(--primary-color) !important;
+    border: #4A148D !important;
 }
 
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active {
+    background-color: #5A1A9D !important;
+    border-color: #5A1A9D !important;
+    color: #FFFFFF !important;
+}
+
+/* Outline Primary Buttons */
 .btn-outline-primary {
     background-color: transparent !important;
-    border-color: var(--primary-color) !important;
-    color: var(--primary-color) !important;
+    border-color: #4A148D !important;
+    color: #4A148D !important;
 }
 
-.btn-outline-primary:hover {
-    background-color: var(--primary-color) !important;
-    border-color: var(--primary-color) !important;
-    color: var(--secondary-color) !important;
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active,
+.btn-outline-primary.active {
+    background-color: #4A148D !important;
+    border-color: #4A148D !important;
+    color: #FFFFFF !important;
 }
 
-a.sidebar-link .fab,
-a.sidebar-link .fal,
-a.sidebar-link .far,
-a.sidebar-link .fas,
-a.sidebar-link svg {
-    color: var(--primary-color) !important;
+/* Links with primary color */
+a.text-primary,
+.text-primary {
+    color: #4A148D !important;
 }
 
-.sidebar-item.active>.sidebar-link .fab,
-.sidebar-item.active>.sidebar-link .fal,
-.sidebar-item.active>.sidebar-link .far,
-.sidebar-item.active>.sidebar-link .fas,
-.sidebar-item.active>.sidebar-link svg,
-.sidebar-item.active>.sidebar-link {
-    color: var(--secondary-color) !important;
+a.text-primary:hover {
+    color: #5A1A9D !important;
 }
 
-.sidebar-item.active>.sidebar-link {
-    background-color: var(--primary-color) !important;
+/* Badges */
+.badge-primary,
+.bg-primary {
+    background-color: #4A148D !important;
+    color: #FFFFFF !important;
 }
 
-
-.sidebar-link:hover {
-    color: var(--primary-color) !important;
-    background-color: #e9e9e9 !important;
+/* Pagination */
+.page-link {
+    color: #4A148D;
 }
 
-.sidebar-brand,
-.sidebar-brand:hover,
-.wrapper:before {
-    background-color: var(--primary-color) !important;
+.page-link:hover {
+    color: #5A1A9D;
+    background-color: #f8f5fc;
 }
 
-/* .header-title {
-    color: #ed1c24 !important;
-} */
+.page-item.active .page-link {
+    background-color: #4A148D;
+    border-color: #4A148D;
+    color: #FFFFFF;
+}
+
+/* Dropdown */
+.dropdown-item.active,
+.dropdown-item:active {
+    background-color: #4A148D !important;
+    color: #FFFFFF !important;
+}
+
+/* Progress bars */
+.progress-bar {
+    background-color: #4A148D !important;
+}
+
+/* Checkboxes and Radio buttons */
+.form-check-input:checked {
+    background-color: #4A148D;
+    border-color: #4A148D;
+}
+
+/* Switch/Toggle */
+.form-switch .form-check-input:checked {
+    background-color: #4A148D;
+}
+
+/* Table active row */
+.table-active {
+    background-color: rgba(74, 20, 141, 0.1) !important;
+}
 
 .dispatch-note {
     display: block;
-    /* Ensures the badge behaves like a block element */
     max-width: 100%;
-    /* Prevents overflow */
     white-space: normal;
-    /* Allows wrapping */
     word-wrap: break-word;
-    /* Breaks long words */
     overflow-wrap: break-word;
-    /* Ensures text wraps properly */
     text-align: left;
-    /* Align text properly */
     padding: 8px;
-    /* Adds spacing inside the badge */
 }
 
 input:focus,
@@ -106,13 +843,9 @@ textarea:focus,
 select:focus,
 button:focus {
     outline: none !important;
-    box-shadow: none !important;
-    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 0.2rem rgba(74, 20, 141, 0.25) !important;
+    border-color: #4A148D !important;
     border-width: 1px !important;
-}
-
-.sidebar-user {
-    padding: 1rem 0rem 0rem !important;
 }
 
 .cardscroll {
@@ -157,21 +890,12 @@ button:focus {
 }
 
 .nav-tab .active {
-    background-color: #ececec;
-}
-
-.sidebar-link,
-a.sidebar-link {
-    border-radius: .6rem !important;
-    padding: .5rem .6rem !important;
+    background-color: #4A148D !important;
+    color: #FFFFFF !important;
 }
 
 .sidebar [data-bs-toggle=collapse]:before {
     top: 1.1rem !important;
-}
-
-.sidebar-item {
-    margin-bottom: 0.3rem !important;
 }
 
 .sidebar-dropdown {
@@ -180,4 +904,160 @@ a.sidebar-link {
 
 .min-height {
     min-height: 85vh !important;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    .dashboard-card-metrics {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .chart-filters {
+        flex-direction: column;
+    }
+}
+
+/* ============================================
+   FINAL ABSOLUTE OVERRIDES - Last resort
+   ============================================ */
+/* These must be at the very end to override everything */
+body .sidebar .sidebar-link,
+body .sidebar a.sidebar-link,
+body #sidebar .sidebar-link,
+body #sidebar a.sidebar-link,
+body nav#sidebar .sidebar-link,
+body nav#sidebar a.sidebar-link {
+    color: #FFFFFF !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+body .sidebar .sidebar-link span,
+body .sidebar a.sidebar-link span,
+body #sidebar .sidebar-link span,
+body #sidebar a.sidebar-link span,
+body nav#sidebar .sidebar-link span,
+body nav#sidebar a.sidebar-link span {
+    color: #FFFFFF !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+body .sidebar .sidebar-link i,
+body .sidebar a.sidebar-link i,
+body .sidebar .sidebar-link .fas,
+body .sidebar .sidebar-link .far,
+body .sidebar .sidebar-link .fab,
+body .sidebar .sidebar-link .fal,
+body #sidebar .sidebar-link i,
+body #sidebar a.sidebar-link i,
+body #sidebar .sidebar-link .fas,
+body #sidebar .sidebar-link .far,
+body #sidebar .sidebar-link .fab,
+body #sidebar .sidebar-link .fal,
+body nav#sidebar .sidebar-link i,
+body nav#sidebar a.sidebar-link i,
+body nav#sidebar .sidebar-link .fas,
+body nav#sidebar .sidebar-link .far,
+body nav#sidebar .sidebar-link .fab,
+body nav#sidebar .sidebar-link .fal {
+    color: #FFFFFF !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* ============================================
+   ABSOLUTE FINAL OVERRIDES - Override ALL modern.css sidebar rules
+   ============================================ */
+/* These rules use maximum specificity to override everything */
+html body .sidebar,
+html body #sidebar,
+html body nav#sidebar {
+    background: #202938 !important;
+    background-color: #202938 !important;
+}
+
+html body .sidebar-content,
+html body #sidebar .sidebar-content,
+html body nav#sidebar .sidebar-content {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+html body .sidebar-user,
+html body #sidebar .sidebar-user,
+html body nav#sidebar .sidebar-user {
+    background: #202938 !important;
+    background-color: #202938 !important;
+    color: #FFFFFF !important;
+}
+
+html body .sidebar-nav,
+html body #sidebar .sidebar-nav,
+html body nav#sidebar .sidebar-nav {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+html body .sidebar-link,
+html body a.sidebar-link,
+html body #sidebar .sidebar-link,
+html body #sidebar a.sidebar-link,
+html body nav#sidebar .sidebar-link,
+html body nav#sidebar a.sidebar-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+html body .sidebar-link:hover,
+html body a.sidebar-link:hover,
+html body #sidebar .sidebar-link:hover,
+html body #sidebar a.sidebar-link:hover,
+html body nav#sidebar .sidebar-link:hover,
+html body nav#sidebar a.sidebar-link:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: #FFFFFF !important;
+}
+
+html body .sidebar-link i,
+html body .sidebar-link .fas,
+html body .sidebar-link .far,
+html body .sidebar-link .fab,
+html body .sidebar-link .fal,
+html body .sidebar-link svg,
+html body #sidebar .sidebar-link i,
+html body #sidebar .sidebar-link .fas,
+html body #sidebar .sidebar-link .far,
+html body #sidebar .sidebar-link .fab,
+html body #sidebar .sidebar-link .fal,
+html body #sidebar .sidebar-link svg,
+html body nav#sidebar .sidebar-link i,
+html body nav#sidebar .sidebar-link .fas,
+html body nav#sidebar .sidebar-link .far,
+html body nav#sidebar .sidebar-link .fab,
+html body nav#sidebar .sidebar-link .fal,
+html body nav#sidebar .sidebar-link svg {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+html body .sidebar-link span,
+html body .sidebar-link .align-middle,
+html body #sidebar .sidebar-link span,
+html body #sidebar .sidebar-link .align-middle,
+html body nav#sidebar .sidebar-link span,
+html body nav#sidebar .sidebar-link .align-middle {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+html body .sidebar-dropdown .sidebar-link,
+html body .sidebar-dropdown a.sidebar-link,
+html body #sidebar .sidebar-dropdown .sidebar-link,
+html body #sidebar .sidebar-dropdown a.sidebar-link,
+html body nav#sidebar .sidebar-dropdown .sidebar-link,
+html body nav#sidebar .sidebar-dropdown a.sidebar-link {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: rgba(255, 255, 255, 0.9) !important;
 }

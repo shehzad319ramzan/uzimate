@@ -1,29 +1,28 @@
 <nav class="navbar navbar-expand navbar-theme">
-    <a class="sidebar-toggle d-flex me-2">
-        <i class="hamburger align-self-center"></i>
-    </a>
+    <div class="d-flex align-items-center">
+        <a class="sidebar-toggle d-flex me-3">
+            <i class="hamburger align-self-center"></i>
+        </a>
+        <span class="header-title-nav">{{ $pageTitle ?? 'Dashboard' }}</span>
+    </div>
 
     <div class="navbar-collapse collapse">
-        <ul class="navbar-nav ms-auto">
-            {{-- <x-auth.messages /> --}}
-            <x-auth.notifications />
-
-            <li class="nav-item dropdown ms-lg-2">
-                <a class="nav-link dropdown-toggle position-relative" href="#" id="userDropdown"
-                    data-bs-toggle="dropdown">
-                    <i class="align-middle fas fa-cog"></i>
-                </a>
-                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                    <a class="dropdown-item" href="{{ route('myprofile') }}"><i
-                            class="align-middle me-1 fas fa-fw fa-user"></i>
-                        View Profile</a>
-                    <a class="dropdown-item" href="{{ route('change_password') }}"><i
-                            class="align-middle me-1 fas fa-fw fa-cogs"></i>
-                        Settings</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="{{ route('logout') }}"><i
-                            class="align-middle me-1 fas fa-fw fa-arrow-alt-circle-right"></i> Sign out</a>
+        <ul class="navbar-nav ms-auto align-items-center">
+            <li class="nav-item">
+                <div class="advance-mode-toggle">
+                    <span>Advance Mode:</span>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="advanceModeToggle">
+                    </div>
                 </div>
+            </li>
+            <li class="nav-item">
+                <span class="super-admin-badge">{{ auth()->user()->roles->first()->title ?? 'Super Admin' }}</span>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('logout') }}" class="logout-icon">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
             </li>
         </ul>
     </div>

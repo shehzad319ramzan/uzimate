@@ -1,7 +1,13 @@
 <nav id="sidebar" class="sidebar">
     <div class="sidebar-content">
         <div class="sidebar-user">
-            <x-logo />
+            <div class="sidebar-user-info">
+                <div class="uzimate-logo-icon">U</div>
+                <div class="user-details">
+                    <div class="user-role">{{ auth()->user()->roles->first()->title ?? 'Super Admin' }}</div>
+                    <div class="user-email">{{ auth()->user()->email }}</div>
+                </div>
+            </div>
         </div>
 
         <ul class="sidebar-nav mt-3">
@@ -93,5 +99,13 @@
 
 
         </ul>
+
+        {{-- Footer Logo --}}
+        <div class="sidebar-footer">
+            <div class="uzimate-footer-logo">
+                <span class="uzimate-logo-icon-small">U</span>
+                <span class="uzimate-text">Uzimate</span>
+            </div>
+        </div>
     </div>
 </nav>
