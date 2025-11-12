@@ -547,7 +547,7 @@ nav#sidebar {
 
 .navbar-theme .navbar-brand,
 .navbar-theme .header-title-nav {
-    color: var(--uzimate-purple-dark) !important;
+    color: var(--uzimate-purple-white) !important;
     font-weight: 600;
     font-size: 18px;
 }
