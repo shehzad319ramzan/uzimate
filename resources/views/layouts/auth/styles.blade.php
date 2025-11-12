@@ -135,6 +135,27 @@
   nav#sidebar .sidebar-link:hover i {
     color: #FFFFFF !important;
   }
+  
+  /* Advanced Mode Items - Force hide/show */
+  #sidebar .advance-mode-item:not(.show),
+  nav#sidebar .advance-mode-item:not(.show) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  #sidebar .advance-mode-item.show,
+  nav#sidebar .advance-mode-item.show {
+    display: list-item !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
   .message {
     margin: 6px 0;
     padding: 10px 14px;

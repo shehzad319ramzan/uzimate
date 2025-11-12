@@ -820,12 +820,37 @@ a.text-primary:hover {
 
 /* Switch/Toggle */
 .form-switch .form-check-input:checked {
-    background-color: #4A148D;
+    background-color: #ff0000;
 }
 
 /* Table active row */
 .table-active {
     background-color: rgba(74, 20, 141, 0.1) !important;
+}
+
+/* Advanced Mode Items - Hidden by default */
+.advance-mode-item,
+#sidebar .advance-mode-item,
+nav#sidebar .advance-mode-item,
+.sidebar .advance-mode-item,
+.sidebar-nav .advance-mode-item {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+}
+
+.advance-mode-item.show,
+#sidebar .advance-mode-item.show,
+nav#sidebar .advance-mode-item.show,
+.sidebar .advance-mode-item.show,
+.sidebar-nav .advance-mode-item.show {
+    display: list-item !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: auto !important;
+    overflow: visible !important;
 }
 
 .dispatch-note {

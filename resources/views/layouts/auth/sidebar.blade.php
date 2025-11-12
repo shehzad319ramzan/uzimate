@@ -56,56 +56,56 @@
                 </a>
             </li>
 
-            {{-- Sites --}}
-            <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'sites.') || request()->route()->getName() == 'sites.index' ? 'active' : '' }}">
+            {{-- Sites (Advanced Mode Only) --}}
+            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'sites.') || request()->route()->getName() == 'sites.index' ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ Route::has('sites.index') ? route('sites.index') : '#' }}">
                     <i class="align-middle me-2 fas fa-th-large"></i>
                     <span class="align-middle">Sites</span>
                 </a>
             </li>
 
-            {{-- Site Users --}}
-            <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'site-users.') || request()->route()->getName() == 'site-users.index' ? 'active' : '' }}">
+            {{-- Site Users (Advanced Mode Only) --}}
+            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'site-users.') || request()->route()->getName() == 'site-users.index' ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ Route::has('site-users.index') ? route('site-users.index') : '#' }}">
                     <i class="align-middle me-2 fas fa-user-plus"></i>
                     <span class="align-middle">Site Users</span>
                 </a>
             </li>
 
-            {{-- Offers --}}
-            <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'offers.') || request()->route()->getName() == 'offers.index' ? 'active' : '' }}">
+            {{-- Offers (Advanced Mode Only) --}}
+            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'offers.') || request()->route()->getName() == 'offers.index' ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ Route::has('offers.index') ? route('offers.index') : '#' }}">
                     <i class="align-middle me-2 fas fa-tag"></i>
                     <span class="align-middle">Offers</span>
                 </a>
             </li>
 
-            {{-- Customer Scans --}}
-            <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'customer-scans.') || request()->route()->getName() == 'customer-scans.index' ? 'active' : '' }}">
+            {{-- Customer Scans (Advanced Mode Only) --}}
+            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'customer-scans.') || request()->route()->getName() == 'customer-scans.index' ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ Route::has('customer-scans.index') ? route('customer-scans.index') : '#' }}">
                     <i class="align-middle me-2 fas fa-bullseye"></i>
                     <span class="align-middle">Customer Scans</span>
                 </a>
             </li>
 
-            {{-- Offer Scans --}}
-            <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'offer-scans.') || request()->route()->getName() == 'offer-scans.index' ? 'active' : '' }}">
+            {{-- Offer Scans (Advanced Mode Only) --}}
+            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'offer-scans.') || request()->route()->getName() == 'offer-scans.index' ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ Route::has('offer-scans.index') ? route('offer-scans.index') : '#' }}">
                     <i class="align-middle me-2 fas fa-qrcode"></i>
                     <span class="align-middle">Offer Scans</span>
                 </a>
             </li>
 
-            {{-- Point Awards --}}
-            <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'point-awards.') || request()->route()->getName() == 'point-awards.index' ? 'active' : '' }}">
+            {{-- Point Awards (Advanced Mode Only) --}}
+            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'point-awards.') || request()->route()->getName() == 'point-awards.index' ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ Route::has('point-awards.index') ? route('point-awards.index') : '#' }}">
                     <i class="align-middle me-2 fas fa-award"></i>
                     <span class="align-middle">Point Awards</span>
                 </a>
             </li>
 
-            {{-- Spin History --}}
-            <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'spin-history.') || request()->route()->getName() == 'spin-history.index' ? 'active' : '' }}">
+            {{-- Spin History (Advanced Mode Only) --}}
+            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'spin-history.') || request()->route()->getName() == 'spin-history.index' ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ Route::has('spin-history.index') ? route('spin-history.index') : '#' }}">
                     <i class="align-middle me-2 fas fa-redo"></i>
                     <span class="align-middle">Spin History</span>
