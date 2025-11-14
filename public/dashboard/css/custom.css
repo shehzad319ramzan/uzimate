@@ -55,12 +55,44 @@ nav#sidebar .sidebar-user {
     color: var(--uzimate-text-white) !important;
     padding: 1.5rem 1rem !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    text-align: center !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
 }
 
-.sidebar-user-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+.sidebar-user-info,
+#sidebar .sidebar-user-info,
+nav#sidebar .sidebar-user-info {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+}
+
+.sidebar-logo-container,
+#sidebar .sidebar-logo-container,
+nav#sidebar .sidebar-logo-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 auto 0.5rem auto !important;
+    width: 100% !important;
+}
+
+.sidebar-profile-logo,
+#sidebar .sidebar-profile-logo,
+nav#sidebar .sidebar-profile-logo {
+    width: 64px !important;
+    height: 64px !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    display: block !important;
+    margin: 0 auto !important;
 }
 
 .uzimate-logo-icon {
@@ -77,24 +109,38 @@ nav#sidebar .sidebar-user {
     flex-shrink: 0;
 }
 
-.user-details {
-    flex: 1;
-    min-width: 0;
+.user-details,
+#sidebar .user-details,
+nav#sidebar .user-details {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    width: 100% !important;
+    margin: 0 auto !important;
 }
 
-.user-role {
-    color: var(--uzimate-text-white);
-    font-weight: 600;
-    font-size: 14px;
-    margin-bottom: 4px;
+.user-role,
+#sidebar .user-role,
+nav#sidebar .user-role {
+    color: var(--uzimate-text-white) !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    margin-bottom: 4px !important;
+    text-align: center !important;
+    width: 100% !important;
 }
 
-.user-email {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 12px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.user-email,
+#sidebar .user-email,
+nav#sidebar .user-email {
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-size: 12px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+    width: 100% !important;
 }
 
 /* Sidebar Navigation - Override modern.css white background */

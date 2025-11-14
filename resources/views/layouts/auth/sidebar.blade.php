@@ -2,10 +2,20 @@
     <div class="sidebar-content">
         <div class="sidebar-user">
             <div class="sidebar-user-info">
-                <div class="uzimate-logo-icon">U</div>
+                @php
+                    $user = auth()->user();
+                    $profileImage = $user->profile();
+                    $hasProfileImage = !empty($profileImage) && trim($profileImage) !== '';
+                @endphp
+                @if($hasProfileImage)
+                    <div class="sidebar-logo-container">
+                        <img src="{{ $profileImage }}" alt="{{ $user->first_name ?? 'User' }}" 
+                             class="sidebar-profile-logo" />
+                    </div>
+                @endif
                 <div class="user-details">
-                    <div class="user-role">{{ auth()->user()->roles->first()->title ?? 'Super Admin' }}</div>
-                    <div class="user-email">{{ auth()->user()->email }}</div>
+                    <div class="user-role">{{ $user->roles->first()->title ?? 'Super Admin' }}</div>
+                    <div class="user-email">{{ $user->email }}</div>
                 </div>
             </div>
         </div>
