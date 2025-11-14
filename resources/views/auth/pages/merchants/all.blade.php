@@ -31,7 +31,10 @@
                                     @if($merchant->logo())
                                         <img src="{{ $merchant->logo() }}" alt="{{ $merchant->name }}" class="rounded-circle" width="40" height="40" style="object-fit: cover;" />
                                     @else
-                                        <img src="{{ fileUrl() }}" alt="Default Logo" class="rounded-circle" width="40" height="40" style="object-fit: cover;" />
+                                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center text-white fw-bold" 
+                                             style="width: 40px; height: 40px; background-color: #4A148D; font-size: 16px;">
+                                            {{ strtoupper(substr($merchant->name ?? 'M', 0, 1)) }}
+                                        </div>
                                     @endif
                                 </td>
                                 <td>{{ $merchant?->name }}</td>

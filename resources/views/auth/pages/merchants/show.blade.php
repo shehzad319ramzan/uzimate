@@ -11,9 +11,12 @@
                 <div class="row mb-3">
                     <div class="col-md-12 text-center">
                         @if($data->logo())
-                            <img src="{{ $data->logo() }}" alt="Merchant Logo" class="rounded-circle" width="128" height="128" />
+                            <img src="{{ $data->logo() }}" alt="Merchant Logo" class="rounded-circle" width="128" height="128" style="object-fit: cover;" />
                         @else
-                            <img src="{{ fileUrl() }}" alt="Default Logo" class="rounded-circle" width="128" height="128" />
+                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center text-white fw-bold mx-auto" 
+                                 style="width: 128px; height: 128px; background-color: #4A148D; font-size: 48px;">
+                                {{ strtoupper(substr($data->name ?? 'M', 0, 1)) }}
+                            </div>
                         @endif
                     </div>
                 </div>

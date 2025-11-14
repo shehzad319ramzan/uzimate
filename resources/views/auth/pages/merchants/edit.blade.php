@@ -15,7 +15,7 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label mb-2 d-block" style="font-weight: 500;">Merchant Logo</label>
-                    <x-auth.upload-file image="{{ $data->logo() }}" />
+                    <x-auth.upload-file image="{{ $data->logo() }}" name="{{ $data->name }}" />
                 </div>
                 <div class="col-md-6">
                     <x-auth.input-field type="number" name="max_sites" id="max_sites" required="true"
