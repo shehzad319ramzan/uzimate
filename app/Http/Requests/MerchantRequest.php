@@ -21,8 +21,14 @@ class MerchantRequest extends FormRequest
      */
     public function rules(): array
     {
+        // dd(request()->all());
         return [
-            //
+            'merchant_name' => ['required', 'string', 'max:255'],
+            'max_sites' => ['required', 'integer', 'min:1'],
+            'spin_after_days' => ['nullable', 'integer', 'min:0'],
+            'scan_after_hours' => ['nullable', 'integer', 'min:0'],
+            'use_other_merchant_points' => ['nullable', 'boolean'],
+            'file' => ['nullable', 'image'],
         ];
     }
 }

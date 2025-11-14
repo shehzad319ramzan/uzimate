@@ -17,7 +17,7 @@ class MerchantController extends BaseController
      */
     public function __construct(MerchantRepository $repo)
     {
-        $this->setRepo($repo, '{{directory_name}}', 'merchants');
+        $this->setRepo($repo, 'auth/pages/merchants', 'merchants');
     }
 
     /**
@@ -29,10 +29,10 @@ class MerchantController extends BaseController
     public function store(MerchantRequest $request)
     {
         try {
-            $this->_repo->store(MerchantDto::fromRequest($request->validated()));
+            $this->_repo->store(MerchantDto::fromRequest($request));
             return redirect()->route($this->_route . '.index')->with('success', 'Successfully created.');
         } catch (\Throwable $th) {
-            return redirect()->route($this->_route . '.index')->with('error', 'Something went wrong..');
+            return redirect()->back()->withInput()->with('error', $th->getMessage());
         }
     }
 
@@ -45,7 +45,7 @@ class MerchantController extends BaseController
     public function update(MerchantRequest $request, $id)
     {
         try {
-            $this->_repo->update($id, MerchantDto::fromRequest($request->validated()));
+            $this->_repo->update($id, MerchantDto::fromRequest($request));
             return redirect()->route($this->_route . '.index')->with('success', 'Updated succesfully');
         } catch (\Throwable $th) {
             if ($th instanceof NotFoundHttpException) {

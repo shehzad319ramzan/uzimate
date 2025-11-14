@@ -17,8 +17,12 @@ return new class extends Migration
             $table->UUID('id')->primary();
 
             $table->string('name');
+            $table->integer('max_sites')->default(1);
+            $table->integer('spin_after_days')->default(1);
+            $table->integer('scan_after_hours')->default(6);
+            $table->boolean('use_other_merchant_points')->default(false);
             $table->string('status')->default(1);
-            
+
             $table->timestamps();
         });
     }

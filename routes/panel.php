@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
@@ -43,6 +44,18 @@ Route::group(
 
             Route::post('assign/permission', 'assign_permission')->name('assign_permission')->middleware('can:assign_permission');
         });
+        Route::prefix('merchants')->as('merchants.')->controller(MerchantController::class)->group(function () {
+            Route::get('create', 'create')->name('create');
+            Route::get('', 'index')->name('index');
+            Route::post('store', 'store')->name('store');
+            Route::put('update/{merchant}', 'update')->name('update');
+            Route::delete('delete/{merchant}', 'destroy')->name('destroy');
+            Route::get('detail/{merchant}', 'show')->name('show');
+            Route::get('edit/{merchant}', 'edit')->name('edit');
+
+;
+        });
+
 
         Route::prefix('s')->as('settings.')->middleware('can:site_setting')->controller(SettingController::class)->group(function () {
 
