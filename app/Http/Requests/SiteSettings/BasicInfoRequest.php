@@ -21,11 +21,12 @@ class BasicInfoRequest extends FormRequest
      */
     public function rules(): array
     {
+        // dd($this->all());
         return [
             'site_name' => ['required', 'max:200', 'string'],
             'site_url' => ['required', 'url', 'max:200', 'string'],
             'site_email' => ['required', 'max:200', 'string'],
-            'file' => ['nullable', 'image', 'mimes:jpeg,jpg,png,svg', 'max:2048'],
+            'file' => ['nullable', 'image'],
         ];
     }
 }

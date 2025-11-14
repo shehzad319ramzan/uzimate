@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Artisan;
 
 class SettingRepository extends BaseRepository
 {
+    protected $_imgPath = 'settings/';
+
     /**
      * Create a new service instance.
      *

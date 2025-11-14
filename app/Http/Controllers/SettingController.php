@@ -62,6 +62,7 @@ class SettingController extends Controller
      */
     public function basic_info(BasicInfoRequest $request)
     {
+        // dd($request->all());
         try {
             $this->_repo->basic_info(BasicInfoDto::fromRequest($request->validated()));
             return redirect()->back()->with('success', 'Updated succesfully');
