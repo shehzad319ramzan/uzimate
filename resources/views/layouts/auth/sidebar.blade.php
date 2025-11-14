@@ -201,8 +201,7 @@
         {{-- Footer Logo --}}
         <div class="sidebar-footer">
             <div class="uzimate-footer-logo">
-                <span class="uzimate-logo-icon-small">U</span>
-                <span class="uzimate-text">Uzimate</span>
+                <img src="{{ asset('dashboard/images/logo-text-on-dark.svg') }}" alt="Uzimate" class="uzimate-footer-logo-img" />
             </div>
         </div>
     </div>

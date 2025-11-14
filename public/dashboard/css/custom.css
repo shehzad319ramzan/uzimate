@@ -349,8 +349,15 @@ nav#sidebar .sidebar-dropdown a.sidebar-link span {
 .uzimate-footer-logo {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
     justify-content: center;
+    width: 100%;
+}
+
+.uzimate-footer-logo-img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
 }
 
 .uzimate-logo-icon-small {
