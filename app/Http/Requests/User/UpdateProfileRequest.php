@@ -34,7 +34,7 @@ class UpdateProfileRequest extends FormRequest
                 }
             }],
             'about' => ['required', 'string', 'max:250'],
-            'file' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
+            'file' => ['nullable', 'image'],
         ];
     }
 }
