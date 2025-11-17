@@ -104,7 +104,7 @@ class SiteDto
         
         $data['use_merchant_logo'] = $this->use_merchant_logo ?? false;
         
-        if ($this->file !== null) {
+        if (!$this->use_merchant_logo && $this->file !== null) {
             $data['image'] = $this->file;
         }
 

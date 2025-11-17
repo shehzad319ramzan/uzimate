@@ -28,8 +28,13 @@
 
                 <!-- Logo Section -->
                 <div class="col-md-6 mb-3">
-                    <label class="form-label mb-2 d-block" style="font-weight: 500;">Merchant Logo</label>
-                    <x-auth.upload-file image="{{ $data->logo() ?? '' }}" name="{{ $data->name ?? '' }}" />
+                    <label class="form-label mb-2 d-block" style="font-weight: 500;">Site Logo</label>
+                    <div id="siteLogoUploadWrapper">
+                        <x-auth.upload-file image="{{ !$data->use_merchant_logo ? $data->logo() : '' }}" name="{{ $data->name ?? '' }}" />
+                    </div>
+                    <div id="merchantLogoNotice" class="alert alert-info mt-3 d-none">
+                        Merchant logo will be used automatically for this site. Logo upload is disabled.
+                    </div>
                 </div>
 
                 <div class="col-md-12 mb-3">
@@ -132,3 +137,31 @@
         </x-auth.form>
     </x-auth.card>
 </x-layouts.auth>
+
+{{-- @push('auth_scripts') --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const useMerchantLogoCheckbox = document.getElementById('use_merchant_logo');
+        const uploadWrapper = document.getElementById('siteLogoUploadWrapper');
+        const merchantNotice = document.getElementById('merchantLogoNotice');
+
+        function toggleLogoSection() {
+            if (!useMerchantLogoCheckbox) {
+                return;
+            }
+
+            if (useMerchantLogoCheckbox.checked) {
+                uploadWrapper?.classList.add('d-none');
+                merchantNotice?.classList.remove('d-none');
+            } else {
+                uploadWrapper?.classList.remove('d-none');
+                merchantNotice?.classList.add('d-none');
+            }
+        }
+
+        toggleLogoSection();
+
+        useMerchantLogoCheckbox?.addEventListener('change', toggleLogoSection);
+    });
+</script>
+{{-- @endpush --}}

@@ -27,8 +27,11 @@
                             <tr>
                                 <td>{{ $key + 1 }}</td>
                                 <td>
-                                    @if($site->logo())
-                                        <img src="{{ $site->logo() }}" alt="{{ $site->name }}" class="rounded-circle" width="40" height="40" style="object-fit: cover;" />
+                                    @php
+                                        $siteLogo = $site->displayLogo();
+                                    @endphp
+                                    @if(!empty($siteLogo))
+                                        <img src="{{ $siteLogo }}" alt="{{ $site->name }}" class="rounded-circle" width="40" height="40" style="object-fit: cover;" />
                                     @else
                                         <div class="rounded-circle d-inline-flex align-items-center justify-content-center text-white fw-bold" 
                                              style="width: 40px; height: 40px; background-color: #4A148D; font-size: 16px;">

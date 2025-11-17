@@ -49,4 +49,22 @@ class Site extends Model
     {
         return $this->fileUrl('logo');
     }
+
+    /**
+     * Get the logo that should be shown for the site.
+     * If merchant logo usage is enabled and the merchant has a logo,
+     * prefer that. Otherwise, fall back to the site's custom logo.
+     */
+    public function displayLogo(): string
+    {
+        if (($this->use_merchant_logo ?? false) && $this->merchant) {
+            $merchantLogo = $this->merchant->logo();
+
+            if (!empty($merchantLogo)) {
+                return $merchantLogo;
+            }
+        }
+
+        return $this->logo();
+    }
 }

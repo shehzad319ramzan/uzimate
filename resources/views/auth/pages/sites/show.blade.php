@@ -12,8 +12,11 @@
 
                 <div class="row mb-3">
                     <div class="col-md-12 text-center">
-                        @if($data->logo())
-                            <img src="{{ $data->logo() }}" alt="Site Logo" class="rounded-circle" width="128" height="128" style="object-fit: cover;" />
+                        @php
+                            $siteLogo = $data->displayLogo();
+                        @endphp
+                        @if(!empty($siteLogo))
+                            <img src="{{ $siteLogo }}" alt="Site Logo" class="rounded-circle" width="128" height="128" style="object-fit: cover;" />
                         @else
                             <div class="rounded-circle d-inline-flex align-items-center justify-content-center text-white fw-bold mx-auto" 
                                  style="width: 128px; height: 128px; background-color: #4A148D; font-size: 48px;">

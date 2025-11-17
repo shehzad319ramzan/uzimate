@@ -9,6 +9,7 @@ use App\Models\Site;
 class SiteRepository extends BaseRepository
 {
     protected $_imgPath = 'sites/logos';
+    protected $_logoType = Constants::LOGOTYPE;
 
     /**
      * Create a new service instance.
@@ -36,7 +37,7 @@ class SiteRepository extends BaseRepository
 
         if (isset($fileData)) {
             $logoUpload = $this->uploadFile($fileData, $this->_imgPath);
-            $logoUpload['type'] = Constants::LOGOTYPE;
+            $logoUpload['type'] = $this->_logoType;
             $dataResult->file()->create($logoUpload);
         }
 
@@ -56,20 +57,28 @@ class SiteRepository extends BaseRepository
             $fileData = $dataArray['image'];
             unset($dataArray['image']);
 
-            $existingLogo = $result->file()->where('type', Constants::LOGOTYPE)->first();
-
-            if ($existingLogo) {
-                $this->deleteFile($existingLogo->path);
-                $existingLogo->delete();
-            }
+            $this->removeExistingLogo($result);
 
             $logoUpload = $this->uploadFile($fileData, $this->_imgPath);
-            $logoUpload['type'] = Constants::LOGOTYPE;
+            $logoUpload['type'] = $this->_logoType;
             $result->file()->create($logoUpload);
+        } elseif (($dataArray['use_merchant_logo'] ?? $result->use_merchant_logo) == true) {
+            // if switching to use merchant logo, remove existing site logo if any
+            $this->removeExistingLogo($result);
         }
 
         $result->update($dataArray);
 
         return $result;
+    }
+
+    protected function removeExistingLogo(Site $model): void
+    {
+        $existingLogo = $model->file()->where('type', $this->_logoType)->first();
+
+        if ($existingLogo) {
+            $this->deleteFile($existingLogo->path);
+            $existingLogo->delete();
+        }
     }
 }
