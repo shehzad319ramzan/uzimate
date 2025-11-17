@@ -6,8 +6,8 @@ class Constants
 {
     //roles
     const SUPERADMIN = 'super_admin';
-    const BUSINESS_ADMIN = 'business_admin';
-    const MANAGER = 'manager';
+    const BUSINESS_ADMIN = 'merchant';
+    const MANAGER = 'admin';
     const CUSTOMER = 'customer';
 
     const DASHBOARD_URL = 'my-account';

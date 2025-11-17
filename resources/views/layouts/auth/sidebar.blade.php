@@ -75,8 +75,8 @@
             </li>
 
             {{-- Site Users (Advanced Mode Only) --}}
-            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'site-users.') || request()->route()->getName() == 'site-users.index' ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ Route::has('site-users.index') ? route('site-users.index') : '#' }}">
+            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'siteusers.') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ Route::has('siteusers.index') ? route('siteusers.index') : '#' }}">
                     <i class="align-middle me-2 fas fa-user-plus"></i>
                     <span class="align-middle">Site Users</span>
                 </a>

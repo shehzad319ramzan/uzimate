@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('provider_id')->nullable();
             $table->string('provider')->nullable();
             $table->string('email')->unique();
+            $table->string('phone')->nullable();
 
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->default('test123');

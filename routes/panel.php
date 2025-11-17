@@ -6,6 +6,7 @@ use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SiteController;
+use App\Http\Controllers\SiteUserController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -55,6 +56,15 @@ Route::group(
             Route::get('edit/{merchant}', 'edit')->name('edit');
         });
         Route::prefix('sites')->as('sites.')->controller(SiteController::class)->group(function () {
+            Route::get('create', 'create')->name('create');
+            Route::get('', 'index')->name('index');
+            Route::post('store', 'store')->name('store');
+            Route::put('update/{site}', 'update')->name('update');
+            Route::delete('delete/{site}', 'destroy')->name('destroy');
+            Route::get('detail/{site}', 'show')->name('show');
+            Route::get('edit/{site}', 'edit')->name('edit');
+        });
+        Route::prefix('siteusers')->as('siteusers.')->controller(SiteUserController::class)->group(function () {
             Route::get('create', 'create')->name('create');
             Route::get('', 'index')->name('index');
             Route::post('store', 'store')->name('store');

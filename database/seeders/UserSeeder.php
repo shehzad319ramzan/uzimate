@@ -43,7 +43,7 @@ class UserSeeder extends Seeder
 
         // Manager/Staff User
         $user3 = new User();
-        $user3->first_name = 'Manager';
+        $user3->first_name = 'admin';
         $user3->last_name = 'Staff';
         $user3->about = "This is a manager/staff member who handles day-to-day operations.";
         $user3->email = 'manager@gmail.com';

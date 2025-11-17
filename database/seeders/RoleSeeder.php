@@ -24,22 +24,22 @@ class RoleSeeder extends Seeder
         $superAdmin->availablePermissions()->sync($permissions);
         $superAdmin->syncPermissions($permissions);
 
-        // Business Admin / Owner — can set up loyalty program, define rewards, 
+        // Business Admin / Owner — can set up loyalty program, define rewards,
         // manage customers and view reports
         $businessAdmin = Role::create([
-            'name' => 'business_admin',
-            'title' => 'Business Admin',
+            'name' => 'merchant',
+            'title' => 'Merchant',
             'color' => '#4ECDC4'
         ]);
         // Business Admin gets most permissions except super admin level settings
         $businessAdmin->availablePermissions()->sync($permissions);
         $businessAdmin->syncPermissions($permissions);
 
-        // Manager / Staff — manages day-to-day tasks like checking customers in, 
+        // Manager / Staff — manages day-to-day tasks like checking customers in,
         // scanning codes, or issuing rewards at point of sale
         $manager = Role::create([
-            'name' => 'manager',
-            'title' => 'Manager / Staff',
+            'name' => 'admin',
+            'title' => 'Admin',
             'color' => '#95E1D3'
         ]);
         // Manager gets limited permissions for day-to-day operations
@@ -51,7 +51,7 @@ class RoleSeeder extends Seeder
         $manager->availablePermissions()->sync($managerPermissions);
         $manager->syncPermissions($managerPermissions);
 
-        // Customer (Member) — end-user who signs up for loyalty program, 
+        // Customer (Member) — end-user who signs up for loyalty program,
         // collects points, and redeems rewards
         $customer = Role::create([
             'name' => 'customer',
