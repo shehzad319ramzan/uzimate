@@ -67,8 +67,8 @@
             </li>
 
             {{-- Sites (Advanced Mode Only) --}}
-            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'sites.') || request()->route()->getName() == 'sites.index' ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ Route::has('sites.index') ? route('sites.index') : '#' }}">
+            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'sites.') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('sites.index') }}">
                     <i class="align-middle me-2 fas fa-th-large"></i>
                     <span class="align-middle">Sites</span>
                 </a>

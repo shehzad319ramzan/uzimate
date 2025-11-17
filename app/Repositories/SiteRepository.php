@@ -2,11 +2,14 @@
 
 namespace App\Repositories;
 
+use App\Constants\Constants;
 use App\Dto\SiteDto;
 use App\Models\Site;
 
 class SiteRepository extends BaseRepository
 {
+    protected $_imgPath = 'sites/logos';
+
     /**
      * Create a new service instance.
      *
@@ -23,18 +26,21 @@ class SiteRepository extends BaseRepository
     public function store(SiteDto $data)
     {
         $dataArray = $data->toArray();
-        $image = $dataArray['image'];
-
-        unset($dataArray['image']);
+        
+        if (isset($dataArray['image'])) {
+            $fileData = $dataArray['image'];
+            unset($dataArray['image']);
+        }
 
         $dataResult = $this->add($this->_model, $dataArray);
 
-        if ($image != null) {
-            $imageUploaded = $this->uploadFile($image, $this->_imgPath);
-            $dataResult->images()->create($imageUploaded);
+        if (isset($fileData)) {
+            $logoUpload = $this->uploadFile($fileData, $this->_imgPath);
+            $logoUpload['type'] = Constants::LOGOTYPE;
+            $dataResult->file()->create($logoUpload);
         }
 
-        return true;
+        return $dataResult;
     }
 
     /**
@@ -45,6 +51,25 @@ class SiteRepository extends BaseRepository
         $result = $this->checkRecord($id);
 
         $dataArray = $data->toArray();
-        return $result->update($dataArray);
+
+        if (isset($dataArray['image'])) {
+            $fileData = $dataArray['image'];
+            unset($dataArray['image']);
+
+            $existingLogo = $result->file()->where('type', Constants::LOGOTYPE)->first();
+
+            if ($existingLogo) {
+                $this->deleteFile($existingLogo->path);
+                $existingLogo->delete();
+            }
+
+            $logoUpload = $this->uploadFile($fileData, $this->_imgPath);
+            $logoUpload['type'] = Constants::LOGOTYPE;
+            $result->file()->create($logoUpload);
+        }
+
+        $result->update($dataArray);
+
+        return $result;
     }
 }

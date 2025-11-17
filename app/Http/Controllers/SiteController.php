@@ -7,6 +7,7 @@ use App\Repositories\SiteRepository;
 use App\Http\Requests\SiteRequest;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class SiteController extends BaseController
 {
@@ -17,7 +18,7 @@ class SiteController extends BaseController
      */
     public function __construct(SiteRepository $repo)
     {
-        $this->setRepo($repo, '{{directory_name}}', 'sites');
+        $this->setRepo($repo, 'auth/pages/sites', 'sites');
     }
 
     /**
@@ -29,10 +30,10 @@ class SiteController extends BaseController
     public function store(SiteRequest $request)
     {
         try {
-            $this->_repo->store(SiteDto::fromRequest($request->validated()));
+            $this->_repo->store(SiteDto::fromRequest($request));
             return redirect()->route($this->_route . '.index')->with('success', 'Successfully created.');
         } catch (\Throwable $th) {
-            return redirect()->route($this->_route . '.index')->with('error', 'Something went wrong..');
+            return redirect()->back()->withInput()->with('error', $th->getMessage());
         }
     }
 
@@ -45,7 +46,7 @@ class SiteController extends BaseController
     public function update(SiteRequest $request, $id)
     {
         try {
-            $this->_repo->update($id, SiteDto::fromRequest($request->validated()));
+            $this->_repo->update($id, SiteDto::fromRequest($request));
             return redirect()->route($this->_route . '.index')->with('success', 'Updated succesfully');
         } catch (\Throwable $th) {
             if ($th instanceof NotFoundHttpException) {
