@@ -20,7 +20,7 @@ class RoleDto
     {
         $this->title = $request['title'];
         $this->color = $request['color'];
-        $this->permissions = $request['permissions'];
+        $this->permissions = $request['permissions'] ?? [];
         $this->guard_name = 'web';
     }
 

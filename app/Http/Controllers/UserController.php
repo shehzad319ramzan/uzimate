@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Dto\UserDto;
 use App\Http\Requests\User\UserRequest;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Permission;
 use App\Http\Requests\User\UpdateProfileRequest;
 use App\Http\Requests\User\UserUpdateRequest;
 use App\Interface\UserInterface;
@@ -109,5 +110,33 @@ class UserController extends BaseController
     {
         $data['all'] = $this->_repo->getStaff($user);
         return view($this->_directory . '.all', compact('data'));
+    }
+
+    public function editPermissions($id)
+    {
+        $user = $this->_repo->show($id);
+
+        if ($user == null) {
+            abort(404);
+        }
+
+        $permissions = Permission::orderBy('category')->orderBy('title')->get()->groupBy('category');
+        $assigned = $user->permissions->pluck('name')->toArray();
+
+        return view('auth/pages/users/permissions', compact('user', 'permissions', 'assigned'));
+    }
+
+    public function updatePermissions(Request $request, $id)
+    {
+        $user = $this->_repo->show($id);
+
+        if ($user == null) {
+            abort(404);
+        }
+
+        $permissions = $request->input('permissions', []);
+        $user->syncPermissions($permissions);
+
+        return redirect()->back()->with('success', 'Permissions updated successfully.');
     }
 }

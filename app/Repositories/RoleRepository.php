@@ -54,12 +54,8 @@ class RoleRepository extends BaseRepository
         $result = $this->checkRecord($id);
 
         $dataArr = $data->toArray();
-        $permissions = array_keys(array_filter($dataArr['permissions'] ?? []));
 
-        unset($dataArr['permissions']);
-
-        $result->update($data->toArray());
-        $result->availablePermissions()->sync($permissions);
+        $result->update($dataArr);
 
         return true;
     }

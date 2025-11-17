@@ -3,6 +3,8 @@
 namespace App\Http\Requests\RolePermission;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 class RoleUpdateRequest extends FormRequest
 {
@@ -21,11 +23,23 @@ class RoleUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
+        $title = $this->input('title');
+        $slug = $title ? Str::slug($title) : null;
+        $role = $this->route('role');
+        $roleId = is_object($role) ? $role->id : $role;
+
         return [
-            'title' => ['required', 'string', 'max:255'],
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('roles', 'name')
+                    ->ignore($roleId)
+                    ->where(function ($query) use ($slug) {
+                        return $query->where('name', $slug);
+                    }),
+            ],
             'color' => ['required', 'string', 'max:255'],
-            'permissions' => ['required', 'array', 'min:1'],
-            'permissions.*' => ['integer', 'exists:permissions,id'],
         ];
     }
 }

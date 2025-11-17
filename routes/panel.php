@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SiteUserController;
@@ -33,6 +34,8 @@ Route::group(
             Route::put('update/{user}', 'update')->name('update')->middleware('can:edit_user');
             Route::delete('delete/{user}', 'destroy')->name('destroy')->middleware('can:delete_user');
             Route::get('{user}/list', 'getStaff')->name('index')->middleware(['can:all_user', 'validateRole']);
+            Route::get('permissions/{user}', 'editPermissions')->name('permissions.edit')->middleware('can:assign_permission');
+            Route::post('permissions/{user}', 'updatePermissions')->name('permissions.update')->middleware('can:assign_permission');
         });
 
         Route::prefix('roles')->as('roles.')->controller(RoleController::class)->group(function () {
@@ -45,6 +48,14 @@ Route::group(
             Route::get('edit/{role}', 'edit')->name('edit')->middleware('can:edit_role');
 
             Route::post('assign/permission', 'assign_permission')->name('assign_permission')->middleware('can:assign_permission');
+        });
+        Route::prefix('permissions')->as('permissions.')->controller(PermissionController::class)->group(function () {
+            Route::get('', 'index')->name('index')->middleware('can:view_permission');
+            Route::get('create', 'create')->name('create')->middleware('can:add_permission');
+            Route::post('store', 'store')->name('store')->middleware('can:add_permission');
+            Route::get('edit/{permission}', 'edit')->name('edit')->middleware('can:edit_permission');
+            Route::put('update/{permission}', 'update')->name('update')->middleware('can:edit_permission');
+            Route::delete('delete/{permission}', 'destroy')->name('destroy')->middleware('can:delete_permission');
         });
         Route::prefix('merchants')->as('merchants.')->controller(MerchantController::class)->group(function () {
             Route::get('create', 'create')->name('create');

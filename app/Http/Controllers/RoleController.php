@@ -20,24 +20,19 @@ class RoleController extends BaseController
 
     public function create()
     {
-        $rawPermissions = app()->make('App\Repositories\PermissionRepository')->index();
-        $groupedPermissions = $rawPermissions->groupBy('category');
-
-        return view($this->_directory . '.create', compact('groupedPermissions'));
+        return view($this->_directory . '.create');
     }
 
     public function edit($id)
     {
         try {
             $data = $this->_repo->show($id);
-            $rawPermissions = app()->make('App\Repositories\PermissionRepository')->index();
-            $groupedPermissions = $rawPermissions->groupBy('category');
 
             if ($data == null) {
                 abort(404);
             }
 
-            return view($this->_directory . '.edit', compact('data', 'groupedPermissions'));
+            return view($this->_directory . '.edit', compact('data'));
         } catch (\Throwable $th) {
             dd($th->getMessage());
             return redirect()->back()->with('error', 'Something went wrong..');
@@ -59,9 +54,10 @@ class RoleController extends BaseController
         try {
             $this->_repo->update($id, RoleUpdateDto::fromRequest($request->validated()));
 
-            return redirect()->route($this->_route . '.show', $id)->with('success', 'Updated succesfully');
+            return redirect()->route($this->_route . '.index')->with('success', 'Updated succesfully');
         } catch (\Throwable $th) {
             $message = $th->getMessage();
+            dd($message);
             if ($th instanceof NotFoundHttpException) {
                 return redirect()->route($this->_route . '.index')->with('error', $message);
             } else {

@@ -64,6 +64,12 @@
                                         </a>
                                         @endif
 
+                                        @can('assign_permission')
+                                        <a class="dropdown-item" href="{{ route('users.permissions.edit', $user?->id) }}">
+                                            <i class="fas fa-user-shield me-2 text-info"></i> Assign Permissions
+                                        </a>
+                                        @endcan
+
                                         @if (auth()->user()->can('delete_user'))
                                         <form action="{{ route('users.destroy', $user?->id) }}" method="POST"
                                             onsubmit="return confirm('Are you sure you want to delete this user?');">

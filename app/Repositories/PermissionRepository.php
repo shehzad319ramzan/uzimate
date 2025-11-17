@@ -16,8 +16,26 @@ class PermissionRepository extends BaseRepository
         $this->setModel($model);
     }
 
-    public function index()
+    public function index($perPage = 20)
     {
-        return $this->all();
+        return $this->_model->orderBy('category')->orderBy('title')->paginate($perPage);
+    }
+
+    public function store(array $data)
+    {
+        return $this->add($this->_model, $data);
+    }
+
+    public function update($id, array $data)
+    {
+        $permission = $this->checkRecord($id);
+
+        if ($permission == null) {
+            return null;
+        }
+
+        $permission->update($data);
+
+        return $permission;
     }
 }

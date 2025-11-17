@@ -9,7 +9,7 @@
                 @endphp
                 @if($hasProfileImage)
                     <div class="sidebar-logo-container">
-                        <img src="{{ $profileImage }}" alt="{{ $user->first_name ?? 'User' }}" 
+                        <img src="{{ $profileImage }}" alt="{{ $user->first_name ?? 'User' }}"
                              class="sidebar-profile-logo" />
                     </div>
                 @endif
@@ -58,6 +58,7 @@
             </li>
             @endcan
 
+            @can('view_merchant')
             {{-- Merchants --}}
             <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'merchants.') || request()->route()->getName() == 'merchants.index' ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ Route::has('merchants.index') ? route('merchants.index') : '#' }}">
@@ -65,7 +66,9 @@
                     <span class="align-middle">Merchants</span>
                 </a>
             </li>
+            @endcan
 
+            @can('view_site')
             {{-- Sites (Advanced Mode Only) --}}
             <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'sites.') ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ route('sites.index') }}">
@@ -73,7 +76,9 @@
                     <span class="align-middle">Sites</span>
                 </a>
             </li>
+            @endcan
 
+            @can('view_site_user')
             {{-- Site Users (Advanced Mode Only) --}}
             <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'siteusers.') ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ Route::has('siteusers.index') ? route('siteusers.index') : '#' }}">
@@ -81,7 +86,9 @@
                     <span class="align-middle">Site Users</span>
                 </a>
             </li>
+            @endcan
 
+            @can('view_offer')
             {{-- Offers (Advanced Mode Only) --}}
             <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'offers.') || request()->route()->getName() == 'offers.index' ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ Route::has('offers.index') ? route('offers.index') : '#' }}">
@@ -89,7 +96,9 @@
                     <span class="align-middle">Offers</span>
                 </a>
             </li>
+            @endcan
 
+            @can('view_customer_scan')
             {{-- Customer Scans (Advanced Mode Only) --}}
             <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'customer-scans.') || request()->route()->getName() == 'customer-scans.index' ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ Route::has('customer-scans.index') ? route('customer-scans.index') : '#' }}">
@@ -97,7 +106,9 @@
                     <span class="align-middle">Customer Scans</span>
                 </a>
             </li>
+            @endcan
 
+            @can('view_offer_scan')
             {{-- Offer Scans (Advanced Mode Only) --}}
             <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'offer-scans.') || request()->route()->getName() == 'offer-scans.index' ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ Route::has('offer-scans.index') ? route('offer-scans.index') : '#' }}">
@@ -105,7 +116,9 @@
                     <span class="align-middle">Offer Scans</span>
                 </a>
             </li>
+            @endcan
 
+            @can('view_point_award')
             {{-- Point Awards (Advanced Mode Only) --}}
             <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'point-awards.') || request()->route()->getName() == 'point-awards.index' ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ Route::has('point-awards.index') ? route('point-awards.index') : '#' }}">
@@ -113,7 +126,9 @@
                     <span class="align-middle">Point Awards</span>
                 </a>
             </li>
+            @endcan
 
+            @can('view_spin_history')
             {{-- Spin History (Advanced Mode Only) --}}
             <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'spin-history.') || request()->route()->getName() == 'spin-history.index' ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ Route::has('spin-history.index') ? route('spin-history.index') : '#' }}">
@@ -121,7 +136,9 @@
                     <span class="align-middle">Spin History</span>
                 </a>
             </li>
+            @endcan
 
+            @can('view_customer_log')
             {{-- Customer Logs --}}
             <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'customer-logs.') || request()->route()->getName() == 'customer-logs.index' ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ Route::has('customer-logs.index') ? route('customer-logs.index') : '#' }}">
@@ -129,7 +146,9 @@
                     <span class="align-middle">Customer Logs</span>
                 </a>
             </li>
+            @endcan
 
+            @can('view_inbox')
             {{-- Inbox --}}
             <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'inbox.') || request()->route()->getName() == 'inbox.index' ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ Route::has('inbox.index') ? route('inbox.index') : '#' }}">
@@ -137,7 +156,9 @@
                     <span class="align-middle">Inbox</span>
                 </a>
             </li>
+            @endcan
 
+            @can('view_feedback')
             {{-- Feedbacks --}}
             <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'feedbacks.') || request()->route()->getName() == 'feedbacks.index' ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ Route::has('feedbacks.index') ? route('feedbacks.index') : '#' }}">
@@ -145,6 +166,7 @@
                     <span class="align-middle">Feedbacks</span>
                 </a>
             </li>
+            @endcan
 
             {{-- SYSTEM SETTINGS (Dropdown) --}}
             @canany(['all_role', 'site_setting'])
@@ -161,7 +183,16 @@
                     <li
                         class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'roles.') ? 'active' : '' }}">
                         <a class="sidebar-link" href="{{ route('roles.index') }}">
-                            <i class="fas fa-angle-double-right me-2"></i> {{ __('language.role_permission') }}
+                            <i class="fas fa-angle-double-right me-2"></i>  Roles
+                        </a>
+                    </li>
+                    @endcan
+
+                    @can('view_permission')
+                    <li
+                        class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'permissions.') ? 'active' : '' }}">
+                        <a class="sidebar-link" href="{{ route('permissions.index') }}">
+                            <i class="fas fa-angle-double-right me-2"></i> Permissions
                         </a>
                     </li>
                     @endcan

@@ -25,25 +25,19 @@ class RoleRequest extends FormRequest
      */
     public function rules()
     {
-        $title = request()->input('title');
+        $title = $this->input('title');
         $slug = $title ? Str::slug($title) : null;
-
-        $roleId = $this->route('role')?->id;
 
         return [
             'title' => [
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('roles', 'name')
-                    ->ignore($roleId)
-                    ->where(function ($query) use ($slug) {
-                        return $query->where('name', $slug);
-                    }),
+                Rule::unique('roles', 'name')->where(function ($query) use ($slug) {
+                    return $query->where('name', $slug);
+                }),
             ],
             'color' => ['required', 'string', 'max:255'],
-            'permissions' => ['required', 'array', 'min:1'],
-            'permissions.*' => ['integer', 'exists:permissions,id'],
         ];
     }
 }

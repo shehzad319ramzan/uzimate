@@ -14,18 +14,64 @@ class PermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        Permission::create(['name' => 'all_user', 'title' => 'View all users', 'category' => 'Users']);
-        Permission::create(['name' => 'add_user', 'title' => 'Add new user', 'category' => 'Users']);
-        Permission::create(['name' => 'view_user', 'title' => 'View user details', 'category' => 'Users']);
-        Permission::create(['name' => 'edit_user', 'title' => 'Edit user', 'category' => 'Users']);
-        Permission::create(['name' => 'delete_user', 'title' => 'Delete user', 'category' => 'Users']);
+        $basicPermissions = [
+            'Users' => [
+                ['name' => 'all_user', 'title' => 'View all users'],
+                ['name' => 'add_user', 'title' => 'Add new user'],
+                ['name' => 'view_user', 'title' => 'View user details'],
+                ['name' => 'edit_user', 'title' => 'Edit user'],
+                ['name' => 'delete_user', 'title' => 'Delete user'],
+            ],
+            'Roles' => [
+                ['name' => 'all_role', 'title' => 'All Roles'],
+                ['name' => 'add_role', 'title' => 'Add Role'],
+                ['name' => 'edit_role', 'title' => 'Edit Role'],
+                ['name' => 'delete_role', 'title' => 'Delete Role'],
+                ['name' => 'assign_permission', 'title' => 'Assign Permission'],
+            ],
+            'Website Settings' => [
+                ['name' => 'website_setting', 'title' => 'Website Setting'],
+            ],
+        ];
 
-        Permission::create(['name' => 'all_role', 'title' => 'All Roles', 'category' => 'Roles']);
-        Permission::create(['name' => 'add_role', 'title' => 'Add Role', 'category' => 'Roles']);
-        Permission::create(['name' => 'edit_role', 'title' => 'Edit Role', 'category' => 'Roles']);
-        Permission::create(['name' => 'delete_role', 'title' => 'Delete Role', 'category' => 'Roles']);
-        Permission::create(['name' => 'assign_permission', 'title' => 'Assign Permission', 'category' => 'Roles']);
+        foreach ($basicPermissions as $category => $permissions) {
+            foreach ($permissions as $permission) {
+                Permission::firstOrCreate(
+                    ['name' => $permission['name']],
+                    ['title' => $permission['title'], 'category' => $category]
+                );
+            }
+        }
 
-        Permission::create(['name' => 'website_setting', 'title' => 'Website Setting', 'category' => 'Website Settings']);
+        $crudModules = [
+            'Merchants' => 'merchant',
+            'Sites' => 'site',
+            'Site Users' => 'site_user',
+            'Offers' => 'offer',
+            'Customer Scans' => 'customer_scan',
+            'Offer Scans' => 'offer_scan',
+            'Point Awards' => 'point_award',
+            'Spin History' => 'spin_history',
+            'Customer Logs' => 'customer_log',
+            'Inbox' => 'inbox',
+            'Feedbacks' => 'feedback',
+            'Permissions' => 'permission',
+        ];
+
+        foreach ($crudModules as $category => $prefix) {
+            $crudPermissions = [
+                ['name' => "view_{$prefix}", 'title' => "View {$category}"],
+                ['name' => "add_{$prefix}", 'title' => "Add {$category}"],
+                ['name' => "edit_{$prefix}", 'title' => "Edit {$category}"],
+                ['name' => "delete_{$prefix}", 'title' => "Delete {$category}"],
+            ];
+
+            foreach ($crudPermissions as $permission) {
+                Permission::firstOrCreate(
+                    ['name' => $permission['name']],
+                    ['title' => $permission['title'], 'category' => $category]
+                );
+            }
+        }
     }
 }

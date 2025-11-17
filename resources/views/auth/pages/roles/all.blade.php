@@ -14,7 +14,6 @@
                         <tr>
                             <th>Sr#</th>
                             <th>Name</th>
-                            <th>Permissions</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -23,10 +22,6 @@
                             <tr>
                                 <td>{{ $key + 1 }}</td>
                                 <td>{{ $role?->title }}</td>
-                                <td>
-                                    <x-auth.href-link link-href="{{ route('roles.show', $role->id) }}"
-                                        link-value="Assign Permissions" />
-                                </td>
                                 @canany(['edit_role', 'delete_role'])
                                     <td class="text-center">
                                         <div class="d-inline-block dropdown">
