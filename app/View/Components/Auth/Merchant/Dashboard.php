@@ -8,14 +8,18 @@ use Illuminate\View\Component;
 
 class Dashboard extends Component
 {
-    public $data;
+    public $stats;
+    public $filters;
+    public $filterOptions;
 
     /**
      * Create a new component instance.
      */
-    public function __construct($data = [])
+    public function __construct($stats = [], $filters = [], $filterOptions = [])
     {
-        $this->data = $data;
+        $this->stats = $stats;
+        $this->filters = $filters;
+        $this->filterOptions = $filterOptions;
     }
 
     /**

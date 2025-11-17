@@ -404,6 +404,21 @@ nav#sidebar .sidebar-item {
     margin-bottom: 0.3rem !important;
 }
 
+/* Alerts */
+body .alert.alert-light {
+    background: var(--uzimate-purple) !important;
+    background-color: var(--uzimate-purple) !important;
+    border-color: var(--uzimate-purple-dark) !important;
+    color: var(--uzimate-text-white) !important;
+}
+
+body .alert.alert-light .alert-link,
+body .alert.alert-light a,
+body .alert.alert-light strong {
+    color: var(--uzimate-yellow) !important;
+    text-decoration: underline;
+}
+
 /* ============================================
    CRITICAL OVERRIDES - Must override modern.css completely
    ============================================ */

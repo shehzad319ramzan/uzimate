@@ -8,9 +8,11 @@ use App\Models\Site;
 use App\Models\SiteUser;
 use App\Models\User;
 use App\Models\Offer;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
 
 class HomeController extends Controller
@@ -30,54 +32,76 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
         $userRole = $user->roles->first()?->name ?? '';
 
-        $data = [];
+        [$filters, $filterOptions] = $this->prepareFilters($request, $userRole, $user);
 
-        // Super Admin Dashboard - All statistics
-        if ($userRole === Constants::SUPERADMIN) {
-            $data = $this->getSuperAdminStats();
-        }
-        // Merchant Dashboard - Merchant-specific statistics
-        elseif ($userRole === Constants::Merchant) {
-            $data = $this->getMerchantStats($user);
-        }
-        // Admin Dashboard - Operational statistics
-        elseif ($userRole === Constants::Admin) {
-            $data = $this->getAdminStats($user);
-        }
-        // Customer Dashboard - Customer-specific data
-        elseif ($userRole === Constants::CUSTOMER) {
-            $data = $this->getCustomerStats($user);
-        }
-        // Default to Super Admin if role not recognized
-        else {
-            $data = $this->getSuperAdminStats();
+        switch ($userRole) {
+            case Constants::SUPERADMIN:
+                $data = $this->getSuperAdminStats($filters);
+                break;
+            case Constants::Merchant:
+                $data = $this->getMerchantStats($user, $filters);
+                break;
+            case Constants::Admin:
+                $data = $this->getAdminStats($user, $filters);
+                break;
+            case Constants::CUSTOMER:
+                $data = $this->getCustomerStats($user, $filters);
+                break;
+            default:
+                $data = $this->getSuperAdminStats($filters);
         }
 
-        return view('auth.pages.dashboard', compact('data', 'userRole'));
+        Log::info('Dashboard view payload', $data);
+        return view('auth.pages.dashboard', compact('data', 'userRole', 'filters', 'filterOptions'));
     }
 
     /**
      * Get statistics for Super Admin dashboard
      */
-    private function getSuperAdminStats(): array
+    private function getSuperAdminStats(array $filters): array
     {
-        $now = Carbon::now();
-        $startOfMonth = $now->copy()->startOfMonth();
-        $startOfYear = $now->copy()->startOfYear();
+        [$startDate, $endDate] = $this->getDateRange($filters);
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $startOfYear = Carbon::now()->startOfYear();
+        $merchantFilter = $filters['merchant_id'] ?? null;
+        $module = $filters['module'] ?? 'merchants';
 
         // Merchants statistics
-        $totalMerchants = Merchant::count();
-        $merchantsThisMonth = Merchant::where('created_at', '>=', $startOfMonth)->count();
-        $merchantsThisYear = Merchant::where('created_at', '>=', $startOfYear)->count();
-        $totalSites = Site::count();
+        $merchantQuery = $this->applyDateFilter(Merchant::query(), 'created_at', $startDate, $endDate);
+        if ($merchantFilter) {
+            $merchantQuery->where('id', $merchantFilter);
+        }
+        $totalMerchants = $merchantQuery->count();
+        $merchantsThisMonth = $this->applyDateFilter(
+            Merchant::when($merchantFilter, fn ($q) => $q->where('id', $merchantFilter)),
+            'created_at',
+            $startOfMonth,
+            Carbon::now()
+        )->count();
+        $merchantsThisYear = $this->applyDateFilter(
+            Merchant::when($merchantFilter, fn ($q) => $q->where('id', $merchantFilter)),
+            'created_at',
+            $startOfYear,
+            Carbon::now()
+        )->count();
+
+        $sitesQuery = $this->applyDateFilter(Site::query(), 'created_at', $startDate, $endDate);
+        if ($merchantFilter) {
+            $sitesQuery->where('merchant_id', $merchantFilter);
+        }
+        $totalSites = $sitesQuery->count();
 
         // Site Users statistics
-        $totalSiteUsers = SiteUser::count();
+        $siteUserQuery = $this->applyDateFilter(SiteUser::query(), 'created_at', $startDate, $endDate);
+        if ($merchantFilter) {
+            $siteUserQuery->where('merchant_id', $merchantFilter);
+        }
+        $totalSiteUsers = $siteUserQuery->count();
         $merchantRole = Role::where('name', Constants::Merchant)->first();
         $adminRole = Role::where('name', Constants::Admin)->first();
         $superAdminRole = Role::where('name', Constants::SUPERADMIN)->first();
@@ -87,13 +111,13 @@ class HomeController extends Controller
         $superAdminUsers = 0;
 
         if ($merchantRole) {
-            $merchantUsers = User::role($merchantRole->name)->count();
+            $merchantUsers = $this->applyRoleDateFilter($merchantRole->name, $startDate, $endDate);
         }
         if ($adminRole) {
-            $adminUsers = User::role($adminRole->name)->count();
+            $adminUsers = $this->applyRoleDateFilter($adminRole->name, $startDate, $endDate);
         }
         if ($superAdminRole) {
-            $superAdminUsers = User::role($superAdminRole->name)->count();
+            $superAdminUsers = $this->applyRoleDateFilter($superAdminRole->name, $startDate, $endDate);
         }
 
         // Offers statistics (if Offer model exists)
@@ -101,9 +125,19 @@ class HomeController extends Controller
         $activeOffers = 0;
         $expiredOffers = 0;
         if (class_exists(Offer::class)) {
-            $totalOffers = Offer::count();
-            $activeOffers = Offer::where('status', 'active')->orWhere('status', 1)->count();
-            $expiredOffers = Offer::where('status', 'expired')->orWhere('status', 0)->count();
+            $offerQuery = $this->applyDateFilter(Offer::query(), 'created_at', $startDate, $endDate);
+            if ($merchantFilter && Schema::hasColumn((new Offer())->getTable(), 'merchant_id')) {
+                $offerQuery->where('merchant_id', $merchantFilter);
+            }
+            $totalOffers = $offerQuery->count();
+
+            $activeOffers = (clone $offerQuery)->where(function ($q) {
+                $q->where('status', 'active')->orWhere('status', 1);
+            })->count();
+
+            $expiredOffers = (clone $offerQuery)->where(function ($q) {
+                $q->where('status', 'expired')->orWhere('status', 0);
+            })->count();
         }
 
         // Customers statistics
@@ -112,20 +146,51 @@ class HomeController extends Controller
         $activeCustomers = 0;
         $inactiveCustomers = 0;
         if ($customerRole) {
-            $customerQuery = User::role($customerRole->name);
+            $customerQuery = $this->applyDateFilter(User::role($customerRole->name), 'created_at', $startDate, $endDate);
             $totalCustomers = $customerQuery->count();
 
             if (Schema::hasColumn('users', 'status')) {
-                $activeCustomers = User::role($customerRole->name)
-                    ->where(function ($query) {
+                $activeCustomers = $this->applyDateFilter(
+                    User::role($customerRole->name)->where(function ($query) {
                         $query->where('status', 1)->orWhere('status', 'active');
-                    })->count();
+                    }),
+                    'created_at',
+                    $startDate,
+                    $endDate
+                )->count();
                 $inactiveCustomers = $totalCustomers - $activeCustomers;
             } else {
                 $activeCustomers = $totalCustomers;
                 $inactiveCustomers = 0;
             }
         }
+
+        $chart = $this->buildSuperAdminChart($module, $merchantFilter, $startDate, $endDate);
+
+        Log::info('Dashboard Super Admin Stats', [
+            'filters' => [
+                'start_date' => $startDate->toDateString(),
+                'end_date' => $endDate->toDateString(),
+                'merchant' => $merchantFilter,
+                'module' => $module,
+            ],
+            'totals' => [
+                'merchants' => $totalMerchants,
+                'merchants_this_month' => $merchantsThisMonth,
+                'merchants_this_year' => $merchantsThisYear,
+                'sites' => $totalSites,
+                'site_users' => $totalSiteUsers,
+                'merchants_role_users' => $merchantUsers,
+                'admin_role_users' => $adminUsers,
+                'super_admin_role_users' => $superAdminUsers,
+                'offers' => $totalOffers,
+                'offers_active' => $activeOffers,
+                'offers_expired' => $expiredOffers,
+                'customers' => $totalCustomers,
+                'customers_active' => $activeCustomers,
+                'customers_inactive' => $inactiveCustomers,
+            ],
+        ]);
 
         return [
             'merchants' => [
@@ -150,13 +215,14 @@ class HomeController extends Controller
                 'active' => $activeCustomers,
                 'inactive' => $inactiveCustomers,
             ],
+            'chart' => $chart,
         ];
     }
 
     /**
      * Get statistics for Merchant dashboard
      */
-    private function getMerchantStats($user): array
+    private function getMerchantStats($user, array $filters): array
     {
         $siteUser = SiteUser::where('user_id', $user->id)->first();
         $merchantId = $siteUser?->merchant_id;
@@ -165,38 +231,73 @@ class HomeController extends Controller
             return $this->getEmptyStats();
         }
 
-        $now = Carbon::now();
-        $startOfMonth = $now->copy()->startOfMonth();
-        $startOfYear = $now->copy()->startOfYear();
+        [$startDate, $endDate] = $this->getDateRange($filters);
+        $siteFilter = $filters['site_id'] ?? 'all';
 
         // Merchant's sites
-        $totalSites = Site::where('merchant_id', $merchantId)->count();
-        $sitesThisMonth = Site::where('merchant_id', $merchantId)
-            ->where('created_at', '>=', $startOfMonth)->count();
-        $sitesThisYear = Site::where('merchant_id', $merchantId)
-            ->where('created_at', '>=', $startOfYear)->count();
+        $siteQuery = $this->applyDateFilter(
+            Site::where('merchant_id', $merchantId),
+            'created_at',
+            $startDate,
+            $endDate
+        );
+        if ($siteFilter !== 'all') {
+            $siteQuery->where('id', $siteFilter);
+        }
+        $totalSites = $siteQuery->count();
+        $sitesThisMonth = $totalSites;
+        $sitesThisYear = $totalSites;
 
         // Merchant's site users
-        $totalSiteUsers = SiteUser::where('merchant_id', $merchantId)->count();
-        $siteUsersThisMonth = SiteUser::where('merchant_id', $merchantId)
-            ->where('created_at', '>=', $startOfMonth)->count();
+        $siteUserQuery = $this->applyDateFilter(
+            SiteUser::where('merchant_id', $merchantId),
+            'created_at',
+            $startDate,
+            $endDate
+        );
+        if ($siteFilter !== 'all') {
+            $siteUserQuery->where('site_id', $siteFilter);
+        }
+        $totalSiteUsers = $siteUserQuery->count();
+        $siteUsersThisMonth = $totalSiteUsers;
 
         // Merchant's offers
         $totalOffers = 0;
         $activeOffers = 0;
         $expiredOffers = 0;
         if (class_exists(Offer::class)) {
-            $totalOffers = Offer::where('merchant_id', $merchantId)->count();
-            $activeOffers = Offer::where('merchant_id', $merchantId)
-                ->where('status', 'active')->orWhere('status', 1)->count();
-            $expiredOffers = Offer::where('merchant_id', $merchantId)
-                ->where('status', 'expired')->orWhere('status', 0)->count();
+            $offerQuery = $this->applyDateFilter(Offer::query(), 'created_at', $startDate, $endDate);
+            if (Schema::hasColumn((new Offer())->getTable(), 'merchant_id')) {
+                $offerQuery->where('merchant_id', $merchantId);
+            }
+            if ($siteFilter !== 'all' && Schema::hasColumn((new Offer())->getTable(), 'site_id')) {
+                $offerQuery->where('site_id', $siteFilter);
+            }
+            $totalOffers = $offerQuery->count();
+            $activeOffers = (clone $offerQuery)->where(function ($q) {
+                $q->where('status', 'active')->orWhere('status', 1);
+            })->count();
+            $expiredOffers = (clone $offerQuery)->where(function ($q) {
+                $q->where('status', 'expired')->orWhere('status', 0);
+            })->count();
         }
 
         // Merchant's customers (if relationship exists)
         $totalCustomers = 0;
         $activeCustomers = 0;
         $inactiveCustomers = 0;
+
+        $chart = $this->buildChartData(
+            $this->applyDateFilter(
+                Site::where('merchant_id', $merchantId)->when($siteFilter !== 'all', fn ($q) => $q->where('id', $siteFilter)),
+                'created_at',
+                $startDate,
+                $endDate
+            ),
+            'created_at',
+            'd M',
+            'Sites created'
+        );
 
         return [
             'sites' => [
@@ -219,35 +320,41 @@ class HomeController extends Controller
                 'active' => $activeCustomers,
                 'inactive' => $inactiveCustomers,
             ],
+            'chart' => $chart,
         ];
     }
 
     /**
      * Get statistics for Admin dashboard
      */
-    private function getAdminStats($user): array
+    private function getAdminStats($user, array $filters): array
     {
         $siteUser = SiteUser::where('user_id', $user->id)->first();
         $siteId = $siteUser?->site_id;
-        $merchantId = $siteUser?->merchant_id;
 
         if (!$siteId) {
             return $this->getEmptyStats();
         }
 
-        $now = Carbon::now();
-        $startOfMonth = $now->copy()->startOfMonth();
+        [$startDate, $endDate] = $this->getDateRange($filters);
+        $activity = $filters['activity'] ?? 'offers';
 
         // Site-specific offers
         $totalOffers = 0;
         $activeOffers = 0;
         $expiredOffers = 0;
         if (class_exists(Offer::class)) {
-            $totalOffers = Offer::where('site_id', $siteId)->count();
-            $activeOffers = Offer::where('site_id', $siteId)
-                ->where('status', 'active')->orWhere('status', 1)->count();
-            $expiredOffers = Offer::where('site_id', $siteId)
-                ->where('status', 'expired')->orWhere('status', 0)->count();
+            $offerQuery = $this->applyDateFilter(Offer::query(), 'created_at', $startDate, $endDate);
+            if (Schema::hasColumn((new Offer())->getTable(), 'site_id')) {
+                $offerQuery->where('site_id', $siteId);
+            }
+            $totalOffers = $offerQuery->count();
+            $activeOffers = (clone $offerQuery)->where(function ($q) {
+                $q->where('status', 'active')->orWhere('status', 1);
+            })->count();
+            $expiredOffers = (clone $offerQuery)->where(function ($q) {
+                $q->where('status', 'expired')->orWhere('status', 0);
+            })->count();
         }
 
         // Customer scans (if model exists)
@@ -257,6 +364,8 @@ class HomeController extends Controller
         // Point awards (if model exists)
         $totalPointsAwarded = 0;
         $pointsThisMonth = 0;
+
+        $chart = $this->buildAdminChart($activity, $siteId, $startDate, $endDate);
 
         return [
             'offers' => [
@@ -272,14 +381,18 @@ class HomeController extends Controller
                 'total' => $totalPointsAwarded,
                 'this_month' => $pointsThisMonth,
             ],
+            'chart' => $chart,
         ];
     }
 
     /**
      * Get statistics for Customer dashboard
      */
-    private function getCustomerStats($user): array
+    private function getCustomerStats($user, array $filters): array
     {
+        [$startDate, $endDate] = $this->getDateRange($filters);
+        $activity = $filters['activity'] ?? 'points';
+
         // Customer-specific data
         $totalPoints = 0;
         $availablePoints = 0;
@@ -292,6 +405,8 @@ class HomeController extends Controller
         // Customer offers/rewards
         $availableOffers = 0;
         $redeemedOffers = 0;
+
+        $chart = $this->buildCustomerChart($activity, $user->id, $startDate, $endDate);
 
         return [
             'points' => [
@@ -307,6 +422,7 @@ class HomeController extends Controller
                 'available' => $availableOffers,
                 'redeemed' => $redeemedOffers,
             ],
+            'chart' => $chart,
         ];
     }
 
@@ -320,7 +436,165 @@ class HomeController extends Controller
             'site_users' => ['total' => 0, 'this_month' => 0],
             'offers' => ['total' => 0, 'active' => 0, 'expired' => 0],
             'customers' => ['total' => 0, 'active' => 0, 'inactive' => 0],
+            'chart' => [
+                'labels' => [],
+                'values' => [],
+                'title' => 'Activity',
+            ],
         ];
+    }
+
+    private function prepareFilters(Request $request, string $role, $user): array
+    {
+        $defaultStart = Carbon::now()->subDays(29)->format('Y-m-d');
+        $defaultEnd = Carbon::now()->format('Y-m-d');
+
+        $filters = [
+            'start_date' => $request->input('start_date', $defaultStart),
+            'end_date' => $request->input('end_date', $defaultEnd),
+        ];
+        $filterOptions = [];
+
+        if ($role === Constants::SUPERADMIN) {
+            $filters['merchant_id'] = $request->input('merchant_id');
+            $filters['module'] = $request->input('module', 'merchants');
+            $filterOptions['merchants'] = Merchant::select('id', 'name')->orderBy('name')->get();
+            $filterOptions['modules'] = [
+                'merchants' => 'Merchants',
+                'sites' => 'Sites',
+                'site_users' => 'Site Users',
+                'offers' => 'Offers',
+                'customers' => 'Customers',
+            ];
+        } elseif ($role === Constants::Merchant) {
+            $siteUser = SiteUser::where('user_id', $user->id)->first();
+            $merchantId = $siteUser?->merchant_id;
+            $filters['site_id'] = $request->input('site_id', 'all');
+            $filterOptions['sites'] = Site::where('merchant_id', $merchantId)->select('id', 'name')->orderBy('name')->get();
+        } elseif ($role === Constants::Admin) {
+            $filters['activity'] = $request->input('activity', 'offers');
+            $filterOptions['activities'] = [
+                'offers' => 'Offers',
+                'scans' => 'Customer Scans',
+                'points' => 'Point Awards',
+            ];
+        } elseif ($role === Constants::CUSTOMER) {
+            $filters['activity'] = $request->input('activity', 'points');
+            $filterOptions['activities'] = [
+                'points' => 'Points',
+                'scans' => 'Scans',
+            ];
+        }
+
+        return [$filters, $filterOptions];
+    }
+
+    private function getDateRange(array $filters): array
+    {
+        $start = isset($filters['start_date']) ? Carbon::parse($filters['start_date']) : Carbon::now()->subDays(29);
+        $end = isset($filters['end_date']) ? Carbon::parse($filters['end_date']) : Carbon::now();
+
+        return [$start->startOfDay(), $end->endOfDay()];
+    }
+
+    private function buildChartData($query, string $dateColumn = 'created_at', string $labelFormat = 'd M', string $title = 'Activity'): array
+    {
+        $records = (clone $query)
+            ->selectRaw("DATE($dateColumn) as chart_date, COUNT(*) as total")
+            ->groupBy('chart_date')
+            ->orderBy('chart_date')
+            ->get();
+
+        return [
+            'labels' => $records->map(fn ($item) => Carbon::parse($item->chart_date)->format($labelFormat)),
+            'values' => $records->pluck('total'),
+            'title' => $title,
+        ];
+    }
+
+    private function buildSuperAdminChart(string $module, ?string $merchantId, Carbon $startDate, Carbon $endDate): array
+    {
+        switch ($module) {
+            case 'sites':
+                $query = $this->applyDateFilter(Site::query(), 'created_at', $startDate, $endDate);
+                if ($merchantId) {
+                    $query->where('merchant_id', $merchantId);
+                }
+                return $this->buildChartData($query, 'created_at', 'd M', 'Sites created');
+            case 'site_users':
+                $query = $this->applyDateFilter(SiteUser::query(), 'created_at', $startDate, $endDate);
+                if ($merchantId) {
+                    $query->where('merchant_id', $merchantId);
+                }
+                return $this->buildChartData($query, 'created_at', 'd M', 'Site users added');
+            case 'offers':
+                if (class_exists(Offer::class)) {
+                    $query = $this->applyDateFilter(Offer::query(), 'created_at', $startDate, $endDate);
+                    if ($merchantId && Schema::hasColumn((new Offer())->getTable(), 'merchant_id')) {
+                        $query->where('merchant_id', $merchantId);
+                    }
+                    return $this->buildChartData($query, 'created_at', 'd M', 'Offers created');
+                }
+                break;
+            case 'customers':
+                $customerRole = Role::where('name', Constants::CUSTOMER)->first();
+                if ($customerRole) {
+                    $query = $this->applyDateFilter(User::role($customerRole->name), 'created_at', $startDate, $endDate);
+                    return $this->buildChartData($query, 'created_at', 'd M', 'Customers added');
+                }
+                break;
+            case 'merchants':
+            default:
+                $query = $this->applyDateFilter(Merchant::query(), 'created_at', $startDate, $endDate);
+                if ($merchantId) {
+                    $query->where('id', $merchantId);
+                }
+                return $this->buildChartData($query, 'created_at', 'd M', 'Merchants onboarded');
+        }
+
+        return [
+            'labels' => [],
+            'values' => [],
+            'title' => 'Activity',
+        ];
+    }
+
+    private function buildAdminChart(string $activity, string $siteId, Carbon $startDate, Carbon $endDate): array
+    {
+        if ($activity === 'offers' && class_exists(Offer::class)) {
+            $query = $this->applyDateFilter(Offer::query(), 'created_at', $startDate, $endDate);
+            if (Schema::hasColumn((new Offer())->getTable(), 'site_id')) {
+                $query->where('site_id', $siteId);
+            }
+            return $this->buildChartData($query, 'created_at', 'd M', 'Offers activity');
+        }
+
+        return [
+            'labels' => [],
+            'values' => [],
+            'title' => 'Activity',
+        ];
+    }
+
+    private function buildCustomerChart(string $activity, int $userId, Carbon $startDate, Carbon $endDate): array
+    {
+        return [
+            'labels' => [],
+            'values' => [],
+            'title' => ucfirst($activity) . ' activity',
+        ];
+    }
+
+    private function applyDateFilter($query, string $column, Carbon $startDate, Carbon $endDate)
+    {
+        return $query
+            ->whereDate($column, '>=', $startDate->toDateString())
+            ->whereDate($column, '<=', $endDate->toDateString());
+    }
+
+    private function applyRoleDateFilter(string $roleName, Carbon $startDate, Carbon $endDate): int
+    {
+        return $this->applyDateFilter(User::role($roleName), 'created_at', $startDate, $endDate)->count();
     }
 
     public function logout()
