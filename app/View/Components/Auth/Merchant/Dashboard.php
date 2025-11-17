@@ -1,6 +1,6 @@
 <?php
 
-namespace App\View\Components\Auth\Admin;
+namespace App\View\Components\Auth\Merchant;
 
 use Closure;
 use Illuminate\Contracts\View\View;
@@ -23,6 +23,7 @@ class Dashboard extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.auth.admin.dashboard');
+        return view('components.auth.merchant.dashboard');
     }
 }
+

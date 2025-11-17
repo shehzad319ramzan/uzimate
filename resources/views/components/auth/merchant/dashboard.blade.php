@@ -3,21 +3,21 @@
     <div class="col-md-6 mb-4">
         <div class="dashboard-card">
             <div class="dashboard-card-header">
-                <h6 class="dashboard-card-title">Merchants</h6>
+                <h6 class="dashboard-card-title">My Sites</h6>
             </div>
-            <div class="dashboard-card-value">{{ $data['merchants']['total'] ?? 0 }}</div>
+            <div class="dashboard-card-value">{{ $data['sites']['total'] ?? 0 }}</div>
             <div class="dashboard-card-metrics">
                 <div class="dashboard-metric">
                     <span class="dashboard-metric-label">This Month</span>
-                    <span class="dashboard-metric-value">{{ $data['merchants']['this_month'] ?? 0 }}</span>
+                    <span class="dashboard-metric-value">{{ $data['sites']['this_month'] ?? 0 }}</span>
                 </div>
                 <div class="dashboard-metric">
                     <span class="dashboard-metric-label">This Year</span>
-                    <span class="dashboard-metric-value">{{ $data['merchants']['this_year'] ?? 0 }}</span>
+                    <span class="dashboard-metric-value">{{ $data['sites']['this_year'] ?? 0 }}</span>
                 </div>
                 <div class="dashboard-metric">
-                    <span class="dashboard-metric-label">Sites</span>
-                    <span class="dashboard-metric-value">{{ $data['merchants']['sites'] ?? 0 }}</span>
+                    <span class="dashboard-metric-label">Site Users</span>
+                    <span class="dashboard-metric-value">{{ $data['sites']['site_users'] ?? 0 }}</span>
                 </div>
             </div>
         </div>
@@ -31,16 +31,8 @@
             <div class="dashboard-card-value">{{ $data['site_users']['total'] ?? 0 }}</div>
             <div class="dashboard-card-metrics">
                 <div class="dashboard-metric">
-                    <span class="dashboard-metric-label">Merchants</span>
-                    <span class="dashboard-metric-value">{{ $data['site_users']['merchants'] ?? 0 }}</span>
-                </div>
-                <div class="dashboard-metric">
-                    <span class="dashboard-metric-label">Admins</span>
-                    <span class="dashboard-metric-value">{{ $data['site_users']['admins'] ?? 0 }}</span>
-                </div>
-                <div class="dashboard-metric">
-                    <span class="dashboard-metric-label">Super Admins</span>
-                    <span class="dashboard-metric-value">{{ $data['site_users']['super_admins'] ?? 0 }}</span>
+                    <span class="dashboard-metric-label">This Month</span>
+                    <span class="dashboard-metric-value">{{ $data['site_users']['this_month'] ?? 0 }}</span>
                 </div>
             </div>
         </div>
@@ -89,8 +81,8 @@
     <div class="col-12">
         <div class="chart-section">
             <div class="chart-tabs">
-                <button class="chart-tab active">Customers</button>
-                <button class="chart-tab">Merchants</button>
+                <button class="chart-tab active">Offers</button>
+                <button class="chart-tab">Customers</button>
             </div>
             
             <div class="chart-filters">
@@ -113,9 +105,8 @@
 </div>
 
 <script>
-// Chart will be initialized here if needed
 document.addEventListener('DOMContentLoaded', function() {
-    // Chart initialization code can go here
-    console.log('Dashboard loaded');
+    console.log('Merchant Dashboard loaded');
 });
 </script>
+
