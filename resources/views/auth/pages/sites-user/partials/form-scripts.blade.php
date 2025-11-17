@@ -4,7 +4,7 @@
         const merchantSelect = document.getElementById('merchant_id');
         const siteSelect = document.getElementById('site_id');
 
-        if (!merchantSelect || !siteSelect) {
+        if (!merchantSelect || !siteSelect || merchantSelect.tagName !== 'SELECT' || siteSelect.tagName !== 'SELECT') {
             return;
         }
 

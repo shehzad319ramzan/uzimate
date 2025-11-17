@@ -66,8 +66,10 @@ Route::group(
         });
         Route::prefix('siteusers')->as('siteusers.')->controller(SiteUserController::class)->group(function () {
             Route::get('create', 'create')->name('create');
+            Route::get('create-super', 'createSuper')->name('create-super');
             Route::get('', 'index')->name('index');
             Route::post('store', 'store')->name('store');
+            Route::post('store-super', 'storeSuper')->name('store-super');
             Route::put('update/{site}', 'update')->name('update');
             Route::delete('delete/{site}', 'destroy')->name('destroy');
             Route::get('detail/{site}', 'show')->name('show');

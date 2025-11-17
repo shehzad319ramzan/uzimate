@@ -1,40 +1,54 @@
+@php
+    $isSuperMode = $isSuperMode ?? false;
+    $superRoleId = $superRoleId ?? null;
+@endphp
 <x-layouts.auth>
-    <x-slot name="pageTitle">Create Site User</x-slot>
-    <x-auth.card card-header="Create Site User" header-button="true">
+    <x-slot name="pageTitle">{{ $isSuperMode ? 'Add Super Admin' : 'Create Site User' }}</x-slot>
+    <x-auth.card card-header="{{ $isSuperMode ? 'Add Super Admin' : 'Create Site User' }}" header-button="true">
         <x-slot name="headerCustom">
             <x-auth.href-link link-href="{{ route('siteusers.index') }}" link-value="{{ __('Back to List') }}"
                 link-class="btn btn-outline-primary me-2" />
         </x-slot>
-        <x-auth.form form-action="{{ route('siteusers.store') }}" enctype="true">
+        <x-auth.form form-action="{{ $isSuperMode ? route('siteusers.store-super') : route('siteusers.store') }}" enctype="true">
             <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="merchant_id" class="form-label">Merchant <span class="text-danger">*</span></label>
-                    <select class="form-select @error('merchant_id') is-invalid @enderror" name="merchant_id" id="merchant_id" required>
-                        <option value="">Select Merchant</option>
-                        @foreach ($merchants as $merchant)
-                            <option value="{{ $merchant->id }}" {{ old('merchant_id') == $merchant->id ? 'selected' : '' }}>
-                                {{ $merchant->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('merchant_id')
-                        <span class="text-danger small">{{ $message }}</span>
-                    @enderror
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="site_id" class="form-label">Site <span class="text-danger">*</span></label>
-                    <select class="form-select @error('site_id') is-invalid @enderror" name="site_id" id="site_id" required>
-                        <option value="">Select Site</option>
-                        @foreach ($sites as $site)
-                            <option value="{{ $site->id }}" data-merchant="{{ $site->merchant_id }}" {{ old('site_id') == $site->id ? 'selected' : '' }}>
-                                {{ $site->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('site_id')
-                        <span class="text-danger small">{{ $message }}</span>
-                    @enderror
-                </div>
+                @if (!$isSuperMode)
+                    <div class="col-md-6 mb-3">
+                        <label for="merchant_id" class="form-label">Merchant <span class="text-danger">*</span></label>
+                        <select class="form-select @error('merchant_id') is-invalid @enderror" name="merchant_id" id="merchant_id" required>
+                            <option value="">Select Merchant</option>
+                            @foreach ($merchants as $merchant)
+                                <option value="{{ $merchant->id }}" {{ old('merchant_id') == $merchant->id ? 'selected' : '' }}>
+                                    {{ $merchant->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('merchant_id')
+                            <span class="text-danger small">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="site_id" class="form-label">Site <span class="text-danger">*</span></label>
+                        <select class="form-select @error('site_id') is-invalid @enderror" name="site_id" id="site_id" required>
+                            <option value="">Select Site</option>
+                            @foreach ($sites as $site)
+                                <option value="{{ $site->id }}" data-merchant="{{ $site->merchant_id }}" {{ old('site_id') == $site->id ? 'selected' : '' }}>
+                                    {{ $site->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('site_id')
+                            <span class="text-danger small">{{ $message }}</span>
+                        @enderror
+                    </div>
+                @else
+                    <input type="hidden" name="merchant_id" value="">
+                    <input type="hidden" name="site_id" value="">
+                    <div class="col-md-12 mb-3 ">
+                        <div class="alert alert-info px-2">
+                            This user will be created as a Super Admin and does not need a merchant or site assignment.
+                        </div>
+                    </div>
+                @endif
 
                 <div class="col-md-12 mb-4">
                     <div class="d-flex justify-content-center">
@@ -64,20 +78,31 @@
                         label="Mobile" />
                 </div>
 
-                <div class="col-md-6 mb-3">
-                    <label for="role_id" class="form-label">Role <span class="text-danger">*</span></label>
-                    <select class="form-select @error('role_id') is-invalid @enderror" name="role_id" id="role_id" required>
-                        <option value="">Select Role</option>
-                        @foreach ($roles as $role)
-                            <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>
-                                {{ $role->title ?? ucwords(str_replace('_', ' ', $role->name)) }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('role_id')
-                        <span class="text-danger small">{{ $message }}</span>
-                    @enderror
-                </div>
+                @if (!$isSuperMode)
+                    <div class="col-md-6 mb-3">
+                        <label for="role_id" class="form-label">Role <span class="text-danger">*</span></label>
+                        <select class="form-select @error('role_id') is-invalid @enderror" name="role_id" id="role_id" required>
+                            <option value="">Select Role</option>
+                            @foreach ($roles as $role)
+                                <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>
+                                    {{ $role->title ?? ucwords(str_replace('_', ' ', $role->name)) }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('role_id')
+                            <span class="text-danger small">{{ $message }}</span>
+                        @enderror
+                    </div>
+                @else
+                    <input type="hidden" name="role_id" value="{{ old('role_id', $superRoleId) }}">
+                    @if (!$superRoleId)
+                        <div class="col-md-12">
+                            <div class="alert alert-warning">
+                                Super Admin role is missing. Please create it before adding a super user.
+                            </div>
+                        </div>
+                    @endif
+                @endif
                 <div class="col-md-6">
                     <x-auth.input-field type="password" name="password" id="password" required="true"
                         place="********" val="" extraclasses="mb-3"

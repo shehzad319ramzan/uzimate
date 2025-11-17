@@ -6,7 +6,9 @@
             <x-all-list title="Site Users" :data="$data['all']">
                 <x-slot name="headerCustom">
                     <x-auth.href-link link-href="{{ route('siteusers.create') }}" link-value="{{ __('Create Site User') }}"
-                        link-class="btn btn-primary" />
+                        link-class="btn btn-primary me-2" />
+                    <x-auth.href-link link-href="{{ route('siteusers.create-super') }}" link-value="{{ __('Add Super') }}"
+                        link-class="btn btn-outline-light text-primary" />
                 </x-slot>
 
                 <x-auth.datatable>

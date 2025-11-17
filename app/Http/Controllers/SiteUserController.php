@@ -34,11 +34,34 @@ class SiteUserController extends BaseController
         return view($this->_directory . '.create', $this->formOptions());
     }
 
+    public function createSuper()
+    {
+        return view($this->_directory . '.create', $this->formOptions([
+            'isSuperMode' => true,
+            'superRoleId' => $this->getSuperRoleId(),
+        ]));
+    }
+
     public function store(SiteUserRequest $request)
     {
         try {
             $this->_repo->store(SiteUserDto::fromRequest($request));
             return redirect()->route($this->_route . '.index')->with('success', 'Successfully created.');
+        } catch (\Throwable $th) {
+            return redirect()->back()->withInput()->with('error', $th->getMessage());
+        }
+    }
+
+    public function storeSuper(SiteUserRequest $request)
+    {
+        try {
+            $request->merge([
+                'merchant_id' => null,
+                'site_id' => null,
+                'role_id' => $this->getSuperRoleId(),
+            ]);
+            $this->_repo->store(SiteUserDto::fromRequest($request));
+            return redirect()->route($this->_route . '.index')->with('success', 'Super admin added.');
         } catch (\Throwable $th) {
             return redirect()->back()->withInput()->with('error', $th->getMessage());
         }
@@ -60,12 +83,23 @@ class SiteUserController extends BaseController
 
         return view($this->_directory . '.edit', array_merge([
             'data' => $data,
-        ], $this->formOptions()));
+        ], $this->formOptions([
+            'isSuperMode' => $data->user?->hasRole(Constants::SUPERADMIN),
+            'superRoleId' => $this->getSuperRoleId(),
+        ])));
     }
 
     public function update(SiteUserRequest $request, $id)
     {
         try {
+            $siteUser = $this->_repo->show($id);
+            if ($siteUser && $siteUser->user?->hasRole(Constants::SUPERADMIN)) {
+                $request->merge([
+                    'merchant_id' => null,
+                    'site_id' => null,
+                    'role_id' => $this->getSuperRoleId(),
+                ]);
+            }
             $this->_repo->update($id, SiteUserDto::fromRequest($request));
             return redirect()->route($this->_route . '.index')->with('success', 'Updated succesfully');
         } catch (\Throwable $th) {
@@ -78,12 +112,19 @@ class SiteUserController extends BaseController
         }
     }
 
-    protected function formOptions(): array
+    protected function formOptions(array $overrides = []): array
     {
-        return [
+        return array_merge([
             'merchants' => Merchant::select('id', 'name')->orderBy('name')->get(),
             'sites' => Site::select('id', 'name', 'merchant_id')->orderBy('name')->get(),
             'roles' => Role::whereNotIn('name', [Constants::SUPERADMIN, Constants::CUSTOMER])->select('id', 'name', 'title')->orderBy('title')->get(),
-        ];
+            'isSuperMode' => false,
+            'superRoleId' => $this->getSuperRoleId(),
+        ], $overrides);
+    }
+
+    protected function getSuperRoleId(): ?string
+    {
+        return Role::where('name', Constants::SUPERADMIN)->value('id');
     }
 }

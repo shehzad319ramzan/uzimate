@@ -26,8 +26,8 @@ class SiteUserDto
     {
         $payload = $request instanceof Request ? $request->all() : $request;
 
-        $this->merchant_id = $payload['merchant_id'] ?? null;
-        $this->site_id = $payload['site_id'] ?? null;
+        $this->merchant_id = !empty($payload['merchant_id']) ? $payload['merchant_id'] : null;
+        $this->site_id = !empty($payload['site_id']) ? $payload['site_id'] : null;
         $this->first_name = $payload['first_name'] ?? null;
         $this->last_name = $payload['last_name'] ?? null;
         $this->email = $payload['email'] ?? null;

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Constants\Constants;
 use App\Models\SiteUser;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -16,6 +17,28 @@ class SiteUserRequest extends FormRequest
         return auth()->check();
     }
 
+    protected function isSuperMode(): bool
+    {
+        if ($this->routeIs('siteusers.store-super')) {
+            return true;
+        }
+
+        $siteUser = $this->currentSiteUser();
+
+        return $siteUser?->user?->hasRole(Constants::SUPERADMIN) ?? false;
+    }
+
+    protected function currentSiteUser(): ?SiteUser
+    {
+        $siteUserId = $this->route('site');
+
+        if (!$siteUserId) {
+            return null;
+        }
+
+        return SiteUser::with('user.roles')->find($siteUserId);
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -23,8 +46,7 @@ class SiteUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        $siteUserId = $this->route('site');
-        $siteUser = $siteUserId ? SiteUser::with('user')->find($siteUserId) : null;
+        $siteUser = $this->currentSiteUser();
         $userId = $siteUser?->user_id;
 
         $passwordRules = ['nullable', 'confirmed', 'min:8'];
@@ -32,18 +54,28 @@ class SiteUserRequest extends FormRequest
             $passwordRules[0] = 'required';
         }
 
+        $merchantRules = ['required', 'uuid', 'exists:merchants,id'];
+        $siteRules = [
+            'required',
+            'uuid',
+            Rule::exists('sites', 'id')->where(function ($query) {
+                $merchantId = $this->input('merchant_id');
+                if ($merchantId) {
+                    $query->where('merchant_id', $merchantId);
+                }
+            }),
+        ];
+        $roleRules = ['required', 'exists:roles,id'];
+
+        if ($this->isSuperMode()) {
+            $merchantRules = ['nullable', 'uuid', 'exists:merchants,id'];
+            $siteRules = ['nullable', 'uuid', 'exists:sites,id'];
+            $roleRules = ['nullable', 'exists:roles,id'];
+        }
+
         return [
-            'merchant_id' => ['required', 'uuid', 'exists:merchants,id'],
-            'site_id' => [
-                'required',
-                'uuid',
-                Rule::exists('sites', 'id')->where(function ($query) {
-                    $merchantId = $this->input('merchant_id');
-                    if ($merchantId) {
-                        $query->where('merchant_id', $merchantId);
-                    }
-                }),
-            ],
+            'merchant_id' => $merchantRules,
+            'site_id' => $siteRules,
             'first_name' => ['required', 'string', 'max:150'],
             'last_name' => ['required', 'string', 'max:150'],
             'email' => [
@@ -53,7 +85,7 @@ class SiteUserRequest extends FormRequest
                 Rule::unique('users', 'email')->ignore($userId),
             ],
             'phone' => ['nullable', 'string', 'max:50'],
-            'role_id' => ['required', 'exists:roles,id'],
+            'role_id' => $roleRules,
             'password' => $passwordRules,
             'file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ];
