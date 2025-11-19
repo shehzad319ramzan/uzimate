@@ -28,8 +28,16 @@ class UserController extends BaseController
 
     public function index()
     {
-        $data['all'] = $this->_repo->get_all_users();
-        return view($this->_directory . '.all', compact('data'));
+        $filterRole = request()->query('role');
+
+        $data['all'] = $this->_repo->get_all_users($filterRole);
+        $roles = Role::select('name', 'title')->orderBy('title')->get();
+
+        return view($this->_directory . '.all', [
+            'data' => $data,
+            'roles' => $roles,
+            'activeRole' => $filterRole,
+        ]);
     }
 
     /**

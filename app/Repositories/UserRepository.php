@@ -30,14 +30,18 @@ class UserRepository extends BaseRepository implements UserInterface
         $this->setModel($model);
     }
 
-    public function get_all_users()
+    public function get_all_users(?string $roleFilter = null)
     {
         $user = Auth::user();
         $isSuperAdmin = $user && $user->hasRole(Constants::SUPERADMIN);
 
         $query = $this->_model->with('roles')
-            ->whereHas('roles', function ($q) {
+            ->whereHas('roles', function ($q) use ($roleFilter) {
                 $q->whereNotIn('name', [Constants::SUPERADMIN]);
+
+                if (!empty($roleFilter)) {
+                    $q->where('name', $roleFilter);
+                }
             });
 
         // If not superadmin, only show users that are linked to SiteUser records

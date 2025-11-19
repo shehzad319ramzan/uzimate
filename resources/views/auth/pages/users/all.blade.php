@@ -4,12 +4,28 @@
     <div class="row">
         <div class="col-md-12">
             <x-auth.card card-header="Staff Management">
-                @can('add_user')
                 <x-slot name="headerCustom">
-                    <x-auth.href-link link-href="{{ route('users.create') }}" link-class="btn btn-primary"
-                        link-value="{{ __('Create New Staff Member') }}" />
+                    <form action="{{ route('users.index') }}" method="GET" class="d-flex align-items-center gap-2">
+                        <select name="role" class="form-select form-select-sm" onchange="this.form.submit()"
+                            style="min-width: 180px;">
+                            <option value="">All Roles</option>
+                            @foreach ($roles as $role)
+                                <option value="{{ $role->name }}" {{ ($activeRole ?? '') === $role->name ? 'selected' : '' }}>
+                                    {{ $role->title ?? ucwords(str_replace('_', ' ', $role->name)) }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        @if ($activeRole)
+                            <a href="{{ route('users.index') }}" class="btn btn-link btn-sm">Reset</a>
+                        @endif
+
+                        @can('add_user')
+                        <x-auth.href-link link-href="{{ route('users.create') }}" link-class="btn btn-primary btn-sm"
+                            link-value="{{ __('Create New Staff Member') }}" />
+                        @endcan
+                    </form>
                 </x-slot>
-                @endcan
 
                 <x-auth.datatable>
                     <thead class="border-top">
