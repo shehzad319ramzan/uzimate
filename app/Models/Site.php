@@ -31,7 +31,8 @@ class Site extends Model
         'location',
         'coordinates',
         'use_merchant_logo',
-        'status'
+        'status',
+        'user_id',
     ];
 
     /**
@@ -40,6 +41,11 @@ class Site extends Model
     public function merchant(): BelongsTo
     {
         return $this->belongsTo(Merchant::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     /**

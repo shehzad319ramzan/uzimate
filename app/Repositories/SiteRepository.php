@@ -5,9 +5,13 @@ namespace App\Repositories;
 use App\Constants\Constants;
 use App\Dto\SiteDto;
 use App\Models\Site;
+use App\Support\Concerns\HasMerchantScope;
+use Illuminate\Support\Facades\Auth;
 
 class SiteRepository extends BaseRepository
 {
+    use HasMerchantScope;
+
     protected $_imgPath = 'sites/logos';
     protected $_logoType = Constants::LOGOTYPE;
 
@@ -22,11 +26,37 @@ class SiteRepository extends BaseRepository
     }
 
     /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $query = $this->_model->newQuery();
+
+        if ($this->shouldLimitByMerchant()) {
+            $siteIds = $this->accessibleSiteIds();
+            $merchantIds = $this->accessibleMerchantIds();
+
+            if (empty($siteIds) && empty($merchantIds)) {
+                return $query->whereRaw('1 = 0')->paginate(20);
+            }
+
+            if (! empty($siteIds)) {
+                $query->whereIn('id', $siteIds);
+            } elseif (! empty($merchantIds)) {
+                $query->whereIn('merchant_id', $merchantIds);
+            }
+        }
+
+        return $query->orderBy('created_at', 'desc')->paginate(20);
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(SiteDto $data)
     {
         $dataArray = $data->toArray();
+        $dataArray['user_id'] = $dataArray['user_id'] ?? Auth::id();
         
         if (isset($dataArray['image'])) {
             $fileData = $dataArray['image'];
@@ -52,6 +82,7 @@ class SiteRepository extends BaseRepository
         $result = $this->checkRecord($id);
 
         $dataArray = $data->toArray();
+        $dataArray['user_id'] = $dataArray['user_id'] ?? $result->user_id;
 
         if (isset($dataArray['image'])) {
             $fileData = $dataArray['image'];

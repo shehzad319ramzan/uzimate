@@ -37,6 +37,44 @@
                                         place="Enter your email" val="{{ old('email') }}" extraclasses="mb-3"
                                         label="Email address" />
 
+                                    <x-auth.input-field type="text" name="merchant_name" id="merchant_name" required="true"
+                                        place="Enter your merchant/business name" val="{{ old('merchant_name') }}" extraclasses="mb-3"
+                                        label="Merchant/Business Name" />
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <x-auth.input-field type="number" name="max_sites" id="max_sites" required="true"
+                                                place="Enter max sites" val="{{ old('max_sites', 1) }}" extraclasses="mb-0"
+                                                label="Max Sites" />
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <x-auth.input-field type="number" name="spin_after_days" id="spin_after_days" required="true"
+                                                place="Enter spin after days" val="{{ old('spin_after_days', 1) }}" extraclasses="mb-0"
+                                                label="Spin After Days" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <x-auth.input-field type="number" name="scan_after_hours" id="scan_after_hours" required="true"
+                                                place="Enter scan after hours" val="{{ old('scan_after_hours', 6) }}" extraclasses="mb-0"
+                                                label="Scan After Hours" />
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="form-check mt-4">
+                                                <input class="form-check-input @error('use_other_merchant_points') is-invalid @enderror" 
+                                                    type="checkbox" value="1" name="use_other_merchant_points" 
+                                                    id="use_other_merchant_points" {{ old('use_other_merchant_points') ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="use_other_merchant_points">
+                                                    Use Other Merchant Points
+                                                </label>
+                                            </div>
+                                            @error('use_other_merchant_points')
+                                            <span class="text-danger small">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+
                                     <div class="mb-3">
                                         <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
                                         <div class="position-relative">

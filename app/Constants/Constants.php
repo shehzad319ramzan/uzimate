@@ -6,7 +6,7 @@ class Constants
 {
     //roles
     const SUPERADMIN = 'super_admin';
-    const Merchant = 'merchant';
+    const Manager = 'manager';
     const Admin = 'admin';
     const CUSTOMER = 'customer';
 

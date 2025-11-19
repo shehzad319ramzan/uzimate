@@ -5,9 +5,13 @@ namespace App\Repositories;
 use App\Constants\Constants;
 use App\Dto\MerchantDto;
 use App\Models\Merchant;
+use App\Support\Concerns\HasMerchantScope;
+use Illuminate\Support\Facades\Auth;
 
 class MerchantRepository extends BaseRepository
 {
+    use HasMerchantScope;
+
     protected $_imgPath = 'merchants/logos';
 
     /**
@@ -21,11 +25,32 @@ class MerchantRepository extends BaseRepository
     }
 
     /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $query = $this->_model->newQuery();
+
+        if ($this->shouldLimitByMerchant()) {
+            $merchantIds = $this->accessibleMerchantIds();
+
+            if (empty($merchantIds)) {
+                return $query->whereRaw('1 = 0')->paginate(20);
+            }
+
+            $query->whereIn('id', $merchantIds);
+        }
+
+        return $query->orderBy('created_at', 'desc')->paginate(20);
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(MerchantDto $data)
     {
         $dataArray = $data->toArray();
+        $dataArray['user_id'] = $dataArray['user_id'] ?? Auth::id();
         
         if (isset($dataArray['image'])) {
             $fileData = $dataArray['image'];
@@ -51,6 +76,7 @@ class MerchantRepository extends BaseRepository
         $result = $this->checkRecord($id);
 
         $dataArray = $data->toArray();
+        $dataArray['user_id'] = $dataArray['user_id'] ?? $result->user_id;
 
         if (isset($dataArray['image'])) {
             $fileData = $dataArray['image'];

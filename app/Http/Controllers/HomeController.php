@@ -43,7 +43,7 @@ class HomeController extends Controller
             case Constants::SUPERADMIN:
                 $data = $this->getSuperAdminStats($filters);
                 break;
-            case Constants::Merchant:
+            case Constants::Manager:
                 $data = $this->getMerchantStats($user, $filters);
                 break;
             case Constants::Admin:
@@ -102,10 +102,10 @@ class HomeController extends Controller
             $siteUserQuery->where('merchant_id', $merchantFilter);
         }
         $totalSiteUsers = $siteUserQuery->count();
-        $merchantRole = Role::where('name', Constants::Merchant)->first();
+        $merchantRole = Role::where('name', Constants::Manager)->first();
         $adminRole = Role::where('name', Constants::Admin)->first();
         $superAdminRole = Role::where('name', Constants::SUPERADMIN)->first();
-        
+
         $merchantUsers = 0;
         $adminUsers = 0;
         $superAdminUsers = 0;
@@ -466,7 +466,7 @@ class HomeController extends Controller
                 'offers' => 'Offers',
                 'customers' => 'Customers',
             ];
-        } elseif ($role === Constants::Merchant) {
+        } elseif ($role === Constants::Manager) {
             $siteUser = SiteUser::where('user_id', $user->id)->first();
             $merchantId = $siteUser?->merchant_id;
             $filters['site_id'] = $request->input('site_id', 'all');

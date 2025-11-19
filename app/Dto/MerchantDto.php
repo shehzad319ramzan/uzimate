@@ -9,6 +9,7 @@ class MerchantDto
     public ?int $spin_after_days;
     public ?int $scan_after_hours;
     public ?bool $use_other_merchant_points;
+    public ?int $user_id;
     public $file;
 
     /**
@@ -23,6 +24,7 @@ class MerchantDto
         $this->spin_after_days = isset($request['spin_after_days']) ? (int)$request['spin_after_days'] : null;
         $this->scan_after_hours = isset($request['scan_after_hours']) ? (int)$request['scan_after_hours'] : null;
         $this->use_other_merchant_points = isset($request['use_other_merchant_points']) ? (bool)$request['use_other_merchant_points'] : false;
+        $this->user_id = isset($request['user_id']) ? (int)$request['user_id'] : auth()->id();
         $this->file = request()->hasFile('file') ? request()->file('file') : null;
     }
 
@@ -55,6 +57,10 @@ class MerchantDto
         }
         
         $data['use_other_merchant_points'] = $this->use_other_merchant_points ?? false;
+        
+        if ($this->user_id !== null) {
+            $data['user_id'] = $this->user_id;
+        }
         
         if ($this->file !== null) {
             $data['image'] = $this->file;

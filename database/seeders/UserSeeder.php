@@ -38,7 +38,7 @@ class UserSeeder extends Seeder
         $user2->email_verified_at = now();
         $user2->created_at = now();
         $user2->save();
-        $user2->assignRole(Constants::Merchant);
+        $user2->assignRole(Constants::Manager);
         $user2->file()->create(['name' => 'avatar.png', 'path' => 'users/avatar.png', 'type' => 'profile']);
 
         // Manager/Staff User

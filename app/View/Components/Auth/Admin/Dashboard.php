@@ -27,8 +27,6 @@ class Dashboard extends Component
      */
     public function render(): View|Closure|string
     {
-        // dd($this->stats);
-
         return view('components.auth.admin.dashboard');
     }
 }

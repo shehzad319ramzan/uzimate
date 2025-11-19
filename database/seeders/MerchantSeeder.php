@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Constants\Constants;
 use App\Models\Merchant;
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -14,6 +15,8 @@ class MerchantSeeder extends Seeder
      */
     public function run(): void
     {
+        $defaultUserId = User::first()?->id;
+
         // Merchant 1
         $merchant1 = new Merchant();
         $merchant1->name = 'McDonald';
@@ -22,6 +25,7 @@ class MerchantSeeder extends Seeder
         $merchant1->scan_after_hours = 12;
         $merchant1->use_other_merchant_points = true;
         $merchant1->status = '1';
+        $merchant1->user_id = $defaultUserId;
         $merchant1->created_at = now();
         $merchant1->updated_at = now();
         $merchant1->save();
@@ -39,6 +43,7 @@ class MerchantSeeder extends Seeder
         $merchant2->scan_after_hours = 8;
         $merchant2->use_other_merchant_points = false;
         $merchant2->status = '1';
+        $merchant2->user_id = $defaultUserId;
         $merchant2->created_at = now();
         $merchant2->updated_at = now();
         $merchant2->save();
@@ -56,6 +61,7 @@ class MerchantSeeder extends Seeder
         $merchant3->scan_after_hours = 6;
         $merchant3->use_other_merchant_points = true;
         $merchant3->status = '1';
+        $merchant3->user_id = $defaultUserId;
         $merchant3->created_at = now();
         $merchant3->updated_at = now();
         $merchant3->save();
@@ -73,6 +79,7 @@ class MerchantSeeder extends Seeder
         $merchant4->scan_after_hours = 24;
         $merchant4->use_other_merchant_points = false;
         $merchant4->status = '1';
+        $merchant4->user_id = $defaultUserId;
         $merchant4->created_at = now();
         $merchant4->updated_at = now();
         $merchant4->save();
@@ -90,6 +97,7 @@ class MerchantSeeder extends Seeder
         $merchant5->scan_after_hours = 12;
         $merchant5->use_other_merchant_points = true;
         $merchant5->status = '1';
+        $merchant5->user_id = $defaultUserId;
         $merchant5->created_at = now();
         $merchant5->updated_at = now();
         $merchant5->save();

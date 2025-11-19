@@ -17,6 +17,7 @@ class SiteDto
     public ?string $location;
     public ?string $coordinates;
     public ?bool $use_merchant_logo;
+    public ?int $user_id;
     public $file;
 
     /**
@@ -39,6 +40,7 @@ class SiteDto
         $this->location = isset($request['location']) ? $request['location'] : null;
         $this->coordinates = isset($request['coordinates']) ? $request['coordinates'] : null;
         $this->use_merchant_logo = isset($request['use_merchant_logo']) ? (bool)$request['use_merchant_logo'] : false;
+        $this->user_id = isset($request['user_id']) ? (int)$request['user_id'] : auth()->id();
         $this->file = request()->hasFile('file') ? request()->file('file') : null;
     }
 
@@ -103,6 +105,10 @@ class SiteDto
         }
         
         $data['use_merchant_logo'] = $this->use_merchant_logo ?? false;
+        
+        if ($this->user_id !== null) {
+            $data['user_id'] = $this->user_id;
+        }
         
         if (!$this->use_merchant_logo && $this->file !== null) {
             $data['image'] = $this->file;

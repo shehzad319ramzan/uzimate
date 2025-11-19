@@ -15,8 +15,7 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Merchant</th>
-                            <th>Site</th>
+                            <th>Merchant &amp; Site</th>
                             <th>User</th>
                             <th>Email</th>
                             <th>Role</th>
@@ -32,8 +31,16 @@
                             @endphp
                             <tr>
                                 <td>{{ $data['all']->firstItem() + $key }}</td>
-                                <td>{{ $siteUser->merchant?->name ?? '-' }}</td>
-                                <td>{{ $siteUser->site?->name ?? '-' }}</td>
+                                <td>
+                                    <div class="text-dark fw-semibold">
+                                        <span class="text-uppercase text-muted small me-1">Merchant:</span>
+                                        {{ $siteUser->merchant?->name ?? '-' }}
+                                    </div>
+                                    <small class="text-muted d-block mt-1">
+                                        <span class="text-uppercase text-muted small me-1">Site:</span>
+                                        {{ $siteUser->site?->name ?? '-' }}
+                                    </small>
+                                </td>
                                 <td>{{ $siteUser->user?->full_name ?? '-' }}</td>
                                 <td>{{ $siteUser->user?->email ?? '-' }}</td>
                                 <td>

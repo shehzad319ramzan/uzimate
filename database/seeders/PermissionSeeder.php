@@ -44,6 +44,7 @@ class PermissionSeeder extends Seeder
         }
 
         $crudModules = [
+            'App User' => 'app_user',
             'Merchants' => 'merchant',
             'Sites' => 'site',
             'Site Users' => 'site_user',

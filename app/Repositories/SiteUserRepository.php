@@ -4,14 +4,18 @@ namespace App\Repositories;
 
 use App\Constants\Constants;
 use App\Dto\SiteUserDto;
+use App\Models\Permission;
 use App\Models\SiteUser;
 use App\Models\User;
+use App\Support\Concerns\HasMerchantScope;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
 class SiteUserRepository extends BaseRepository
 {
+    use HasMerchantScope;
+
     protected $_imgPath = 'users/profile';
 
     protected array $with = ['merchant', 'site', 'user.roles'];
@@ -23,7 +27,25 @@ class SiteUserRepository extends BaseRepository
 
     public function index()
     {
-        return $this->get_all($this->_model, $this->with);
+        $query = $this->_model->newQuery()->with($this->with);
+
+        if ($this->shouldLimitByMerchant()) {
+            $merchantIds = $this->accessibleMerchantIds();
+            $siteIds = $this->accessibleSiteIds();
+
+            if (empty($merchantIds) && empty($siteIds)) {
+                $query->whereRaw('1 = 0');
+            } else {
+                if (! empty($merchantIds)) {
+                    $query->whereIn('merchant_id', $merchantIds);
+                }
+                if (! empty($siteIds)) {
+                    $query->whereIn('site_id', $siteIds);
+                }
+            }
+        }
+
+        return $query->orderBy('created_at', 'desc')->paginate(20);
     }
 
     public function show($id)
@@ -127,9 +149,44 @@ class SiteUserRepository extends BaseRepository
         if ($roleId) {
             $role = Role::findOrFail($roleId);
             $user->syncRoles([$role->name]);
+
+            if ($role->name === Constants::Admin) {
+                $this->assignDefaultAdminPermissions($user);
+            }
         }
 
         return $user;
+    }
+
+    protected function assignDefaultAdminPermissions(User $user): void
+    {
+        $modules = [
+            'app_user',
+            'site',
+            'site_user',
+            'offer',
+            'customer_scan',
+            'offer_scan',
+            'point_award',
+            'spin_history',
+            'customer_log',
+            'inbox',
+            'feedback',
+        ];
+
+        $actions = ['view', 'add', 'edit', 'delete'];
+
+        $permissions = Permission::where(function ($query) use ($modules, $actions) {
+            foreach ($modules as $module) {
+                foreach ($actions as $action) {
+                    $query->orWhere('name', "{$action}_{$module}");
+                }
+            }
+        })->pluck('name')->toArray();
+
+        if (! empty($permissions)) {
+            $user->syncPermissions($permissions);
+        }
     }
 }
 

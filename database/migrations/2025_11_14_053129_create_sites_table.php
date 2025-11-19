@@ -15,10 +15,11 @@ return new class extends Migration
     {
         Schema::create('sites', function (Blueprint $table) {
             $table->UUID('id')->primary();
-            
+
             $table->UUID('merchant_id');
             $table->foreign('merchant_id')->references('id')->on('merchants')->onDelete('cascade');
-            
+            $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
+
             $table->string('name');
             $table->string('phone')->nullable();
             $table->integer('points')->default(0);
@@ -32,7 +33,7 @@ return new class extends Migration
             $table->string('coordinates')->nullable();
             $table->boolean('use_merchant_logo')->default(false);
             $table->string('status')->default(1);
-            
+
             $table->timestamps();
         });
     }

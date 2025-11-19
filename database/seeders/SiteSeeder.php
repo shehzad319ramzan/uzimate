@@ -26,10 +26,12 @@ class SiteSeeder extends Seeder
 
         // Get random merchant IDs
         $merchantIds = $merchants->pluck('id')->toArray();
+        $merchantOwners = $merchants->pluck('user_id', 'id');
 
         // Site 1: ISB2
         $site1 = new Site();
         $site1->merchant_id = $merchantIds[array_rand($merchantIds)];
+        $site1->user_id = $merchantOwners[$site1->merchant_id] ?? null;
         $site1->name = 'ISB2';
         $site1->phone = '044';
         $site1->points = 10;
@@ -44,6 +46,7 @@ class SiteSeeder extends Seeder
         // Site 2: Super Market Branch
         $site2 = new Site();
         $site2->merchant_id = $merchantIds[array_rand($merchantIds)];
+        $site2->user_id = $merchantOwners[$site2->merchant_id] ?? null;
         $site2->name = 'Super Market Branch';
         $site2->phone = '0778';
         $site2->points = 10;
@@ -58,6 +61,7 @@ class SiteSeeder extends Seeder
         // Site 3: Seven Kings Branch
         $site3 = new Site();
         $site3->merchant_id = $merchantIds[array_rand($merchantIds)];
+        $site3->user_id = $merchantOwners[$site3->merchant_id] ?? null;
         $site3->name = 'Seven Kings Branch';
         $site3->phone = '07789652562';
         $site3->points = 10;
@@ -72,6 +76,7 @@ class SiteSeeder extends Seeder
         // Site 4: Ilford Lane Branch
         $site4 = new Site();
         $site4->merchant_id = $merchantIds[array_rand($merchantIds)];
+        $site4->user_id = $merchantOwners[$site4->merchant_id] ?? null;
         $site4->name = 'Ilford Lane Branch';
         $site4->phone = '07789652563';
         $site4->points = 10;
@@ -86,6 +91,7 @@ class SiteSeeder extends Seeder
         // Site 5: Richmond
         $site5 = new Site();
         $site5->merchant_id = $merchantIds[array_rand($merchantIds)];
+        $site5->user_id = $merchantOwners[$site5->merchant_id] ?? null;
         $site5->name = 'Richmond';
         $site5->phone = '07789652564';
         $site5->points = 10;
@@ -100,6 +106,7 @@ class SiteSeeder extends Seeder
         // Site 6: Earl's Court
         $site6 = new Site();
         $site6->merchant_id = $merchantIds[array_rand($merchantIds)];
+        $site6->user_id = $merchantOwners[$site6->merchant_id] ?? null;
         $site6->name = 'Earl\'s Court';
         $site6->phone = '07789652565';
         $site6->points = 10;
@@ -114,6 +121,7 @@ class SiteSeeder extends Seeder
         // Site 7: Bahria Town Phase
         $site7 = new Site();
         $site7->merchant_id = $merchantIds[array_rand($merchantIds)];
+        $site7->user_id = $merchantOwners[$site7->merchant_id] ?? null;
         $site7->name = 'Bahria Town Phase';
         $site7->phone = '07789652566';
         $site7->points = 10;
@@ -128,6 +136,7 @@ class SiteSeeder extends Seeder
         // Site 8: Romford Branch
         $site8 = new Site();
         $site8->merchant_id = $merchantIds[array_rand($merchantIds)];
+        $site8->user_id = $merchantOwners[$site8->merchant_id] ?? null;
         $site8->name = 'Romford Branch';
         $site8->phone = '07789652567';
         $site8->points = 10;
@@ -142,6 +151,7 @@ class SiteSeeder extends Seeder
         // Site 9: Newbury Branch
         $site9 = new Site();
         $site9->merchant_id = $merchantIds[array_rand($merchantIds)];
+        $site9->user_id = $merchantOwners[$site9->merchant_id] ?? null;
         $site9->name = 'Newbury Branch';
         $site9->phone = '07789652568';
         $site9->points = 10;
@@ -156,6 +166,7 @@ class SiteSeeder extends Seeder
         // Site 10: Becton KFC
         $site10 = new Site();
         $site10->merchant_id = $merchantIds[array_rand($merchantIds)];
+        $site10->user_id = $merchantOwners[$site10->merchant_id] ?? null;
         $site10->name = 'Becton KFC';
         $site10->phone = '07789652569';
         $site10->points = 10;

@@ -14,14 +14,23 @@
                 @if (!$isSuperMode)
                     <div class="col-md-6 mb-3">
                         <label for="merchant_id" class="form-label">Merchant <span class="text-danger">*</span></label>
-                        <select class="form-select @error('merchant_id') is-invalid @enderror" name="merchant_id" id="merchant_id" required>
-                            <option value="">Select Merchant</option>
-                            @foreach ($merchants as $merchant)
-                                <option value="{{ $merchant->id }}" {{ old('merchant_id') == $merchant->id ? 'selected' : '' }}>
-                                    {{ $merchant->name }}
+                        @if(!$isSuperAdmin && $selectedMerchantId)
+                            <input type="hidden" name="merchant_id" value="{{ $selectedMerchantId }}">
+                            <select class="form-select @error('merchant_id') is-invalid @enderror" id="merchant_id" disabled>
+                                <option value="{{ $selectedMerchantId }}" selected>
+                                    {{ $merchants->first()->name ?? 'N/A' }}
                                 </option>
-                            @endforeach
-                        </select>
+                            </select>
+                        @else
+                            <select class="form-select @error('merchant_id') is-invalid @enderror" name="merchant_id" id="merchant_id" required>
+                                <option value="">Select Merchant</option>
+                                @foreach ($merchants as $merchant)
+                                    <option value="{{ $merchant->id }}" {{ ($selectedMerchantId == $merchant->id || old('merchant_id') == $merchant->id) ? 'selected' : '' }}>
+                                        {{ $merchant->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        @endif
                         @error('merchant_id')
                             <span class="text-danger small">{{ $message }}</span>
                         @enderror

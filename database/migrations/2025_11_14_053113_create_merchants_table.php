@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('merchants', function (Blueprint $table) {
             $table->UUID('id')->primary();
-
+            $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->integer('max_sites')->default(1);
             $table->integer('spin_after_days')->default(1);

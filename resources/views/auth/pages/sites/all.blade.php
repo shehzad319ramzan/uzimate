@@ -14,8 +14,7 @@
                         <tr>
                             <th>Sr#</th>
                             <th>Logo</th>
-                            <th>Name</th>
-                            <th>Merchant</th>
+                            <th>Merchant &amp; Site</th>
                             <th>Phone</th>
                             <th>City</th>
                             <th>Status</th>
@@ -39,8 +38,16 @@
                                         </div>
                                     @endif
                                 </td>
-                                <td>{{ $site?->name }}</td>
-                                <td>{{ $site->merchant->name ?? '-' }}</td>
+                                <td>
+                                    <div class="text-dark fw-semibold">
+                                        <span class="text-uppercase text-muted small me-1">Merchant:</span>
+                                        {{ $site->merchant->name ?? '-' }}
+                                    </div>
+                                    <small class="text-muted d-block mt-1">
+                                        <span class="text-uppercase text-muted small me-1">Site:</span>
+                                        {{ $site?->name }}
+                                    </small>
+                                </td>
                                 <td>{{ $site?->phone ?? '-' }}</td>
                                 <td>{{ $site?->city ?? '-' }}</td>
                                 <td>

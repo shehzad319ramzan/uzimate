@@ -22,11 +22,17 @@ class Merchant extends Model
         'spin_after_days',
         'scan_after_hours',
         'use_other_merchant_points',
-        'status'
+        'status',
+        'user_id',
     ];
 
     public function logo()
     {
         return $this->fileUrl('logo');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

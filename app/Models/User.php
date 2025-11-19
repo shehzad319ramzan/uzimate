@@ -76,4 +76,12 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->fileUrl('profile');
     }
+
+    /**
+     * Get the merchant that owns the user.
+     */
+    public function merchant()
+    {
+        return $this->hasOne(Merchant::class);
+    }
 }

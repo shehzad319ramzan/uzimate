@@ -7,7 +7,9 @@ use App\Dto\SiteUserDto;
 use App\Http\Requests\SiteUserRequest;
 use App\Models\Merchant;
 use App\Models\Site;
+use App\Models\SiteUser;
 use App\Repositories\SiteUserRepository;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -114,17 +116,75 @@ class SiteUserController extends BaseController
 
     protected function formOptions(array $overrides = []): array
     {
+        $user = Auth::user();
+        $isSuperAdmin = $user->hasRole(Constants::SUPERADMIN);
+        
+        if ($isSuperAdmin) {
+            // Super admin can see all merchants and sites
+            $merchants = Merchant::select('id', 'name')->orderBy('name')->get();
+            $sites = Site::select('id', 'name', 'merchant_id')->orderBy('name')->get();
+            $selectedMerchantId = null;
+        } else {
+            // For non-superadmin users, only show merchants/sites they have access to
+            $merchants = $this->getAccessibleMerchants($user);
+            $merchantIds = $merchants->pluck('id')->all();
+            $sites = $this->getAccessibleSites($user, $merchantIds);
+            $selectedMerchantId = $merchantIds[0] ?? null;
+        }
+
         return array_merge([
-            'merchants' => Merchant::select('id', 'name')->orderBy('name')->get(),
-            'sites' => Site::select('id', 'name', 'merchant_id')->orderBy('name')->get(),
-            'roles' => Role::whereNotIn('name', [Constants::SUPERADMIN, Constants::CUSTOMER])->select('id', 'name', 'title')->orderBy('title')->get(),
+            'merchants' => $merchants,
+            'sites' => $sites,
+            'selectedMerchantId' => $selectedMerchantId,
+            'roles' => Role::where('name', '!=', Constants::SUPERADMIN)->select('id', 'name', 'title')->orderBy('title')->get(),
             'isSuperMode' => false,
             'superRoleId' => $this->getSuperRoleId(),
+            'isSuperAdmin' => $isSuperAdmin,
         ], $overrides);
     }
 
     protected function getSuperRoleId(): ?string
     {
         return Role::where('name', Constants::SUPERADMIN)->value('id');
+    }
+
+    protected function getAccessibleMerchants($user)
+    {
+        $merchantIds = Merchant::where('user_id', $user->id)->pluck('id')->all();
+
+        $siteUserMerchantIds = SiteUser::where('user_id', $user->id)
+            ->whereNotNull('merchant_id')
+            ->pluck('merchant_id')
+            ->all();
+
+        $ids = array_unique(array_filter(array_merge($merchantIds, $siteUserMerchantIds)));
+
+        if (empty($ids)) {
+            return collect();
+        }
+
+        return Merchant::whereIn('id', $ids)->select('id', 'name')->orderBy('name')->get();
+    }
+
+    protected function getAccessibleSites($user, array $merchantIds = [])
+    {
+        $siteIds = [];
+
+        if (! empty($merchantIds)) {
+            $siteIds = Site::whereIn('merchant_id', $merchantIds)->pluck('id')->all();
+        }
+
+        $siteUserSiteIds = SiteUser::where('user_id', $user->id)
+            ->whereNotNull('site_id')
+            ->pluck('site_id')
+            ->all();
+
+        $ids = array_unique(array_filter(array_merge($siteIds, $siteUserSiteIds)));
+
+        if (empty($ids)) {
+            return collect();
+        }
+
+        return Site::whereIn('id', $ids)->select('id', 'name', 'merchant_id')->orderBy('name')->get();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Constants\Constants;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Role;
@@ -16,7 +17,7 @@ class RoleSeeder extends Seeder
         // Super Admin — oversees all accounts, sets global settings, monitors activity
         // Full access to everything
         $superAdmin = Role::create([
-            'name' => 'super_admin',
+            'name' => Constants::SUPERADMIN,
             'title' => 'Super Admin',
             'color' => '#FF6B6B'
         ]);
@@ -37,13 +38,13 @@ class RoleSeeder extends Seeder
         // Business Admin / Owner — can set up loyalty program, define rewards,
         // manage customers and view reports
         $businessAdmin = Role::create([
-            'name' => 'merchant',
-            'title' => 'Merchant',
+            'name' => Constants::Manager,
+            'title' => 'manager',
             'color' => '#4ECDC4'
         ]);
         // Modules used inside PermissionSeeder; keep same prefixes so sidebar @can checks stay in sync.
         $crudModules = [
-            'merchant',
+            'app_user',
             'site',
             'site_user',
             'offer',
@@ -67,12 +68,14 @@ class RoleSeeder extends Seeder
         // Manager / Staff — manages day-to-day tasks like checking customers in,
         // scanning codes, or issuing rewards at point of sale
         $manager = Role::create([
-            'name' => 'admin',
+            'name' => Constants::Admin,
             'title' => 'Admin',
             'color' => '#95E1D3'
         ]);
         // Manager gets limited permissions for day-to-day operations
         $managerModulePrefixes = [
+            'app_user',
+            'site_user',
             'offer',
             'customer_scan',
             'offer_scan',
@@ -90,7 +93,7 @@ class RoleSeeder extends Seeder
         // Customer (Member) — end-user who signs up for loyalty program,
         // collects points, and redeems rewards
         $customer = Role::create([
-            'name' => 'customer',
+            'name' => Constants::CUSTOMER,
             'title' => 'Customer',
             'color' => '#F38181'
         ]);
