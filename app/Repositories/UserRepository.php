@@ -6,6 +6,9 @@ use App\Constants\Constants;
 use App\Dto\UserDto;
 use App\Interface\UserInterface;
 use App\Models\User;
+use App\Models\SiteUser;
+use App\Support\Concerns\HasMerchantScope;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
 use Spatie\Permission\Models\Role;
@@ -15,6 +18,8 @@ use App\Notifications\UserCreatedResetNotification;
 
 class UserRepository extends BaseRepository implements UserInterface
 {
+    use HasMerchantScope;
+
     /**
      * Create a new service instance.
      *
@@ -27,11 +32,53 @@ class UserRepository extends BaseRepository implements UserInterface
 
     public function get_all_users()
     {
-        return $this->_model->with('roles')
+        $user = Auth::user();
+        $isSuperAdmin = $user && $user->hasRole(Constants::SUPERADMIN);
+
+        $query = $this->_model->with('roles')
             ->whereHas('roles', function ($q) {
                 $q->whereNotIn('name', [Constants::SUPERADMIN]);
-            })
-            ->get();
+            });
+
+        // If not superadmin, only show users that are linked to SiteUser records
+        // that belong to the logged-in user's accessible merchants/sites
+        if (!$isSuperAdmin && $user) {
+            $accessibleMerchantIds = $this->accessibleMerchantIds();
+            $accessibleSiteIds = $this->accessibleSiteIds();
+
+            // Get user IDs from SiteUser records that belong to accessible merchants/sites
+            $siteUserQuery = SiteUser::whereNotNull('user_id');
+
+            if (!empty($accessibleMerchantIds) || !empty($accessibleSiteIds)) {
+                $siteUserQuery->where(function ($q) use ($accessibleMerchantIds, $accessibleSiteIds) {
+                    if (!empty($accessibleMerchantIds)) {
+                        $q->whereIn('merchant_id', $accessibleMerchantIds);
+                    }
+                    if (!empty($accessibleSiteIds)) {
+                        if (!empty($accessibleMerchantIds)) {
+                            $q->orWhereIn('site_id', $accessibleSiteIds);
+                        } else {
+                            $q->whereIn('site_id', $accessibleSiteIds);
+                        }
+                    }
+                });
+            } else {
+                // No accessible merchants or sites, return empty
+                return $query->whereRaw('1 = 0')->get();
+            }
+
+            $siteUserUserIds = $siteUserQuery->pluck('user_id')->unique()->all();
+
+            if (empty($siteUserUserIds)) {
+                // If no accessible SiteUsers, return empty collection
+                return $query->whereRaw('1 = 0')->get();
+            }
+
+            // Only show users that are linked to SiteUser records
+            $query->whereIn('id', $siteUserUserIds);
+        }
+
+        return $query->get();
     }
 
     public function getStaff($user)

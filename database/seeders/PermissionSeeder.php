@@ -21,6 +21,7 @@ class PermissionSeeder extends Seeder
                 ['name' => 'view_user', 'title' => 'View user details'],
                 ['name' => 'edit_user', 'title' => 'Edit user'],
                 ['name' => 'delete_user', 'title' => 'Delete user'],
+                ['name' => 'assign_permission', 'title' => 'Assign Permission'],
             ],
             'Roles' => [
                 ['name' => 'all_role', 'title' => 'All Roles'],

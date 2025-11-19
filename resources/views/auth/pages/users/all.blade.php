@@ -18,7 +18,7 @@
                             <th>Name</th>
                             <th>Email</th>
                             <th>Role</th>
-                            @canany(['view_user', 'edit_user', 'delete_user'])
+                            @canany(['view_user', 'edit_user', 'delete_user','assign_permission'])
                             <th>Action</th>
                             @endcanany
                         </tr>
@@ -40,7 +40,7 @@
                                     {{ $roleTitle }}
                                 </span>
                             </td>
-                            @canany(['view_user', 'edit_user', 'delete_user'])
+                            @canany(['view_user', 'edit_user', 'delete_user','assign_permission'])
                             <td class="text-center">
                                 <div class="d-inline-block dropdown">
                                     <a href="javascript:void(0)" data-bs-toggle="dropdown" data-bs-display="static">
