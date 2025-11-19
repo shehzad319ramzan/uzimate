@@ -37,6 +37,7 @@ class UserUpdateRequest extends FormRequest
                 }
             }],
             'about' => ['required', 'string', 'max:250'],
+            'role' => ['required', 'exists:roles,id'],
             'file' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
         ];
     }

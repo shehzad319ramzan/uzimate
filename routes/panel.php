@@ -27,13 +27,13 @@ Route::group(
         Route::post('change-password/update', [ResetPasswordController::class, 'updatePassword'])->name('update_password');
 
         Route::prefix('users')->as('users.')->controller(UserController::class)->middleware(['isAdmin'])->group(function () {
+            Route::get('', 'index')->name('index')->middleware('can:all_user');
             Route::get('create', 'create')->name('create')->middleware('can:add_user');
             Route::get('show/{user}', 'show')->name('show')->middleware('can:view_user');
             Route::post('store', 'store')->name('store')->middleware('can:add_user');
             Route::get('edit/{user}', 'edit')->name('edit')->middleware('can:edit_user');
             Route::put('update/{user}', 'update')->name('update')->middleware('can:edit_user');
             Route::delete('delete/{user}', 'destroy')->name('destroy')->middleware('can:delete_user');
-            Route::get('{user}/list', 'getStaff')->name('index')->middleware(['can:all_user', 'validateRole']);
             Route::get('permissions/{user}', 'editPermissions')->name('permissions.edit')->middleware('can:assign_permission');
             Route::post('permissions/{user}', 'updatePermissions')->name('permissions.update')->middleware('can:assign_permission');
         });

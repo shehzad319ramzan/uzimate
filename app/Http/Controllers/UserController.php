@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Constants\Constants;
 use App\Dto\UserDto;
 use App\Http\Requests\User\UserRequest;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use App\Http\Requests\User\UpdateProfileRequest;
 use App\Http\Requests\User\UserUpdateRequest;
 use App\Interface\UserInterface;
@@ -57,13 +59,13 @@ class UserController extends BaseController
     {
         try {
             $this->_repo->update($id, UserDto::fromRequest($request->validated()));
-            return redirect()->back()->with('success', 'User updated created.');
+            return redirect()->route($this->_route . '.index')->with('success', 'User updated successfully.');
         } catch (\Throwable $th) {
             if ($th instanceof NotFoundHttpException) {
                 $message = $th->getMessage(); // Get the exception message
-                return redirect()->back()->with('error', $message);
+                return redirect()->route($this->_route . '.index')->with('error', $message);
             } else {
-                return redirect()->back()->with('error', 'Something went wrong..');
+                return redirect()->route($this->_route . '.index')->with('error', 'Something went wrong..');
             }
         }
     }
@@ -104,6 +106,34 @@ class UserController extends BaseController
     public function safety_privacy()
     {
         return view($this->_directory . '.profile.privacy_safety');
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        $data = $this->_repo->show($id);
+
+        if ($data == null) {
+            abort(404);
+        }
+
+        // Ensure roles are loaded
+        if (!$data->relationLoaded('roles')) {
+            $data->load('roles');
+        }
+
+        $roles = Role::select('id', 'name', 'title')
+            ->orderBy('title')
+            ->get();
+
+        $currentRoleId = $data->roles->first()?->id ?? null;
+
+        return view($this->_directory . '.edit', compact('data', 'roles', 'currentRoleId'));
     }
 
     public function getStaff($user)

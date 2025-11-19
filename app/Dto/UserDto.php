@@ -33,12 +33,26 @@ class UserDto
 
     public function toArray()
     {
-        $this->first_name == null ?: $data['first_name'] = $this->first_name;
-        $this->last_name == null ?: $data['last_name'] = $this->last_name;
-        $this->about == null ?: $data['about'] = $this->about;
-        $this->role == null ?: $data['type'] = $this->role;
-        $this->email == null ?: $data['email'] = $this->email;
-        $this->file == null ?: $data['image'] = $this->file;
+        $data = [];
+        
+        if ($this->first_name != null) {
+            $data['first_name'] = $this->first_name;
+        }
+        if ($this->last_name != null) {
+            $data['last_name'] = $this->last_name;
+        }
+        if ($this->about != null) {
+            $data['about'] = $this->about;
+        }
+        if ($this->role != null) {
+            $data['type'] = $this->role;
+        }
+        if ($this->email != null) {
+            $data['email'] = $this->email;
+        }
+        if ($this->file != null) {
+            $data['image'] = $this->file;
+        }
 
         return $data;
     }

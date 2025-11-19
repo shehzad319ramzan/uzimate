@@ -36,25 +36,11 @@
 
             {{-- STAFF MANAGEMENT --}}
             @can('all_user')
-            <li class="sidebar-item">
-                <a data-bs-target="#usersDropdown" data-bs-toggle="collapse" class="sidebar-link collapsed">
+            <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'users.') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('users.index') }}">
                     <i class="align-middle me-2 fas fa-file-invoice-dollar"></i>
                     <span class="align-middle">{{ __('language.staff_management') }}</span>
                 </a>
-                <ul id="usersDropdown"
-                    class="sidebar-dropdown list-unstyled collapse {{ Str::startsWith(request()->route()->getName(), 'users.') ? 'show' : '' }}"
-                    data-bs-parent="#sidebar">
-
-                    @can('all_user')
-                    @foreach ($roles as $roleKey => $role)
-                    <li class="sidebar-item {{ request()->user == $roleKey ? 'active' : '' }}">
-                        <a class="sidebar-link" href="{{ route('users.index', $roleKey) }}">
-                            <i class="fas fa-angle-double-right me-2"></i> {{ $role }}
-                        </a>
-                    </li>
-                    @endforeach
-                    @endcan
-                </ul>
             </li>
             @endcan
 

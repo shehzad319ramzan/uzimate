@@ -1,9 +1,9 @@
 <x-layouts.auth>
-    <x-slot name="pageTitle">{{ \Str::title(str_replace('_', ' ', request()->user)) }} List</x-slot>
+    <x-slot name="pageTitle">Staff Management</x-slot>
 
     <div class="row">
         <div class="col-md-12">
-            <x-auth.card card-header="{{ \Str::title(str_replace('_', ' ', request()->user)) }} List">
+            <x-auth.card card-header="Staff Management">
                 @can('add_user')
                 <x-slot name="headerCustom">
                     <x-auth.href-link link-href="{{ route('users.create') }}" link-class="btn btn-primary"
@@ -17,11 +17,7 @@
                             <th>ID</th>
                             <th>Name</th>
                             <th>Email</th>
-
-                            @if (request()->user == 'teacher')
-                            <th>Assign Class</th>
-                            @endif
-
+                            <th>Role</th>
                             @canany(['view_user', 'edit_user', 'delete_user'])
                             <th>Action</th>
                             @endcanany
@@ -29,21 +25,21 @@
                     </thead>
                     <tbody>
                         @foreach ($data['all'] as $key => $user)
+                        @php
+                            $role = $user->roles->first();
+                            $roleName = $role?->name ?? '-';
+                            $roleTitle = $role?->title ?? ucwords(str_replace('_', ' ', $roleName));
+                            $roleColor = $role?->color ?? '#4A148D';
+                        @endphp
                         <tr>
                             <td>{{ $key + 1 }}</td>
                             <td>{{ $user?->full_name }}</td>
                             <td>{{ $user?->email }}</td>
-
-                            @if (request()->user == 'teacher')
                             <td>
-                                <a href="{{ route('users.showAssignSectionForm', $user->id) }}" class=""
-                                    title="Click here to assign class or section to this teacher"
-                                    data-bs-toggle="tooltip" data-bs-placement="top">
-                                    Assign Class
-                                </a>
+                                <span class="badge" style="background-color: {{ $roleColor }}1c; color: {{ $roleColor }}; border: 1px solid {{ $roleColor }}; padding: 6px 12px; border-radius: 4px;">
+                                    {{ $roleTitle }}
+                                </span>
                             </td>
-                            @endif
-
                             @canany(['view_user', 'edit_user', 'delete_user'])
                             <td class="text-center">
                                 <div class="d-inline-block dropdown">

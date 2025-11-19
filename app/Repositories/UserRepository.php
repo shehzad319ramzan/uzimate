@@ -7,6 +7,7 @@ use App\Dto\UserDto;
 use App\Interface\UserInterface;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cache;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Support\Facades\Password;
@@ -26,9 +27,11 @@ class UserRepository extends BaseRepository implements UserInterface
 
     public function get_all_users()
     {
-        return $this->_model->whereHas('roles', function ($q) {
-            $q->whereNotIn('name', [Constants::SUPERADMIN]);
-        })->get();
+        return $this->_model->with('roles')
+            ->whereHas('roles', function ($q) {
+                $q->whereNotIn('name', [Constants::SUPERADMIN]);
+            })
+            ->get();
     }
 
     public function getStaff($user)
@@ -84,6 +87,10 @@ class UserRepository extends BaseRepository implements UserInterface
 
         $dataResult = $this->get_by_id($this->_model, $id);
 
+        // Handle role update
+        $roleId = isset($dataArray['type']) && !empty($dataArray['type']) ? $dataArray['type'] : null;
+        unset($dataArray['type']);
+
         if (isset($dataArray['image'])) {
             $existingImage = $dataResult->file()->first();
 
@@ -98,6 +105,21 @@ class UserRepository extends BaseRepository implements UserInterface
         }
 
         $dataResult->update($dataArray);
+
+        // Update role if provided
+        if ($roleId) {
+            $role = Role::find($roleId);
+            if ($role) {
+                // Remove all existing roles and assign the new one
+                $dataResult->syncRoles([$role->name]);
+                
+                // Clear permission cache to ensure changes are reflected
+                Cache::forget('spatie.permission.cache');
+            }
+        }
+
+        // Reload the user with roles to ensure fresh data
+        $dataResult->load('roles');
 
         return $dataResult;
     }
