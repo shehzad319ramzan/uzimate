@@ -55,6 +55,19 @@ trait HasMerchantScope
             return [];
         }
 
+        // First, check if user has specific site assignments via SiteUser
+        $siteUserSiteIds = SiteUser::where('user_id', $user->id)
+            ->whereNotNull('site_id')
+            ->pluck('site_id')
+            ->all();
+
+        // If user has specific site assignments, ONLY return those sites
+        // (Site users should only see their assigned sites, not all merchant sites)
+        if (! empty($siteUserSiteIds)) {
+            return array_values(array_unique(array_filter($siteUserSiteIds)));
+        }
+
+        // Otherwise, return sites from owned merchants or sites they created
         $merchantIds = $this->accessibleMerchantIds();
 
         $siteIds = Site::where('user_id', $user->id)
@@ -68,14 +81,7 @@ trait HasMerchantScope
             $siteIds = array_merge($siteIds, $merchantSiteIds);
         }
 
-        $siteUserSiteIds = SiteUser::where('user_id', $user->id)
-            ->whereNotNull('site_id')
-            ->pluck('site_id')
-            ->all();
-
-        $ids = array_unique(array_filter(array_merge($siteIds, $siteUserSiteIds)));
-
-        return array_values($ids);
+        return array_values(array_unique(array_filter($siteIds)));
     }
 }
 

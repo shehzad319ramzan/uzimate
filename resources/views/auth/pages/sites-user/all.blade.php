@@ -5,10 +5,13 @@
         <div class="col-md-12">
             <x-all-list title="Site Users" :data="$data['all']">
                 <x-slot name="headerCustom">
-                    <x-auth.href-link link-href="{{ route('siteusers.create') }}" link-value="{{ __('Create Site User') }}"
-                        link-class="btn btn-primary me-2" />
-                    <x-auth.href-link link-href="{{ route('siteusers.create-super') }}" link-value="{{ __('Add Super') }}"
-                        link-class="btn btn-outline-light text-primary" />
+                    <x-auth.href-link link-href="{{ route('siteusers.create') }}"
+                        link-value="{{ __('Create Site User') }}" link-class="btn btn-primary me-2" />
+                    @if (auth()->user()->hasRole('super_admin'))
+                        <x-auth.href-link link-href="{{ route('siteusers.create-super') }}"
+                            link-value="{{ __('Add Super') }}" link-class="btn btn-outline-light text-primary" />
+                    @endif
+
                 </x-slot>
 
                 <x-auth.datatable>
@@ -45,7 +48,8 @@
                                 <td>{{ $siteUser->user?->email ?? '-' }}</td>
                                 <td>
                                     @php
-                                        $roleLabel = $role?->title ?? ucwords(str_replace('_', ' ', $role?->name ?? '-'));
+                                        $roleLabel =
+                                            $role?->title ?? ucwords(str_replace('_', ' ', $role?->name ?? '-'));
                                         $roleColors = [
                                             'super_admin' => '#7B1FA2',
                                             'business_admin' => '#F57C00',
@@ -55,12 +59,13 @@
                                         ];
                                         $roleColor = $roleColors[$role?->name ?? ''] ?? ($role?->color ?? '#4A148D');
                                     @endphp
-                                    <span class="badge" style="background-color: {{ $roleColor }}1c; color: {{ $roleColor }}; border: 1px solid {{ $roleColor }};">
+                                    <span class="badge"
+                                        style="background-color: {{ $roleColor }}1c; color: {{ $roleColor }}; border: 1px solid {{ $roleColor }};">
                                         {{ $roleLabel }}
                                     </span>
                                 </td>
                                 <td>
-                                    @if($siteUser->status)
+                                    @if ($siteUser->status)
                                         <span class="badge bg-success">Active</span>
                                     @else
                                         <span class="badge bg-danger">Inactive</span>
@@ -73,13 +78,16 @@
                                             <i class="fas fa-ellipsis-v bg-light rounded p-2"></i>
                                         </a>
                                         <div class="dropdown-menu dropdown-menu-end">
-                                            <a class="dropdown-item" href="{{ route('siteusers.show', $siteUser->id) }}">
+                                            <a class="dropdown-item"
+                                                href="{{ route('siteusers.show', $siteUser->id) }}">
                                                 <i class="fas fa-eye me-2 text-primary"></i> View
                                             </a>
-                                            <a class="dropdown-item" href="{{ route('siteusers.edit', $siteUser->id) }}">
+                                            <a class="dropdown-item"
+                                                href="{{ route('siteusers.edit', $siteUser->id) }}">
                                                 <i class="fas fa-edit me-2 text-warning"></i> Edit
                                             </a>
-                                            <form action="{{ route('siteusers.destroy', $siteUser->id) }}" method="POST"
+                                            <form action="{{ route('siteusers.destroy', $siteUser->id) }}"
+                                                method="POST"
                                                 onsubmit="return confirm('Are you sure you want to delete this site user?');">
                                                 @csrf
                                                 @method('DELETE')

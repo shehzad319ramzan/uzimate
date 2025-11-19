@@ -168,23 +168,32 @@ class SiteUserController extends BaseController
 
     protected function getAccessibleSites($user, array $merchantIds = [])
     {
+        // First, check if user has specific site assignments via SiteUser
+        $siteUserSiteIds = SiteUser::where('user_id', $user->id)
+            ->whereNotNull('site_id')
+            ->pluck('site_id')
+            ->all();
+
+        // If user has specific site assignments, ONLY return those sites
+        // (Site users should only see their assigned sites, not all merchant sites)
+        if (! empty($siteUserSiteIds)) {
+            return Site::whereIn('id', $siteUserSiteIds)
+                ->select('id', 'name', 'merchant_id')
+                ->orderBy('name')
+                ->get();
+        }
+
+        // Otherwise, return sites from accessible merchants
         $siteIds = [];
 
         if (! empty($merchantIds)) {
             $siteIds = Site::whereIn('merchant_id', $merchantIds)->pluck('id')->all();
         }
 
-        $siteUserSiteIds = SiteUser::where('user_id', $user->id)
-            ->whereNotNull('site_id')
-            ->pluck('site_id')
-            ->all();
-
-        $ids = array_unique(array_filter(array_merge($siteIds, $siteUserSiteIds)));
-
-        if (empty($ids)) {
+        if (empty($siteIds)) {
             return collect();
         }
 
-        return Site::whereIn('id', $ids)->select('id', 'name', 'merchant_id')->orderBy('name')->get();
+        return Site::whereIn('id', $siteIds)->select('id', 'name', 'merchant_id')->orderBy('name')->get();
     }
 }
