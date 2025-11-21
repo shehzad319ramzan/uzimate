@@ -57,6 +57,11 @@ class SiteUserRequest extends FormRequest
         $merchantRules = ['required', 'uuid', 'exists:merchants,id'];
         $siteRules = [
             'required',
+            'array',
+            'min:1',
+        ];
+
+        $siteItemRules = [
             'uuid',
             Rule::exists('sites', 'id')->where(function ($query) {
                 $merchantId = $this->input('merchant_id');
@@ -69,13 +74,15 @@ class SiteUserRequest extends FormRequest
 
         if ($this->isSuperMode()) {
             $merchantRules = ['nullable', 'uuid', 'exists:merchants,id'];
-            $siteRules = ['nullable', 'uuid', 'exists:sites,id'];
+            $siteRules = ['nullable', 'array'];
+            $siteItemRules = ['nullable', 'uuid', 'exists:sites,id'];
             $roleRules = ['nullable', 'exists:roles,id'];
         }
 
         return [
             'merchant_id' => $merchantRules,
-            'site_id' => $siteRules,
+            'site_ids' => $siteRules,
+            'site_ids.*' => $siteItemRules,
             'first_name' => ['required', 'string', 'max:150'],
             'last_name' => ['required', 'string', 'max:150'],
             'email' => [

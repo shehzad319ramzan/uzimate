@@ -2,6 +2,22 @@
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 @endpush
 
+@php
+    $selectedValues = collect(
+        is_array($existingId) || $existingId instanceof \Illuminate\Support\Collection
+            ? $existingId
+            : array_filter([$existingId])
+    )
+        ->flatten()
+        ->filter(fn ($value) => $value !== null && $value !== '')
+        ->map(fn ($value) => (string) $value)
+        ->unique()
+        ->values()
+        ->all();
+
+    $errorName = preg_replace('/\[\]$/', '', $name);
+@endphp
+
 <div class='required field'>
     @if ($label != null)
     <label for="{{ $id }}" class="form-label">{{ $label }}</label>
@@ -9,21 +25,37 @@
 
     <select class="{{$selectclass}} form-select @error($name)
     is-invalid
+    @enderror @error($errorName)
+    is-invalid
     @enderror" name="{{ $name }}" data-placeholder="{{ $placeholder }}" id="{{ $id }}" {{ $attributes }}>
         <option></option>
 
         @if ($loopData == null)
         @else
         @foreach ($loopData as $item)
-        <option value="{{ $item->id }}" {{ $item->id == $existingId ? 'selected' : '' }}>
-            {{ $item->name }}
+        @php
+            $value = (string) ($item->id ?? $item['id'] ?? '');
+            $label = $item->name ?? $item['name'] ?? $value;
+            $dataMerchant = $item->merchant_id ?? $item['merchant_id'] ?? '';
+        @endphp
+        <option value="{{ $value }}" {{ $dataMerchant !== '' ? 'data-merchant="'.$dataMerchant.'"' : '' }}
+            {{ in_array($value, $selectedValues, true) ? 'selected' : '' }}>
+            {{ $label }}
         </option>
         @endforeach
         @endif
     </select>
 
-    @if ($errors->has($name))
-    <span for="{{ $id }}" class="text-danger">{{ $errors->first($name) }}</span>
+    @error($name)
+    <span for="{{ $id }}" class="text-danger">{{ $message }}</span>
+    @enderror
+    @if ($errorName !== $name)
+        @error($errorName)
+        <span for="{{ $id }}" class="text-danger">{{ $message }}</span>
+        @enderror
+        @error($errorName . '.*')
+        <span for="{{ $id }}" class="text-danger">{{ $message }}</span>
+        @enderror
     @endif
 </div>
 

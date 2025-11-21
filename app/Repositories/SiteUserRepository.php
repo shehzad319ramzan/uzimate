@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Constants\Constants;
 use App\Dto\SiteUserDto;
 use App\Models\Permission;
+use App\Models\Site;
 use App\Models\SiteUser;
 use App\Models\User;
 use App\Support\Concerns\HasMerchantScope;
@@ -63,10 +64,33 @@ class SiteUserRepository extends BaseRepository
         return DB::transaction(function () use ($data) {
             $user = $this->createOrUpdateUser(new User(), $data);
 
-            $siteUserData = $data->toArray();
-            $siteUserData['user_id'] = $user->id;
+            $siteIds = $data->site_ids;
+            if (empty($siteIds)) {
+                throw new \InvalidArgumentException('Please select at least one site.');
+            }
 
-            return $this->_model->create($siteUserData)->load($this->with);
+            $status = $data->status ?? true;
+            $records = collect();
+
+            foreach ($siteIds as $siteId) {
+                $site = Site::findOrFail($siteId);
+
+                $siteUserData = [
+                    'merchant_id' => $data->merchant_id ?? $site->merchant_id,
+                    'site_id' => $siteId,
+                    'user_id' => $user->id,
+                    'status' => $status,
+                ];
+
+                $records->push(
+                    $this->_model->updateOrCreate(
+                        ['user_id' => $user->id, 'site_id' => $siteId],
+                        $siteUserData
+                    )->load($this->with)
+                );
+            }
+
+            return $records->first();
         });
     }
 
@@ -79,10 +103,57 @@ class SiteUserRepository extends BaseRepository
         }
 
         return DB::transaction(function () use ($siteUser, $data) {
-            $this->createOrUpdateUser($siteUser->user, $data);
-            $siteUser->update($data->toArray());
+            $user = $this->createOrUpdateUser($siteUser->user, $data);
 
-            return $siteUser->load($this->with);
+            $siteIds = $data->site_ids;
+            if (empty($siteIds)) {
+                throw new \InvalidArgumentException('Please select at least one site.');
+            }
+
+            $status = $data->status ?? true;
+
+            $existingAssignments = $this->_model->where('user_id', $user->id)->get();
+            $existingSiteIds = $existingAssignments->pluck('site_id')->all();
+
+            $toAdd = array_diff($siteIds, $existingSiteIds);
+            $toRemove = array_diff($existingSiteIds, $siteIds);
+
+            // Remove site assignments that are no longer selected
+            if (!empty($toRemove)) {
+                $this->_model->where('user_id', $user->id)
+                    ->whereIn('site_id', $toRemove)
+                    ->delete();
+            }
+
+            $records = collect();
+
+            // Update existing assignments (ensure merchant/status sync)
+            foreach ($existingAssignments as $assignment) {
+                if (in_array($assignment->site_id, $siteIds)) {
+                    $site = Site::find($assignment->site_id);
+                    $assignment->update([
+                        'merchant_id' => $data->merchant_id ?? $site?->merchant_id,
+                        'status' => $status,
+                    ]);
+                    $records->push($assignment->fresh($this->with));
+                }
+            }
+
+            // Add any new site assignments
+            foreach ($toAdd as $siteId) {
+                $site = Site::findOrFail($siteId);
+                $records->push(
+                    $this->_model->updateOrCreate(
+                        ['user_id' => $user->id, 'site_id' => $siteId],
+                        [
+                            'merchant_id' => $data->merchant_id ?? $site->merchant_id,
+                            'status' => $status,
+                        ]
+                    )->load($this->with)
+                );
+            }
+
+            return $records->first() ?? $siteUser->load($this->with);
         });
     }
 
@@ -99,13 +170,17 @@ class SiteUserRepository extends BaseRepository
             $siteUser->delete();
 
             if ($user) {
-                $existingImage = $user->file()->where('type', Constants::PROFILETYPE)->first();
-                if ($existingImage) {
-                    $this->deleteFile($existingImage->path);
-                    $existingImage->delete();
-                }
+                $remainingAssignments = $this->_model->where('user_id', $user->id)->count();
 
-                $user->delete();
+                if ($remainingAssignments === 0) {
+                    $existingImage = $user->file()->where('type', Constants::PROFILETYPE)->first();
+                    if ($existingImage) {
+                        $this->deleteFile($existingImage->path);
+                        $existingImage->delete();
+                    }
+
+                    $user->delete();
+                }
             }
 
             return true;

@@ -12,6 +12,10 @@
         <x-auth.form form-action="{{ route('siteusers.update', $data->id) }}" enctype="true">
             @method('PUT')
             <div class="row">
+                @php
+                    $selectedSiteIds = $assignedSiteIds ?? [];
+                    $selectedSiteIds = is_array($selectedSiteIds) ? $selectedSiteIds : [];
+                @endphp
                 @if (!$isSuperMode)
                     <div class="col-md-6 mb-3">
                         <label for="merchant_id" class="form-label">Merchant <span class="text-danger">*</span></label>
@@ -37,22 +41,22 @@
                         @enderror
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="site_id" class="form-label">Site <span class="text-danger">*</span></label>
-                        <select class="form-select @error('site_id') is-invalid @enderror" name="site_id" id="site_id" required>
-                            <option value="">Select Site</option>
-                            @foreach ($sites as $site)
-                                <option value="{{ $site->id }}" data-merchant="{{ $site->merchant_id }}" {{ old('site_id', $data->site_id) == $site->id ? 'selected' : '' }}>
-                                    {{ $site->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('site_id')
-                            <span class="text-danger small">{{ $message }}</span>
-                        @enderror
+                        <x-auth.select2
+                            label="Sites"
+                            name="site_ids[]"
+                            id="site_ids"
+                            :data="$sites"
+                            :existing-id="old('site_ids', $selectedSiteIds)"
+                            placeholder="Select sites"
+                            selectclass="select2-sites"
+                            multiple
+                            required
+                        />
+                        <small class="text-muted">Hold Ctrl (Cmd on Mac) to select multiple sites.</small>
                     </div>
                 @else
                     <input type="hidden" name="merchant_id" value="{{ $data->merchant_id }}">
-                    <input type="hidden" name="site_id" value="{{ $data->site_id }}">
+                    <input type="hidden" name="site_ids[]" value="{{ $data->site_id }}">
                     <div class="col-md-12 mb-3">
                         <div class="alert alert-info">
                             Super Admin accounts are not attached to a merchant or site.

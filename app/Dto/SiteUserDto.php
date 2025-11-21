@@ -8,6 +8,7 @@ class SiteUserDto
 {
     public ?string $merchant_id;
     public ?string $site_id;
+    public array $site_ids = [];
     public ?string $first_name;
     public ?string $last_name;
     public ?string $email;
@@ -27,7 +28,15 @@ class SiteUserDto
         $payload = $request instanceof Request ? $request->all() : $request;
 
         $this->merchant_id = !empty($payload['merchant_id']) ? $payload['merchant_id'] : null;
-        $this->site_id = !empty($payload['site_id']) ? $payload['site_id'] : null;
+
+        $siteIds = $payload['site_ids'] ?? $payload['site_id'] ?? [];
+        if (!is_array($siteIds)) {
+            $siteIds = [$siteIds];
+        }
+        $siteIds = array_filter($siteIds);
+
+        $this->site_ids = array_values(array_unique($siteIds));
+        $this->site_id = $this->site_ids[0] ?? null;
         $this->first_name = $payload['first_name'] ?? null;
         $this->last_name = $payload['last_name'] ?? null;
         $this->email = $payload['email'] ?? null;
@@ -51,8 +60,8 @@ class SiteUserDto
     {
         return [
             'merchant_id' => $this->merchant_id,
-            'site_id' => $this->site_id,
             'status' => $this->status ?? true,
+            'site_ids' => $this->site_ids,
         ];
     }
 

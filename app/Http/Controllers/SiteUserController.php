@@ -59,7 +59,7 @@ class SiteUserController extends BaseController
         try {
             $request->merge([
                 'merchant_id' => null,
-                'site_id' => null,
+                'site_ids' => [],
                 'role_id' => $this->getSuperRoleId(),
             ]);
             $this->_repo->store(SiteUserDto::fromRequest($request));
@@ -83,11 +83,14 @@ class SiteUserController extends BaseController
             abort(404);
         }
 
+        $assignedSiteIds = SiteUser::where('user_id', $data->user_id)->pluck('site_id')->toArray();
+
         return view($this->_directory . '.edit', array_merge([
             'data' => $data,
         ], $this->formOptions([
             'isSuperMode' => $data->user?->hasRole(Constants::SUPERADMIN),
             'superRoleId' => $this->getSuperRoleId(),
+            'assignedSiteIds' => $assignedSiteIds,
         ])));
     }
 
@@ -98,7 +101,7 @@ class SiteUserController extends BaseController
             if ($siteUser && $siteUser->user?->hasRole(Constants::SUPERADMIN)) {
                 $request->merge([
                     'merchant_id' => null,
-                    'site_id' => null,
+                'site_ids' => [],
                     'role_id' => $this->getSuperRoleId(),
                 ]);
             }
@@ -118,7 +121,7 @@ class SiteUserController extends BaseController
     {
         $user = Auth::user();
         $isSuperAdmin = $user->hasRole(Constants::SUPERADMIN);
-        
+
         if ($isSuperAdmin) {
             // Super admin can see all merchants and sites
             $merchants = Merchant::select('id', 'name')->orderBy('name')->get();
@@ -132,7 +135,9 @@ class SiteUserController extends BaseController
             $selectedMerchantId = $merchantIds[0] ?? null;
         }
 
-        return array_merge([
+        $assignedSiteIds = $overrides['assignedSiteIds'] ?? [];
+
+        $base = [
             'merchants' => $merchants,
             'sites' => $sites,
             'selectedMerchantId' => $selectedMerchantId,
@@ -140,7 +145,12 @@ class SiteUserController extends BaseController
             'isSuperMode' => false,
             'superRoleId' => $this->getSuperRoleId(),
             'isSuperAdmin' => $isSuperAdmin,
-        ], $overrides);
+        ];
+
+        $result = array_merge($base, $overrides);
+        $result['assignedSiteIds'] = old('site_ids', $assignedSiteIds);
+
+        return $result;
     }
 
     protected function getSuperRoleId(): ?string
