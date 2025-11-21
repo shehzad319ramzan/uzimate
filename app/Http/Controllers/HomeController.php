@@ -71,8 +71,8 @@ class HomeController extends Controller
         $merchantFilter = $filters['merchant_id'] ?? null;
         $module = $filters['module'] ?? 'merchants';
 
-        // Merchants statistics
-        $merchantQuery = $this->applyDateFilter(Merchant::query(), 'created_at', $startDate, $endDate);
+        // Merchants statistics - Total counts (no date filter for totals)
+        $merchantQuery = Merchant::query();
         if ($merchantFilter) {
             $merchantQuery->where('id', $merchantFilter);
         }
@@ -90,14 +90,15 @@ class HomeController extends Controller
             Carbon::now()
         )->count();
 
-        $sitesQuery = $this->applyDateFilter(Site::query(), 'created_at', $startDate, $endDate);
+        // Sites statistics - Total counts (no date filter for totals)
+        $sitesQuery = Site::query();
         if ($merchantFilter) {
             $sitesQuery->where('merchant_id', $merchantFilter);
         }
         $totalSites = $sitesQuery->count();
 
-        // Site Users statistics
-        $siteUserQuery = $this->applyDateFilter(SiteUser::query(), 'created_at', $startDate, $endDate);
+        // Site Users statistics - Total counts (no date filter for totals)
+        $siteUserQuery = SiteUser::query();
         if ($merchantFilter) {
             $siteUserQuery->where('merchant_id', $merchantFilter);
         }
@@ -120,12 +121,12 @@ class HomeController extends Controller
             $superAdminUsers = $this->applyRoleDateFilter($superAdminRole->name, $startDate, $endDate);
         }
 
-        // Offers statistics (if Offer model exists)
+        // Offers statistics (if Offer model exists) - Total counts (no date filter for totals)
         $totalOffers = 0;
         $activeOffers = 0;
         $expiredOffers = 0;
         if (class_exists(Offer::class)) {
-            $offerQuery = $this->applyDateFilter(Offer::query(), 'created_at', $startDate, $endDate);
+            $offerQuery = Offer::query();
             if ($merchantFilter && Schema::hasColumn((new Offer())->getTable(), 'merchant_id')) {
                 $offerQuery->where('merchant_id', $merchantFilter);
             }
@@ -140,24 +141,19 @@ class HomeController extends Controller
             })->count();
         }
 
-        // Customers statistics
+        // Customers statistics - Total counts (no date filter for totals)
         $customerRole = Role::where('name', Constants::CUSTOMER)->first();
         $totalCustomers = 0;
         $activeCustomers = 0;
         $inactiveCustomers = 0;
         if ($customerRole) {
-            $customerQuery = $this->applyDateFilter(User::role($customerRole->name), 'created_at', $startDate, $endDate);
+            $customerQuery = User::role($customerRole->name);
             $totalCustomers = $customerQuery->count();
 
             if (Schema::hasColumn('users', 'status')) {
-                $activeCustomers = $this->applyDateFilter(
-                    User::role($customerRole->name)->where(function ($query) {
-                        $query->where('status', 1)->orWhere('status', 'active');
-                    }),
-                    'created_at',
-                    $startDate,
-                    $endDate
-                )->count();
+                $activeCustomers = User::role($customerRole->name)->where(function ($query) {
+                    $query->where('status', 1)->orWhere('status', 'active');
+                })->count();
                 $inactiveCustomers = $totalCustomers - $activeCustomers;
             } else {
                 $activeCustomers = $totalCustomers;
@@ -165,12 +161,15 @@ class HomeController extends Controller
             }
         }
 
-        $chart = $this->buildSuperAdminChart($module, $merchantFilter, $startDate, $endDate);
+        // For charts, if no date range selected, show last 30 days
+        $chartStartDate = $startDate ?? Carbon::now()->subDays(29);
+        $chartEndDate = $endDate ?? Carbon::now();
+        $chart = $this->buildSuperAdminChart($module, $merchantFilter, $chartStartDate, $chartEndDate);
 
         Log::info('Dashboard Super Admin Stats', [
             'filters' => [
-                'start_date' => $startDate->toDateString(),
-                'end_date' => $endDate->toDateString(),
+                'start_date' => $startDate ? $startDate->toDateString() : 'all',
+                'end_date' => $endDate ? $endDate->toDateString() : 'all',
                 'merchant' => $merchantFilter,
                 'module' => $module,
             ],
@@ -287,12 +286,15 @@ class HomeController extends Controller
         $activeCustomers = 0;
         $inactiveCustomers = 0;
 
+        // For charts, if no date range selected, show last 30 days
+        $chartStartDate = $startDate ?? Carbon::now()->subDays(29);
+        $chartEndDate = $endDate ?? Carbon::now();
         $chart = $this->buildChartData(
             $this->applyDateFilter(
                 Site::where('merchant_id', $merchantId)->when($siteFilter !== 'all', fn ($q) => $q->where('id', $siteFilter)),
                 'created_at',
-                $startDate,
-                $endDate
+                $chartStartDate,
+                $chartEndDate
             ),
             'created_at',
             'd M',
@@ -329,25 +331,66 @@ class HomeController extends Controller
      */
     private function getAdminStats($user, array $filters): array
     {
-        $siteUser = SiteUser::where('user_id', $user->id)->first();
-        $siteId = $siteUser?->site_id;
+        // Get admin's accessible merchants and sites using the same logic as filtering
+        $accessibleMerchantIds = $this->getAccessibleMerchantIds($user);
+        $accessibleSiteIds = $this->getAccessibleSiteIds($user);
 
-        if (!$siteId) {
+        if (empty($accessibleMerchantIds) && empty($accessibleSiteIds)) {
             return $this->getEmptyStats();
         }
 
         [$startDate, $endDate] = $this->getDateRange($filters);
         $activity = $filters['activity'] ?? 'offers';
+        $startOfMonth = Carbon::now()->startOfMonth();
 
-        // Site-specific offers
+        // Sites statistics - from accessible merchants
+        $siteQuery = $this->applyDateFilter(Site::query(), 'created_at', $startDate, $endDate);
+        if (!empty($accessibleMerchantIds)) {
+            $siteQuery->whereIn('merchant_id', $accessibleMerchantIds);
+        }
+        if (!empty($accessibleSiteIds)) {
+            $siteQuery->orWhereIn('id', $accessibleSiteIds);
+        }
+        $totalSites = $siteQuery->count();
+        $sitesThisMonth = $this->applyDateFilter(
+            Site::when(!empty($accessibleMerchantIds), fn($q) => $q->whereIn('merchant_id', $accessibleMerchantIds))
+                ->when(!empty($accessibleSiteIds), fn($q) => $q->orWhereIn('id', $accessibleSiteIds)),
+            'created_at',
+            $startOfMonth,
+            Carbon::now()
+        )->count();
+
+        // Site Users statistics - from accessible merchants/sites
+        $siteUserQuery = $this->applyDateFilter(SiteUser::query(), 'created_at', $startDate, $endDate);
+        if (!empty($accessibleMerchantIds)) {
+            $siteUserQuery->whereIn('merchant_id', $accessibleMerchantIds);
+        }
+        if (!empty($accessibleSiteIds)) {
+            $siteUserQuery->orWhereIn('site_id', $accessibleSiteIds);
+        }
+        $totalSiteUsers = $siteUserQuery->count();
+        $siteUsersThisMonth = $this->applyDateFilter(
+            SiteUser::when(!empty($accessibleMerchantIds), fn($q) => $q->whereIn('merchant_id', $accessibleMerchantIds))
+                ->when(!empty($accessibleSiteIds), fn($q) => $q->orWhereIn('site_id', $accessibleSiteIds)),
+            'created_at',
+            $startOfMonth,
+            Carbon::now()
+        )->count();
+
+        // Offers statistics - from accessible merchants/sites
         $totalOffers = 0;
         $activeOffers = 0;
         $expiredOffers = 0;
         if (class_exists(Offer::class)) {
             $offerQuery = $this->applyDateFilter(Offer::query(), 'created_at', $startDate, $endDate);
-            if (Schema::hasColumn((new Offer())->getTable(), 'site_id')) {
-                $offerQuery->where('site_id', $siteId);
+            
+            if (Schema::hasColumn((new Offer())->getTable(), 'merchant_id') && !empty($accessibleMerchantIds)) {
+                $offerQuery->whereIn('merchant_id', $accessibleMerchantIds);
             }
+            if (Schema::hasColumn((new Offer())->getTable(), 'site_id') && !empty($accessibleSiteIds)) {
+                $offerQuery->orWhereIn('site_id', $accessibleSiteIds);
+            }
+            
             $totalOffers = $offerQuery->count();
             $activeOffers = (clone $offerQuery)->where(function ($q) {
                 $q->where('status', 'active')->orWhere('status', 1);
@@ -357,17 +400,29 @@ class HomeController extends Controller
             })->count();
         }
 
-        // Customer scans (if model exists)
+        // Customer scans (if model exists) - from accessible sites
         $totalScans = 0;
         $scansThisMonth = 0;
 
-        // Point awards (if model exists)
+        // Point awards (if model exists) - from accessible sites
         $totalPointsAwarded = 0;
         $pointsThisMonth = 0;
 
-        $chart = $this->buildAdminChart($activity, $siteId, $startDate, $endDate);
+        // For charts, if no date range selected, show last 30 days
+        $chartStartDate = $startDate ?? Carbon::now()->subDays(29);
+        $chartEndDate = $endDate ?? Carbon::now();
+        $chart = $this->buildAdminChart($activity, $accessibleSiteIds, $chartStartDate, $chartEndDate);
 
         return [
+            'sites' => [
+                'total' => $totalSites,
+                'this_month' => $sitesThisMonth,
+                'site_users' => $totalSiteUsers,
+            ],
+            'site_users' => [
+                'total' => $totalSiteUsers,
+                'this_month' => $siteUsersThisMonth,
+            ],
             'offers' => [
                 'total' => $totalOffers,
                 'active' => $activeOffers,
@@ -406,7 +461,10 @@ class HomeController extends Controller
         $availableOffers = 0;
         $redeemedOffers = 0;
 
-        $chart = $this->buildCustomerChart($activity, $user->id, $startDate, $endDate);
+        // For charts, if no date range selected, show last 30 days
+        $chartStartDate = $startDate ?? Carbon::now()->subDays(29);
+        $chartEndDate = $endDate ?? Carbon::now();
+        $chart = $this->buildCustomerChart($activity, $user->id, $chartStartDate, $chartEndDate);
 
         return [
             'points' => [
@@ -446,14 +504,44 @@ class HomeController extends Controller
 
     private function prepareFilters(Request $request, string $role, $user): array
     {
-        $defaultStart = Carbon::now()->subDays(29)->format('Y-m-d');
-        $defaultEnd = Carbon::now()->format('Y-m-d');
+        $dateRange = $request->input('date_range', 'all'); // Default to 'all'
+        
+        // Set dates based on selected range
+        switch ($dateRange) {
+            case 'this_month':
+                $defaultStart = Carbon::now()->startOfMonth()->format('Y-m-d');
+                $defaultEnd = Carbon::now()->format('Y-m-d');
+                break;
+            case 'this_year':
+                $defaultStart = Carbon::now()->startOfYear()->format('Y-m-d');
+                $defaultEnd = Carbon::now()->format('Y-m-d');
+                break;
+            case 'custom':
+                $defaultStart = $request->input('start_date', Carbon::now()->subDays(29)->format('Y-m-d'));
+                $defaultEnd = $request->input('end_date', Carbon::now()->format('Y-m-d'));
+                break;
+            case 'all':
+            default:
+                $defaultStart = null;
+                $defaultEnd = null;
+                break;
+        }
 
         $filters = [
-            'start_date' => $request->input('start_date', $defaultStart),
-            'end_date' => $request->input('end_date', $defaultEnd),
+            'date_range' => $dateRange,
+            'start_date' => $defaultStart,
+            'end_date' => $defaultEnd,
         ];
-        $filterOptions = [];
+        
+        // Add date range options for all roles
+        $filterOptions = [
+            'date_ranges' => [
+                'all' => 'All Time',
+                'this_month' => 'This Month',
+                'this_year' => 'This Year',
+                'custom' => 'Custom Range',
+            ]
+        ];
 
         if ($role === Constants::SUPERADMIN) {
             $filters['merchant_id'] = $request->input('merchant_id');
@@ -473,8 +561,18 @@ class HomeController extends Controller
             $filterOptions['sites'] = Site::where('merchant_id', $merchantId)->select('id', 'name')->orderBy('name')->get();
         } elseif ($role === Constants::Admin) {
             $filters['activity'] = $request->input('activity', 'offers');
+            $filters['site_id'] = $request->input('site_id', 'all');
+            
+            // Get admin's accessible sites for filtering
+            $accessibleSiteIds = $this->getAccessibleSiteIds($user);
+            $filterOptions['sites'] = Site::whereIn('id', $accessibleSiteIds)
+                ->select('id', 'name')
+                ->orderBy('name')
+                ->get();
+            
             $filterOptions['activities'] = [
                 'offers' => 'Offers',
+                'sites' => 'Sites',
                 'scans' => 'Customer Scans',
                 'points' => 'Point Awards',
             ];
@@ -491,8 +589,13 @@ class HomeController extends Controller
 
     private function getDateRange(array $filters): array
     {
-        $start = isset($filters['start_date']) ? Carbon::parse($filters['start_date']) : Carbon::now()->subDays(29);
-        $end = isset($filters['end_date']) ? Carbon::parse($filters['end_date']) : Carbon::now();
+        // If no date filtering (All Time), return null values
+        if ($filters['date_range'] === 'all' || empty($filters['start_date']) || empty($filters['end_date'])) {
+            return [null, null];
+        }
+
+        $start = Carbon::parse($filters['start_date']);
+        $end = Carbon::parse($filters['end_date']);
 
         return [$start->startOfDay(), $end->endOfDay()];
     }
@@ -512,7 +615,7 @@ class HomeController extends Controller
         ];
     }
 
-    private function buildSuperAdminChart(string $module, ?string $merchantId, Carbon $startDate, Carbon $endDate): array
+    private function buildSuperAdminChart(string $module, ?string $merchantId, ?Carbon $startDate, ?Carbon $endDate): array
     {
         switch ($module) {
             case 'sites':
@@ -559,14 +662,19 @@ class HomeController extends Controller
         ];
     }
 
-    private function buildAdminChart(string $activity, string $siteId, Carbon $startDate, Carbon $endDate): array
+    private function buildAdminChart(string $activity, array $accessibleSiteIds, ?Carbon $startDate, ?Carbon $endDate): array
     {
-        if ($activity === 'offers' && class_exists(Offer::class)) {
+        if ($activity === 'offers' && class_exists(Offer::class) && !empty($accessibleSiteIds)) {
             $query = $this->applyDateFilter(Offer::query(), 'created_at', $startDate, $endDate);
             if (Schema::hasColumn((new Offer())->getTable(), 'site_id')) {
-                $query->where('site_id', $siteId);
+                $query->whereIn('site_id', $accessibleSiteIds);
             }
             return $this->buildChartData($query, 'created_at', 'd M', 'Offers activity');
+        }
+
+        if ($activity === 'sites' && !empty($accessibleSiteIds)) {
+            $query = $this->applyDateFilter(Site::whereIn('id', $accessibleSiteIds), 'created_at', $startDate, $endDate);
+            return $this->buildChartData($query, 'created_at', 'd M', 'Sites activity');
         }
 
         return [
@@ -576,7 +684,7 @@ class HomeController extends Controller
         ];
     }
 
-    private function buildCustomerChart(string $activity, int $userId, Carbon $startDate, Carbon $endDate): array
+    private function buildCustomerChart(string $activity, int $userId, ?Carbon $startDate, ?Carbon $endDate): array
     {
         return [
             'labels' => [],
@@ -585,14 +693,19 @@ class HomeController extends Controller
         ];
     }
 
-    private function applyDateFilter($query, string $column, Carbon $startDate, Carbon $endDate)
+    private function applyDateFilter($query, string $column, ?Carbon $startDate, ?Carbon $endDate)
     {
+        // If no date filtering (All Time), return query unchanged
+        if ($startDate === null || $endDate === null) {
+            return $query;
+        }
+
         return $query
             ->whereDate($column, '>=', $startDate->toDateString())
             ->whereDate($column, '<=', $endDate->toDateString());
     }
 
-    private function applyRoleDateFilter(string $roleName, Carbon $startDate, Carbon $endDate): int
+    private function applyRoleDateFilter(string $roleName, ?Carbon $startDate, ?Carbon $endDate): int
     {
         return $this->applyDateFilter(User::role($roleName), 'created_at', $startDate, $endDate)->count();
     }
@@ -601,5 +714,76 @@ class HomeController extends Controller
     {
         Auth::logout();
         return redirect()->route('login');
+    }
+
+    /**
+     * Get accessible merchant IDs for the current user (same logic as HasMerchantScope trait)
+     */
+    private function getAccessibleMerchantIds($user): array
+    {
+        $merchantIds = Merchant::where('user_id', $user->id)->pluck('id')->all();
+
+        $siteUserMerchantIds = SiteUser::where('user_id', $user->id)
+            ->whereNotNull('merchant_id')
+            ->pluck('merchant_id')
+            ->all();
+
+        $ids = array_unique(array_filter(array_merge($merchantIds, $siteUserMerchantIds)));
+
+        return array_values($ids);
+    }
+
+    /**
+     * Get accessible site IDs for the current user (same logic as HasMerchantScope trait)
+     */
+    private function getAccessibleSiteIds($user): array
+    {
+        // Check if user is ADMIN role - they get broader access
+        $isAdmin = $user->hasRole(Constants::Admin);
+
+        if ($isAdmin) {
+            // ADMIN: Get all sites from owned merchants + sites they created + specific assignments
+            $merchantIds = $this->getAccessibleMerchantIds($user);
+
+            $siteIds = Site::where('user_id', $user->id)
+                ->pluck('id')
+                ->all();
+
+            if (!empty($merchantIds)) {
+                $merchantSiteIds = Site::whereIn('merchant_id', $merchantIds)
+                    ->pluck('id')
+                    ->all();
+                $siteIds = array_merge($siteIds, $merchantSiteIds);
+            }
+
+            // Also include specific site assignments via SiteUser
+            $siteUserSiteIds = SiteUser::where('user_id', $user->id)
+                ->whereNotNull('site_id')
+                ->pluck('site_id')
+                ->all();
+
+            if (!empty($siteUserSiteIds)) {
+                $siteIds = array_merge($siteIds, $siteUserSiteIds);
+            }
+
+            return array_values(array_unique(array_filter($siteIds)));
+        } else {
+            // OTHER ROLES: Only specific site assignments
+            $siteUserSiteIds = SiteUser::where('user_id', $user->id)
+                ->whereNotNull('site_id')
+                ->pluck('site_id')
+                ->all();
+
+            if (!empty($siteUserSiteIds)) {
+                return array_values(array_unique(array_filter($siteUserSiteIds)));
+            }
+
+            // Fallback: sites they created directly
+            $siteIds = Site::where('user_id', $user->id)
+                ->pluck('id')
+                ->all();
+
+            return array_values(array_unique(array_filter($siteIds)));
+        }
     }
 }
