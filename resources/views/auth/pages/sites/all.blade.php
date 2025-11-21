@@ -5,8 +5,10 @@
         <div class="col-md-12">
             <x-all-list title="Sites List" :data="$data['all']">
                 <x-slot name="headerCustom">
+                    @can('add_site')
                     <x-auth.href-link link-href="{{ route('sites.create') }}" link-value="{{ __('Create New Site') }}"
                         link-class="btn btn-primary" />
+                    @endcan
                 </x-slot>
 
                 <x-auth.datatable>
@@ -18,7 +20,9 @@
                             <th>Phone</th>
                             <th>City</th>
                             <th>Status</th>
+                            @canany(['view_site', 'edit_site', 'delete_site'])
                             <th>Action</th>
+                            @endcanany
                         </tr>
                     </thead>
                     <tbody>
@@ -57,18 +61,26 @@
                                         <span class="badge bg-danger">Inactive</span>
                                     @endif
                                 </td>
+                                @canany(['view_site', 'edit_site', 'delete_site'])
                                 <td class="text-center">
                                     <div class="d-inline-block dropdown">
                                         <a href="javascript:void(0)" data-bs-toggle="dropdown" data-bs-display="static">
                                             <i class="fas fa-ellipsis-v bg-light rounded p-2"></i>
                                         </a>
                                         <div class="dropdown-menu dropdown-menu-end">
+                                            @can('view_site')
                                             <a class="dropdown-item" href="{{ route('sites.show', $site?->id) }}">
                                                 <i class="fas fa-eye me-2 text-primary"></i> View Site
                                             </a>
+                                            @endcan
+                                            
+                                            @can('edit_site')
                                             <a class="dropdown-item" href="{{ route('sites.edit', $site?->id) }}">
                                                 <i class="fas fa-edit me-2 text-warning"></i> Edit Site
                                             </a>
+                                            @endcan
+                                            
+                                            @can('delete_site')
                                             <form action="{{ route('sites.destroy', $site?->id) }}" method="POST"
                                                 onsubmit="return confirm('Are you sure you want to delete this Site?');">
                                                 @csrf
@@ -77,9 +89,11 @@
                                                     <i class="fas fa-trash-alt me-2"></i> Delete Site
                                                 </button>
                                             </form>
+                                            @endcan
                                         </div>
                                     </div>
                                 </td>
+                                @endcanany
                             </tr>
                         @endforeach
                     </tbody>

@@ -5,8 +5,10 @@
         <div class="col-md-12">
             <x-all-list title="Site Users" :data="$data['all']">
                 <x-slot name="headerCustom">
+                    @can('add_site_user')
                     <x-auth.href-link link-href="{{ route('siteusers.create') }}"
                         link-value="{{ __('Create Site User') }}" link-class="btn btn-primary me-2" />
+                    @endcan
                     @if (auth()->user()->hasRole('super_admin'))
                         <x-auth.href-link link-href="{{ route('siteusers.create-super') }}"
                             link-value="{{ __('Add Super') }}" link-class="btn btn-outline-light text-primary" />
@@ -24,7 +26,9 @@
                             <th>Role</th>
                             <th>Status</th>
                             <th>Created</th>
+                            @canany(['view_site_user', 'edit_site_user', 'delete_site_user'])
                             <th>Actions</th>
+                            @endcanany
                         </tr>
                     </thead>
                     <tbody>
@@ -72,20 +76,28 @@
                                     @endif
                                 </td>
                                 <td>{{ $siteUser->created_at?->format('d M Y') ?? '-' }}</td>
+                                @canany(['view_site_user', 'edit_site_user', 'delete_site_user'])
                                 <td class="text-center">
                                     <div class="d-inline-block dropdown">
                                         <a href="javascript:void(0)" data-bs-toggle="dropdown" data-bs-display="static">
                                             <i class="fas fa-ellipsis-v bg-light rounded p-2"></i>
                                         </a>
                                         <div class="dropdown-menu dropdown-menu-end">
+                                            @can('view_site_user')
                                             <a class="dropdown-item"
                                                 href="{{ route('siteusers.show', $siteUser->id) }}">
                                                 <i class="fas fa-eye me-2 text-primary"></i> View
                                             </a>
+                                            @endcan
+                                            
+                                            @can('edit_site_user')
                                             <a class="dropdown-item"
                                                 href="{{ route('siteusers.edit', $siteUser->id) }}">
                                                 <i class="fas fa-edit me-2 text-warning"></i> Edit
                                             </a>
+                                            @endcan
+                                            
+                                            @can('delete_site_user')
                                             <form action="{{ route('siteusers.destroy', $siteUser->id) }}"
                                                 method="POST"
                                                 onsubmit="return confirm('Are you sure you want to delete this site user?');">
@@ -95,9 +107,11 @@
                                                     <i class="fas fa-trash-alt me-2"></i> Delete
                                                 </button>
                                             </form>
+                                            @endcan
                                         </div>
                                     </div>
                                 </td>
+                                @endcanany
                             </tr>
                         @endforeach
                     </tbody>

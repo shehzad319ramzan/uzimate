@@ -5,8 +5,10 @@
         <div class="col-md-12">
             <x-all-list title="Merchants List" :data="$data['all']">
                 <x-slot name="headerCustom">
+                    @can('add_merchant')
                     <x-auth.href-link link-href="{{ route('merchants.create') }}" link-value="{{ __('Create New Merchant') }}"
                         link-class="btn btn-primary" />
+                    @endcan
                 </x-slot>
 
                 <x-auth.datatable>
@@ -20,7 +22,9 @@
                             <th>Scan After (hours)</th>
                             <th>Use Other Merchant Points</th>
                             <th>Status</th>
+                            @canany(['view_merchant', 'edit_merchant', 'delete_merchant'])
                             <th>Action</th>
+                            @endcanany
                         </tr>
                     </thead>
                     <tbody>
@@ -55,18 +59,26 @@
                                         <span class="badge bg-danger">Inactive</span>
                                     @endif
                                 </td>
+                                @canany(['view_merchant', 'edit_merchant', 'delete_merchant'])
                                 <td class="text-center">
                                     <div class="d-inline-block dropdown">
                                         <a href="javascript:void(0)" data-bs-toggle="dropdown" data-bs-display="static">
                                             <i class="fas fa-ellipsis-v bg-light rounded p-2"></i>
                                         </a>
                                         <div class="dropdown-menu dropdown-menu-end">
+                                            @can('view_merchant')
                                             <a class="dropdown-item" href="{{ route('merchants.show', $merchant?->id) }}">
                                                 <i class="fas fa-eye me-2 text-primary"></i> View Merchant
                                             </a>
+                                            @endcan
+                                            
+                                            @can('edit_merchant')
                                             <a class="dropdown-item" href="{{ route('merchants.edit', $merchant?->id) }}">
                                                 <i class="fas fa-edit me-2 text-warning"></i> Edit Merchant
                                             </a>
+                                            @endcan
+                                            
+                                            @can('delete_merchant')
                                             <form action="{{ route('merchants.destroy', $merchant?->id) }}" method="POST"
                                                 onsubmit="return confirm('Are you sure you want to delete this Merchant?');">
                                                 @csrf
@@ -75,9 +87,11 @@
                                                     <i class="fas fa-trash-alt me-2"></i> Delete Merchant
                                                 </button>
                                             </form>
+                                            @endcan
                                         </div>
                                     </div>
                                 </td>
+                                @endcanany
                             </tr>
                         @endforeach
                     </tbody>
