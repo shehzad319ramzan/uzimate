@@ -55,33 +55,54 @@ trait HasMerchantScope
             return [];
         }
 
-        // First, check if user has specific site assignments via SiteUser
-        $siteUserSiteIds = SiteUser::where('user_id', $user->id)
-            ->whereNotNull('site_id')
-            ->pluck('site_id')
-            ->all();
+        // Check if user is ADMIN role - they get broader access
+        $isAdmin = $user->hasRole(Constants::Admin);
 
-        // If user has specific site assignments, ONLY return those sites
-        // (Site users should only see their assigned sites, not all merchant sites)
-        if (! empty($siteUserSiteIds)) {
-            return array_values(array_unique(array_filter($siteUserSiteIds)));
-        }
+        if ($isAdmin) {
+            // ADMIN: Get all sites from owned merchants + sites they created + specific assignments
+            $merchantIds = $this->accessibleMerchantIds();
 
-        // Otherwise, return sites from owned merchants or sites they created
-        $merchantIds = $this->accessibleMerchantIds();
-
-        $siteIds = Site::where('user_id', $user->id)
-            ->pluck('id')
-            ->all();
-
-        if (! empty($merchantIds)) {
-            $merchantSiteIds = Site::whereIn('merchant_id', $merchantIds)
+            $siteIds = Site::where('user_id', $user->id)
                 ->pluck('id')
                 ->all();
-            $siteIds = array_merge($siteIds, $merchantSiteIds);
-        }
 
-        return array_values(array_unique(array_filter($siteIds)));
+            if (! empty($merchantIds)) {
+                $merchantSiteIds = Site::whereIn('merchant_id', $merchantIds)
+                    ->pluck('id')
+                    ->all();
+                $siteIds = array_merge($siteIds, $merchantSiteIds);
+            }
+
+            // Also include specific site assignments via SiteUser
+            $siteUserSiteIds = SiteUser::where('user_id', $user->id)
+                ->whereNotNull('site_id')
+                ->pluck('site_id')
+                ->all();
+
+            if (! empty($siteUserSiteIds)) {
+                $siteIds = array_merge($siteIds, $siteUserSiteIds);
+            }
+
+            return array_values(array_unique(array_filter($siteIds)));
+        } else {
+            // OTHER ROLES (not admin, not superadmin): Only specific site assignments
+            $siteUserSiteIds = SiteUser::where('user_id', $user->id)
+                ->whereNotNull('site_id')
+                ->pluck('site_id')
+                ->all();
+
+            // If user has specific site assignments, ONLY return those sites
+            if (! empty($siteUserSiteIds)) {
+                return array_values(array_unique(array_filter($siteUserSiteIds)));
+            }
+
+            // Fallback: sites they created directly
+            $siteIds = Site::where('user_id', $user->id)
+                ->pluck('id')
+                ->all();
+
+            return array_values(array_unique(array_filter($siteIds)));
+        }
     }
 }
 
