@@ -1154,3 +1154,77 @@ html body nav#sidebar .sidebar-dropdown a.sidebar-link {
     background-color: transparent !important;
     color: rgba(255, 255, 255, 0.9) !important;
 }
+
+/* ============================================
+   OFFER FORM STYLES
+   ============================================ */
+/* Image Upload Wrapper */
+#imageUploadWrapper {
+    position: relative;
+    display: inline-block;
+    max-width: 150px;
+    margin: 0 auto;
+}
+
+/* Offer Image Preview */
+#offerImagePreview {
+    width: 150px;
+    height: 150px;
+    max-width: 100%;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    display: block;
+}
+
+#offerImagePreview:hover {
+    border-color: #4A148D;
+    opacity: 0.9;
+    transform: scale(1.02);
+    transition: all 0.2s ease;
+}
+
+/* Image Actions Buttons */
+#imageActions {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    display: none;
+}
+
+#imageActions.show {
+    display: block;
+}
+
+#imageActions .btn {
+    margin-left: 0.25rem;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Weekdays Buttons */
+.weekday-btn {
+    min-width: 60px;
+    transition: all 0.2s ease;
+}
+
+.weekday-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(74, 20, 141, 0.2);
+}
+
+.weekday-btn.btn-primary {
+    background-color: #4A148D !important;
+    border-color: #4A148D !important;
+    color: #FFFFFF !important;
+}
+
+.weekday-btn.btn-outline-primary {
+    border-color: #4A148D !important;
+    color: #4A148D !important;
+}
+
+.weekday-btn.btn-outline-primary:hover {
+    background-color: #4A148D !important;
+    color: #FFFFFF !important;
+}

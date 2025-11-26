@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MerchantController;
+use App\Http\Controllers\OfferController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\SettingController;
@@ -85,6 +86,16 @@ Route::group(
             Route::delete('delete/{site}', 'destroy')->name('destroy');
             Route::get('detail/{site}', 'show')->name('show');
             Route::get('edit/{site}', 'edit')->name('edit');
+        });
+
+        Route::prefix('offers')->as('offers.')->controller(OfferController::class)->group(function () {
+            Route::get('create', 'create')->name('create');
+            Route::get('', 'index')->name('index');
+            Route::post('store', 'store')->name('store');
+            Route::put('update/{id}', 'update')->name('update');
+            Route::delete('delete/{id}', 'destroy')->name('destroy');
+            Route::get('detail/{id}', 'show')->name('show');
+            Route::get('edit/{id}', 'edit')->name('edit');
         });
 
 

@@ -16,10 +16,19 @@ return new class extends Migration
         Schema::create('offers', function (Blueprint $table) {
             $table->UUID('id')->primary();
 
-            $table->string('name');
+            $table->UUID('merchant_id')->nullable();
+            $table->UUID('site_id');
+            $table->string('title');
+            $table->integer('points_required');
+            $table->date('expires_on')->nullable();
+            $table->json('weekdays')->nullable();
+            $table->string('description', 255)->nullable();
             $table->string('status')->default(1);
             
             $table->timestamps();
+
+            $table->foreign('merchant_id')->references('id')->on('merchants')->onDelete('cascade');
+            $table->foreign('site_id')->references('id')->on('sites')->onDelete('cascade');
         });
     }
 
