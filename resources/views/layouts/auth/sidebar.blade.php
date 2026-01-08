@@ -106,8 +106,8 @@
 
             @can('view_point_award')
             {{-- Point Awards (Advanced Mode Only) --}}
-            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'point-awards.') || request()->route()->getName() == 'point-awards.index' ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ Route::has('point-awards.index') ? route('point-awards.index') : '#' }}">
+            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'pointawards.') || request()->route()->getName() == 'pointawards.index' ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ Route::has('pointawards.index') ? route('pointawards.index') : '#' }}">
                     <i class="align-middle me-2 fas fa-award"></i>
                     <span class="align-middle">Point Awards</span>
                 </a>
