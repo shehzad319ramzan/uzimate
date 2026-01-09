@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Constants\Constants;
 use App\Http\Controllers\Controller;
+use App\Models\CustomerLog;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 
@@ -74,6 +75,24 @@ class LoginController extends Controller
         if ($this->attemptLogin($request)) {
             if ($request->hasSession()) {
                 $request->session()->put('auth.password_confirmed_at', time());
+            }
+
+            // Auto-create customer log for customer login
+            $user = auth()->user();
+            if ($user && $user->hasRole(Constants::CUSTOMER)) {
+                try {
+                    CustomerLog::create([
+                        'user_id' => $user->id,
+                        'action_type' => 'login',
+                        'action_category' => 'system',
+                        'description' => 'Customer logged in',
+                        'ip_address' => $request->ip(),
+                        'user_agent' => $request->userAgent(),
+                    ]);
+                } catch (\Exception $e) {
+                    // Log error but don't break login
+                    \Log::error('Failed to create customer log for login: ' . $e->getMessage());
+                }
             }
 
             return $this->sendLoginResponse($request);

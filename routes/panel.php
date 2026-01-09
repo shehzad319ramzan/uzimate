@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\CustomerLogController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\OfferController;
@@ -118,6 +119,10 @@ Route::group(
             Route::get('edit/{id}', 'edit')->name('edit');
         });
 
+        Route::prefix('customer-logs')->as('customerlogs.')->controller(CustomerLogController::class)->group(function () {
+            Route::get('', 'index')->name('index');
+            Route::get('detail/{id}', 'show')->name('show');
+        });
 
         Route::prefix('s')->as('settings.')->middleware('can:site_setting')->controller(SettingController::class)->group(function () {
 

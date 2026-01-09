@@ -12,6 +12,10 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use Illuminate\Support\Facades\Log;
 use App\Helper\Helpers;
 use App\Interface\UserInterface;
+use App\Models\PointAward;
+use App\Models\SpinHistory;
+use App\Observers\PointAwardObserver;
+use App\Observers\SpinHistoryObserver;
 use App\Repositories\UserRepository;
 use App\Services\SettingService;
 use Illuminate\Support\Facades\Schema;
@@ -43,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
             });
 
             $this->registerBladeComponents();
+            $this->registerObservers();
 
             Route::middleware(['web', 'auth', 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath'])
                 ->prefix(LaravelLocalization::setLocale() . '/my-account')
@@ -71,6 +76,18 @@ class AppServiceProvider extends ServiceProvider
     private function setLocale($lang): void
     {
         app()->setLocale($lang);
+    }
+
+    /**
+     * Register model observers for automatic customer log creation.
+     */
+    private function registerObservers(): void
+    {
+        // Only register observers if customer_logs table exists
+        if (Schema::hasTable('customer_logs')) {
+            PointAward::observe(PointAwardObserver::class);
+            SpinHistory::observe(SpinHistoryObserver::class);
+        }
     }
 
     private function registerBladeComponents(): void

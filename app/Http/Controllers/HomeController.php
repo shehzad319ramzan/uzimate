@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Constants\Constants;
+use App\Models\CustomerLog;
 use App\Models\Merchant;
 use App\Models\Site;
 use App\Models\SiteUser;
@@ -56,7 +57,7 @@ class HomeController extends Controller
                 $data = $this->getSuperAdminStats($filters);
         }
 
-        Log::info('Dashboard view payload', $data);
+        // Log::info('Dashboard view payload', $data);
         return view('auth.pages.dashboard', compact('data', 'userRole', 'filters', 'filterOptions'));
     }
 
@@ -383,14 +384,14 @@ class HomeController extends Controller
         $expiredOffers = 0;
         if (class_exists(Offer::class)) {
             $offerQuery = $this->applyDateFilter(Offer::query(), 'created_at', $startDate, $endDate);
-            
+
             if (Schema::hasColumn((new Offer())->getTable(), 'merchant_id') && !empty($accessibleMerchantIds)) {
                 $offerQuery->whereIn('merchant_id', $accessibleMerchantIds);
             }
             if (Schema::hasColumn((new Offer())->getTable(), 'site_id') && !empty($accessibleSiteIds)) {
                 $offerQuery->orWhereIn('site_id', $accessibleSiteIds);
             }
-            
+
             $totalOffers = $offerQuery->count();
             $activeOffers = (clone $offerQuery)->where(function ($q) {
                 $q->where('status', 'active')->orWhere('status', 1);
@@ -505,7 +506,7 @@ class HomeController extends Controller
     private function prepareFilters(Request $request, string $role, $user): array
     {
         $dateRange = $request->input('date_range', 'all'); // Default to 'all'
-        
+
         // Set dates based on selected range
         switch ($dateRange) {
             case 'this_month':
@@ -532,7 +533,7 @@ class HomeController extends Controller
             'start_date' => $defaultStart,
             'end_date' => $defaultEnd,
         ];
-        
+
         // Add date range options for all roles
         $filterOptions = [
             'date_ranges' => [
@@ -562,14 +563,14 @@ class HomeController extends Controller
         } elseif ($role === Constants::Admin) {
             $filters['activity'] = $request->input('activity', 'offers');
             $filters['site_id'] = $request->input('site_id', 'all');
-            
+
             // Get admin's accessible sites for filtering
             $accessibleSiteIds = $this->getAccessibleSiteIds($user);
             $filterOptions['sites'] = Site::whereIn('id', $accessibleSiteIds)
                 ->select('id', 'name')
                 ->orderBy('name')
                 ->get();
-            
+
             $filterOptions['activities'] = [
                 'offers' => 'Offers',
                 'sites' => 'Sites',
@@ -710,8 +711,26 @@ class HomeController extends Controller
         return $this->applyDateFilter(User::role($roleName), 'created_at', $startDate, $endDate)->count();
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
+        // Auto-create customer log for customer logout
+        $user = Auth::user();
+        if ($user && $user->hasRole(Constants::CUSTOMER)) {
+            try {
+                CustomerLog::create([
+                    'user_id' => $user->id,
+                    'action_type' => 'logout',
+                    'action_category' => 'system',
+                    'description' => 'Customer logged out',
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                ]);
+            } catch (\Exception $e) {
+                // Log error but don't break logout
+                Log::error('Failed to create customer log for logout: ' . $e->getMessage());
+            }
+        }
+
         Auth::logout();
         return redirect()->route('login');
     }

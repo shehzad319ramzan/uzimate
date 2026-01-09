@@ -126,8 +126,8 @@
 
             @can('view_customer_log')
             {{-- Customer Logs --}}
-            <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'customer-logs.') || request()->route()->getName() == 'customer-logs.index' ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ Route::has('customer-logs.index') ? route('customer-logs.index') : '#' }}">
+            <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'customerlogs.') || request()->route()->getName() == 'customerlogs.index' ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ Route::has('customerlogs.index') ? route('customerlogs.index') : '#' }}">
                     <i class="align-middle me-2 fas fa-clipboard-list"></i>
                     <span class="align-middle">Customer Logs</span>
                 </a>
