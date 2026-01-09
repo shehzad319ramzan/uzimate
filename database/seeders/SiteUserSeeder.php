@@ -25,23 +25,24 @@ class SiteUserSeeder extends Seeder
             return;
         }
 
-        $roles = Role::select('id', 'name')->whereNotIn('name', [Constants::SUPERADMIN])->get();
+        // Get the customer role specifically
+        $customerRole = Role::where('name', Constants::CUSTOMER)->first();
 
         foreach ($sites as $index => $site) {
             $user = new User();
             $user->first_name = 'Site';
-            $user->last_name = 'Manager ' . ($index + 1);
-            $user->email = 'site.manager' . ($index + 1) . '@uzimate.com';
+            $user->last_name = 'User ' . ($index + 1);
+            $user->email = 'site.user' . ($index + 1) . '@uzimate.com';
             $user->phone = '0778900' . str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT);
-            $user->about = 'Demo site manager account';
+            $user->about = 'Demo site customer account';
             $user->password = Hash::make('test123');
             $user->remember_token = Str::random(10);
             $user->email_verified_at = now();
             $user->save();
 
-            if ($roles->isNotEmpty()) {
-                $randomRole = $roles->random();
-                $user->assignRole($randomRole->name);
+            // Assign only the customer role
+            if ($customerRole) {
+                $user->assignRole($customerRole->name);
             }
 
             SiteUser::create([

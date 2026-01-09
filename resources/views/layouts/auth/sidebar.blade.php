@@ -116,8 +116,8 @@
 
             @can('view_spin_history')
             {{-- Spin History (Advanced Mode Only) --}}
-            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'spin-history.') || request()->route()->getName() == 'spin-history.index' ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ Route::has('spin-history.index') ? route('spin-history.index') : '#' }}">
+            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'spinhistories.') || request()->route()->getName() == 'spinhistories.index' ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ Route::has('spinhistories.index') ? route('spinhistories.index') : '#' }}">
                     <i class="align-middle me-2 fas fa-redo"></i>
                     <span class="align-middle">Spin History</span>
                 </a>
