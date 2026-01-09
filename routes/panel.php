@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\CustomerLogController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\InboxController;
 use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\RoleController;
@@ -122,6 +124,26 @@ Route::group(
         Route::prefix('customer-logs')->as('customerlogs.')->controller(CustomerLogController::class)->group(function () {
             Route::get('', 'index')->name('index');
             Route::get('detail/{id}', 'show')->name('show');
+        });
+
+        Route::prefix('inbox')->as('inbox.')->controller(InboxController::class)->group(function () {
+            Route::get('create', 'create')->name('create');
+            Route::get('', 'index')->name('index');
+            Route::post('store', 'store')->name('store');
+            Route::put('update/{id}', 'update')->name('update');
+            Route::delete('delete/{id}', 'destroy')->name('destroy');
+            Route::get('detail/{id}', 'show')->name('show');
+            Route::get('edit/{id}', 'edit')->name('edit');
+        });
+
+        Route::prefix('feedback')->as('feedbacks.')->controller(FeedbackController::class)->group(function () {
+            Route::get('create', 'create')->name('create');
+            Route::get('', 'index')->name('index');
+            Route::post('store', 'store')->name('store');
+            Route::put('update/{id}', 'update')->name('update');
+            Route::delete('delete/{id}', 'destroy')->name('destroy');
+            Route::get('detail/{id}', 'show')->name('show');
+            Route::get('edit/{id}', 'edit')->name('edit');
         });
 
         Route::prefix('s')->as('settings.')->middleware('can:site_setting')->controller(SettingController::class)->group(function () {
