@@ -736,6 +736,38 @@ class HomeController extends Controller
     }
 
     /**
+     * Logout user via API (returns JSON)
+     */
+    public function logoutApi(Request $request)
+    {
+        $user = Auth::user();
+
+        // Auto-create customer log for customer logout
+        if ($user && $user->hasRole(Constants::CUSTOMER)) {
+            try {
+                CustomerLog::create([
+                    'user_id' => $user->id,
+                    'action_type' => 'logout',
+                    'action_category' => 'system',
+                    'description' => 'Customer logged out via API',
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to create customer log for API logout: ' . $e->getMessage());
+            }
+        }
+
+        // Delete current access token
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Logged out successfully'
+        ], 200);
+    }
+
+    /**
      * Get accessible merchant IDs for the current user (same logic as HasMerchantScope trait)
      */
     private function getAccessibleMerchantIds($user): array

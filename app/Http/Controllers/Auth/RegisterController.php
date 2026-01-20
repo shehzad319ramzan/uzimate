@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Merchant;
 use App\Models\Permission;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -127,5 +128,67 @@ class RegisterController extends Controller
         ]);
 
         return $user;
+    }
+
+    /**
+     * Register a new user via API (returns JSON with token)
+     */
+    public function registerApi(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password_confirmation' => ['required', 'string', 'min:8'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $userArr = [
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'email_verified_at' => now(),
+            ];
+
+            $user = User::create($userArr);
+            
+            // Assign customer role (API registration defaults to customer)
+            $user->assignRole(Constants::CUSTOMER);
+
+            // Create API token
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User registered successfully',
+                'data' => [
+                    'user' => [
+                        'id' => $user->id,
+                        'first_name' => $user->first_name,
+                        'last_name' => $user->last_name,
+                        'email' => $user->email,
+                        'full_name' => $user->full_name ?? ($user->first_name . ' ' . $user->last_name),
+                        'roles' => $user->roles->pluck('name'),
+                    ],
+                    'token' => $token,
+                ]
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Registration failed',
+                'error' => config('app.debug') ? $e->getMessage() : 'An error occurred during registration'
+            ], 500);
+        }
     }
 }

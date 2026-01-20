@@ -29,11 +29,12 @@ class UpdateProfileRequest extends FormRequest
             'f_name' => ['required', 'string', 'max:100'],
             'l_name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:200', function ($attribute, $value, $fail) use ($currentEmail) {
+                // dd($value, $currentEmail);
                 if ($value !== $currentEmail) {
                     $fail('You cannot change your email. Please contact the admin!');
                 }
             }],
-            'about' => ['required', 'string', 'max:250'],
+            'about' => ['nullable','string', 'max:250'],
             'file' => ['nullable', 'image'],
         ];
     }

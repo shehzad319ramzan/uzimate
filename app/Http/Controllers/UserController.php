@@ -177,4 +177,66 @@ class UserController extends BaseController
 
         return redirect()->back()->with('success', 'Permissions updated successfully.');
     }
+
+    public function profileApi(Request $request)
+    {
+        $user = $request->user();
+        $user->load('roles');
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'user' => [
+                    'id' => $user->id,
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                    'about' => $user->about,
+                    'full_name' => $user->full_name ?? ($user->first_name . ' ' . $user->last_name),
+                    'roles' => $user->roles->pluck('name'),
+                    'profile_image' => $user->profile(),
+                ]
+            ]
+        ], 200);
+    }
+
+    /**
+     * Update user profile via API
+     */
+    public function edit_profile(UpdateProfileRequest $request)
+    {
+        // dd($request->all());
+        try {
+            $this->_repo->update(Auth::id(), UserDto::fromRequest($request->validated()));
+
+            $user = Auth::user();
+            $user->load('roles');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile updated successfully',
+                'data' => [
+                    'user' => [
+                        'id' => $user->id,
+                        'first_name' => $user->first_name,
+                        'last_name' => $user->last_name,
+                        'email' => $user->email,
+                        'phone' => $user->phone,
+                        'about' => $user->about,
+                        'full_name' => $user->full_name ?? ($user->first_name . ' ' . $user->last_name),
+                        'roles' => $user->roles->pluck('name'),
+                        'profile_image' => $user->profile(),
+                    ]
+                ]
+            ], 200);
+        } catch (\Throwable $th) {
+            $message = $th->getMessage();
+            if ($th instanceof NotFoundHttpException) {
+                return response()->json(['error' => $message], 400);
+            } else {
+                return response()->json(['error' => 'Something went wrong..'], 500);
+            }
+        }
+    }
 }

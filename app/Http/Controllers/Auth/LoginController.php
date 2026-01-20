@@ -102,4 +102,69 @@ class LoginController extends Controller
 
         return $this->sendFailedLoginResponse($request);
     }
+
+    /**
+     * Login user via API (returns JSON with token)
+     */
+    public function loginWithApi(Request $request)
+    {
+        $request->validate([
+            $this->username() => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        if (
+            method_exists($this, 'hasTooManyLoginAttempts') &&
+            $this->hasTooManyLoginAttempts($request)
+        ) {
+            $this->fireLockoutEvent($request);
+            return $this->sendLockoutResponse($request);
+        }
+
+        if ($this->attemptLogin($request)) {
+            $user = auth()->user();
+
+            // Create API token
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            // Auto-create customer log for customer login
+            if ($user && $user->hasRole(Constants::CUSTOMER)) {
+                try {
+                    CustomerLog::create([
+                        'user_id' => $user->id,
+                        'action_type' => 'login',
+                        'action_category' => 'system',
+                        'description' => 'Customer logged in via API',
+                        'ip_address' => $request->ip(),
+                        'user_agent' => $request->userAgent(),
+                    ]);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to create customer log for API login: ' . $e->getMessage());
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Login successful',
+                'data' => [
+                    'user' => [
+                        'id' => $user->id,
+                        'first_name' => $user->first_name,
+                        'last_name' => $user->last_name,
+                        'email' => $user->email,
+                        'full_name' => $user->full_name ?? ($user->first_name . ' ' . $user->last_name),
+                        'roles' => $user->roles->pluck('name'),
+                    ],
+                    'token' => $token,
+                ]
+            ], 200);
+        }
+
+        $this->incrementLoginAttempts($request);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid credentials'
+        ], 401);
+    }
 }
