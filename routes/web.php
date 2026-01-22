@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\FrontendController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SocialLoginController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
@@ -25,6 +26,9 @@ Route::get('/clear', function () {
     Artisan::call('migrate:fresh --seed');
     return "Cleared";
 });
+
+Route::get('/test-email', [HomeController::class, 'testEmail'])->name('test.email');
+Route::post('/test-email', [HomeController::class, 'testEmail'])->name('test.email.post');
 
 Auth::routes(
     [

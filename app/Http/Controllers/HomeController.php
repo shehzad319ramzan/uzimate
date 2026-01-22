@@ -14,7 +14,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Spatie\Permission\Models\Role;
+use App\Mail\VerificationMail;
 
 class HomeController extends Controller
 {
@@ -27,7 +29,69 @@ class HomeController extends Controller
     {
         $this->middleware('auth');
     }
+    public function testEmail(Request $request)
+    {
+        if (!app()->environment('production') && !app()->environment('local')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email test is only available on production or local environment'
+            ], 403);
+        }
 
+        try {
+            $testEmail = $request->input('email', auth()->user()->email ?? 'test@example.com');
+            $testCode = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+
+            Mail::to($testEmail)->send(new VerificationMail($testCode));
+
+            Log::info('Test email sent successfully', [
+                'to' => $testEmail,
+                'code' => $testCode,
+                'environment' => app()->environment(),
+                'smtp_host' => config('mail.mailers.smtp.host'),
+                'smtp_port' => config('mail.mailers.smtp.port'),
+                'smtp_username' => config('mail.mailers.smtp.username'),
+                'smtp_encryption' => config('mail.mailers.smtp.encryption'),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Test email sent successfully!',
+                'data' => [
+                    'to' => $testEmail,
+                    'code' => $testCode,
+                    'smtp_config' => [
+                        'host' => config('mail.mailers.smtp.host'),
+                        'port' => config('mail.mailers.smtp.port'),
+                        'encryption' => config('mail.mailers.smtp.encryption'),
+                        'from_address' => config('mail.from.address'),
+                        'from_name' => config('mail.from.name'),
+                    ]
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Test email failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'smtp_config' => [
+                    'host' => config('mail.mailers.smtp.host'),
+                    'port' => config('mail.mailers.smtp.port'),
+                    'encryption' => config('mail.mailers.smtp.encryption'),
+                ]
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send test email',
+                'error' => $e->getMessage(),
+                'smtp_config' => [
+                    'host' => config('mail.mailers.smtp.host'),
+                    'port' => config('mail.mailers.smtp.port'),
+                    'encryption' => config('mail.mailers.smtp.encryption'),
+                ]
+            ], 500);
+        }
+    }
     /**
      * Show the application dashboard.
      *
@@ -79,13 +143,13 @@ class HomeController extends Controller
         }
         $totalMerchants = $merchantQuery->count();
         $merchantsThisMonth = $this->applyDateFilter(
-            Merchant::when($merchantFilter, fn ($q) => $q->where('id', $merchantFilter)),
+            Merchant::when($merchantFilter, fn($q) => $q->where('id', $merchantFilter)),
             'created_at',
             $startOfMonth,
             Carbon::now()
         )->count();
         $merchantsThisYear = $this->applyDateFilter(
-            Merchant::when($merchantFilter, fn ($q) => $q->where('id', $merchantFilter)),
+            Merchant::when($merchantFilter, fn($q) => $q->where('id', $merchantFilter)),
             'created_at',
             $startOfYear,
             Carbon::now()
@@ -292,7 +356,7 @@ class HomeController extends Controller
         $chartEndDate = $endDate ?? Carbon::now();
         $chart = $this->buildChartData(
             $this->applyDateFilter(
-                Site::where('merchant_id', $merchantId)->when($siteFilter !== 'all', fn ($q) => $q->where('id', $siteFilter)),
+                Site::where('merchant_id', $merchantId)->when($siteFilter !== 'all', fn($q) => $q->where('id', $siteFilter)),
                 'created_at',
                 $chartStartDate,
                 $chartEndDate
@@ -610,7 +674,7 @@ class HomeController extends Controller
             ->get();
 
         return [
-            'labels' => $records->map(fn ($item) => Carbon::parse($item->chart_date)->format($labelFormat)),
+            'labels' => $records->map(fn($item) => Carbon::parse($item->chart_date)->format($labelFormat)),
             'values' => $records->pluck('total'),
             'title' => $title,
         ];
