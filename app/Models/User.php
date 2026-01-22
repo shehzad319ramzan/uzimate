@@ -15,42 +15,29 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable, HasApiTokens, HasRoles, FileRelationship;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'first_name',
         'last_name',
         'about',
         'email',
         'phone',
+        'date_of_birth',
         'password',
         'provider_id',
         'provider',
         'email_verified_at'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
+            'date_of_birth' => 'date',
             'password' => 'hashed',
         ];
     }
@@ -78,9 +65,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->fileUrl('profile');
     }
 
-    /**
-     * Get the merchant that owns the user.
-     */
     public function merchant()
     {
         return $this->hasOne(Merchant::class);

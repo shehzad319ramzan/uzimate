@@ -87,7 +87,7 @@ class RegisterController extends Controller
         ];
 
         $user = User::create($userArr);
-        
+
         // Assign admin role
         $user->assignRole(Constants::Admin);
 
@@ -130,9 +130,6 @@ class RegisterController extends Controller
         return $user;
     }
 
-    /**
-     * Register a new user via API (returns JSON with token)
-     */
     public function registerApi(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -141,6 +138,7 @@ class RegisterController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'password_confirmation' => ['required', 'string', 'min:8'],
+            'date_of_birth' => ['required', 'date'],
         ]);
 
         if ($validator->fails()) {
@@ -157,15 +155,14 @@ class RegisterController extends Controller
                 'last_name' => $request->last_name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
+                'date_of_birth' => $request->date_of_birth ?? null,
                 'email_verified_at' => now(),
             ];
 
             $user = User::create($userArr);
-            
-            // Assign customer role (API registration defaults to customer)
+
             $user->assignRole(Constants::CUSTOMER);
 
-            // Create API token
             $token = $user->createToken('auth_token')->plainTextToken;
 
             return response()->json([
@@ -177,6 +174,7 @@ class RegisterController extends Controller
                         'first_name' => $user->first_name,
                         'last_name' => $user->last_name,
                         'email' => $user->email,
+                        'date_of_birth' => $user->date_of_birth,
                         'full_name' => $user->full_name ?? ($user->first_name . ' ' . $user->last_name),
                         'roles' => $user->roles->pluck('name'),
                     ],
