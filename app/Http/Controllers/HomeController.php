@@ -38,59 +38,123 @@ class HomeController extends Controller
             ], 403);
         }
 
-        try {
-            $testEmail = $request->input('email', auth()->user()->email ?? 'test@example.com');
-            $testCode = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+        $testEmail = $request->input('email', auth()->user()->email ?? 'test@example.com');
+        $testCode = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
 
-            Mail::to($testEmail)->send(new VerificationMail($testCode));
+        $currentConfig = [
+            'host' => config('mail.mailers.smtp.host'),
+            'port' => config('mail.mailers.smtp.port'),
+            'encryption' => config('mail.mailers.smtp.encryption'),
+            'username' => config('mail.mailers.smtp.username'),
+            'from_address' => config('mail.from.address'),
+            'from_name' => config('mail.from.name'),
+        ];
 
-            Log::info('Test email sent successfully', [
-                'to' => $testEmail,
-                'code' => $testCode,
-                'environment' => app()->environment(),
-                'smtp_host' => config('mail.mailers.smtp.host'),
-                'smtp_port' => config('mail.mailers.smtp.port'),
-                'smtp_username' => config('mail.mailers.smtp.username'),
-                'smtp_encryption' => config('mail.mailers.smtp.encryption'),
-            ]);
+        $errorMessage = '';
+        $lastException = null;
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Test email sent successfully!',
-                'data' => [
+        $configsToTry = [
+            [
+                'name' => 'Current Config (Port 465 + SSL)',
+                'port' => 465,
+                'encryption' => 'ssl',
+            ],
+            [
+                'name' => 'Alternative Config (Port 587 + TLS)',
+                'port' => 587,
+                'encryption' => 'tls',
+            ],
+        ];
+
+        foreach ($configsToTry as $configToTry) {
+            try {
+                config([
+                    'mail.mailers.smtp.port' => $configToTry['port'],
+                    'mail.mailers.smtp.encryption' => $configToTry['encryption'],
+                ]);
+
+                Mail::to($testEmail)->send(new VerificationMail($testCode));
+
+                Log::info('Test email sent successfully', [
                     'to' => $testEmail,
                     'code' => $testCode,
-                    'smtp_config' => [
-                        'host' => config('mail.mailers.smtp.host'),
-                        'port' => config('mail.mailers.smtp.port'),
-                        'encryption' => config('mail.mailers.smtp.encryption'),
-                        'from_address' => config('mail.from.address'),
-                        'from_name' => config('mail.from.name'),
-                    ]
-                ]
-            ], 200);
-        } catch (\Exception $e) {
-            Log::error('Test email failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'smtp_config' => [
-                    'host' => config('mail.mailers.smtp.host'),
-                    'port' => config('mail.mailers.smtp.port'),
-                    'encryption' => config('mail.mailers.smtp.encryption'),
-                ]
-            ]);
+                    'environment' => app()->environment(),
+                    'smtp_config' => array_merge($currentConfig, [
+                        'port' => $configToTry['port'],
+                        'encryption' => $configToTry['encryption'],
+                    ]),
+                ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to send test email',
-                'error' => $e->getMessage(),
-                'smtp_config' => [
-                    'host' => config('mail.mailers.smtp.host'),
-                    'port' => config('mail.mailers.smtp.port'),
-                    'encryption' => config('mail.mailers.smtp.encryption'),
-                ]
-            ], 500);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Test email sent successfully!',
+                    'data' => [
+                        'to' => $testEmail,
+                        'code' => $testCode,
+                        'working_config' => $configToTry['name'],
+                        'smtp_config' => array_merge($currentConfig, [
+                            'port' => $configToTry['port'],
+                            'encryption' => $configToTry['encryption'],
+                        ]),
+                    ]
+                ], 200);
+            } catch (\Exception $e) {
+                $lastException = $e;
+                $errorMessage .= "\n" . $configToTry['name'] . ": " . $e->getMessage();
+                Log::warning('Test email failed with config', [
+                    'config' => $configToTry['name'],
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
+
+        Log::error('Test email failed with all configurations', [
+            'error' => $lastException ? $lastException->getMessage() : 'Unknown error',
+            'trace' => $lastException ? $lastException->getTraceAsString() : '',
+            'smtp_config' => $currentConfig,
+            'all_errors' => $errorMessage,
+        ]);
+
+        $diagnostics = $this->getNetworkDiagnostics();
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to send test email with all configurations',
+            'error' => $lastException ? $lastException->getMessage() : 'Unknown error',
+            'all_errors' => $errorMessage,
+            'smtp_config' => $currentConfig,
+            'diagnostics' => $diagnostics,
+            'suggestions' => [
+                '1. Check if port 465 and 587 are open in firewall',
+                '2. Verify server can reach smtp.gmail.com',
+                '3. Try using port 587 with TLS instead of 465 with SSL',
+                '4. Contact hosting provider to unblock SMTP ports',
+                '5. Check if Gmail App Password is correct',
+            ]
+        ], 500);
+    }
+
+    private function getNetworkDiagnostics(): array
+    {
+        $diagnostics = [];
+
+        $host = config('mail.mailers.smtp.host');
+        $ports = [465, 587, 25];
+
+        foreach ($ports as $port) {
+            $connection = @fsockopen($host, $port, $errno, $errstr, 5);
+            if ($connection) {
+                $diagnostics["port_{$port}"] = "Open";
+                fclose($connection);
+            } else {
+                $diagnostics["port_{$port}"] = "Closed or blocked (Error: $errstr)";
+            }
+        }
+
+        $dnsCheck = gethostbyname($host);
+        $diagnostics['dns_resolution'] = ($dnsCheck !== $host) ? "Resolved to: $dnsCheck" : "Failed to resolve";
+
+        return $diagnostics;
     }
     /**
      * Show the application dashboard.
