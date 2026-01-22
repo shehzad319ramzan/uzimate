@@ -41,7 +41,6 @@ class PasswordApiController extends Controller
             $this->_repo->get_email($request->validated());
             return response()->json(["success" => 'Validated! Check your email for verification code'], Response::HTTP_OK);
         } catch (\Throwable $th) {
-            dd($th);
             if ($th instanceof NotFoundHttpException) {
                 $message = $th->getMessage();
                 return response()->json(["error" => $message], Response::HTTP_BAD_REQUEST);

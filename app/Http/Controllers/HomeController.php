@@ -38,7 +38,7 @@ class HomeController extends Controller
             ], 403);
         }
 
-        $testEmail = $request->input('email', auth()->user()->email ?? 'test@example.com');
+        $testEmail = $request->input('email', auth()->user()->email ?? 'shehzad319ramzan@gmail.com');
         $testCode = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
 
         $currentConfig = [
