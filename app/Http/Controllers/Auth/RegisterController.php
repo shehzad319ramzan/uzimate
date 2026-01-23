@@ -174,7 +174,7 @@ class RegisterController extends Controller
                         'first_name' => $user->first_name,
                         'last_name' => $user->last_name,
                         'email' => $user->email,
-                        'date_of_birth' => $user->date_of_birth,
+                        'date_of_birth' => $user->date_of_birth ? $user->date_of_birth->format('Y-m-d') : null,
                         'full_name' => $user->full_name ?? ($user->first_name . ' ' . $user->last_name),
                         'roles' => $user->roles->pluck('name'),
                     ],

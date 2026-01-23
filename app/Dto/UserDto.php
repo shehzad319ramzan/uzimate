@@ -10,6 +10,7 @@ class UserDto
     public ?string $about;
     public ?string $role;
     public $file;
+    public ?string $date_of_birth;
 
     /**
      * Create a new controller instance.
@@ -24,6 +25,7 @@ class UserDto
         $this->about = isset($request['about']) ? $request['about'] : null;
         $this->role = isset($request['role']) ? $request['role'] : null;
         $this->file = isset(request()->file) ? request()->file : null;
+        $this->date_of_birth = isset($request['date_of_birth']) ? $request['date_of_birth'] : null;
     }
 
     public static function fromRequest($request)
@@ -52,6 +54,9 @@ class UserDto
         }
         if ($this->file != null) {
             $data['image'] = $this->file;
+        }
+        if ($this->date_of_birth != null) {
+            $data['date_of_birth'] = $this->date_of_birth;
         }
 
         return $data;

@@ -35,6 +35,7 @@ class UpdateProfileRequest extends FormRequest
                 }
             }],
             'about' => ['nullable','string', 'max:250'],
+            'date_of_birth' => ['nullable', 'date'],
             'file' => ['nullable', 'image'],
         ];
     }
