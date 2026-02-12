@@ -9,6 +9,7 @@ use App\Http\Resources\OfferResource;
 use App\Http\Resources\StoreResource;
 use App\Models\Merchant;
 use App\Models\MerchantCategory;
+use App\Models\Offer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -67,7 +68,7 @@ class MerchantApiController extends Controller
             ], 404);
         }
 
-        $offers = \App\Models\Offer::where('merchant_id', $merchant->id)
+        $offers =Offer::where('merchant_id', $merchant->id)
             ->with('merchant')
             ->where(function ($q) {
                 $q->where('status', '1')->orWhere('status', 1);
