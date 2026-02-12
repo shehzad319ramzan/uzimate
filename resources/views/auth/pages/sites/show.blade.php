@@ -77,6 +77,10 @@
                             <td>{{ $data->coordinates ?? '-' }}</td>
                         </tr>
                         <tr>
+                            <th>Info</th>
+                            <td>{!! $data->description ?? '-' !!}</td>
+                        </tr>
+                        <tr>
                             <th>Use Merchant Logo</th>
                             <td>
                                 @if($data->use_merchant_logo ?? false)

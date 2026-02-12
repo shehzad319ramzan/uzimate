@@ -8,6 +8,15 @@
                     <h5 class="mb-3">Merchant</h5>
                 </div>
                 <div class="col-md-6">
+                    <label class="form-label mb-2">Category</label>
+                    <select name="merchant_category_id" class="form-select mb-3">
+                        <option value="">Select Category</option>
+                        @foreach($categories ?? [] as $cat)
+                            <option value="{{ $cat->id }}" {{ old('merchant_category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-6">
                     <x-auth.input-field type="text" name="merchant_name" id="merchant_name" required="true"
                         place="Enter merchant name" val="{{ old('merchant_name') }}" extraclasses="mb-3"
                         label="Merchant Name" />
@@ -40,6 +49,10 @@
                             Use other merchant's points for offers
                         </label>
                     </div>
+                </div>
+
+                <div class="col-md-12 mt-3">
+                    <x-auth.editor name="description" label="Info" :value="old('description')" />
                 </div>
             </div>
 

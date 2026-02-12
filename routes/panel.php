@@ -5,6 +5,7 @@ use App\Http\Controllers\CustomerLogController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InboxController;
+use App\Http\Controllers\MerchantCategoryController;
 use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\RoleController;
@@ -63,6 +64,15 @@ Route::group(
             Route::put('update/{permission}', 'update')->name('update')->middleware('can:edit_permission');
             Route::delete('delete/{permission}', 'destroy')->name('destroy')->middleware('can:delete_permission');
         });
+        Route::prefix('merchant-categories')->as('merchantcategories.')->controller(MerchantCategoryController::class)->group(function () {
+            Route::get('create', 'create')->name('create');
+            Route::get('', 'index')->name('index');
+            Route::post('store', 'store')->name('store');
+            Route::put('update/{id}', 'update')->name('update');
+            Route::delete('delete/{id}', 'destroy')->name('destroy');
+            Route::get('detail/{id}', 'show')->name('show');
+            Route::get('edit/{id}', 'edit')->name('edit');
+        });
         Route::prefix('merchants')->as('merchants.')->controller(MerchantController::class)->group(function () {
             Route::get('create', 'create')->name('create');
             Route::get('', 'index')->name('index');
@@ -72,6 +82,8 @@ Route::group(
             Route::get('detail/{merchant}', 'show')->name('show');
             Route::get('edit/{merchant}', 'edit')->name('edit');
         });
+
+
         Route::prefix('sites')->as('sites.')->controller(SiteController::class)->group(function () {
             Route::get('create', 'create')->name('create');
             Route::get('', 'index')->name('index');

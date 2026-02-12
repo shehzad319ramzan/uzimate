@@ -136,6 +136,11 @@
                         place="Enter coordinates" val="{{ old('coordinates', $data->coordinates ?? '') }}" extraclasses="mb-3"
                         label="Coordinates" />
                 </div>
+
+                <!-- Info / Description - Full Width -->
+                <div class="col-md-12 mt-3">
+                    <x-auth.editor name="description" label="Info" :value="old('description', $data->description ?? '')" />
+                </div>
             </div>
 
             <div class="row">

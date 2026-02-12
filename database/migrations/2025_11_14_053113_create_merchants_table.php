@@ -16,11 +16,18 @@ return new class extends Migration
         Schema::create('merchants', function (Blueprint $table) {
             $table->UUID('id')->primary();
             $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignUuid('merchant_category_id')
+                ->nullable()
+                ->constrained('merchant_categories')
+                ->nullOnDelete();
+
             $table->string('name');
             $table->integer('max_sites')->default(1);
             $table->integer('spin_after_days')->default(1);
             $table->integer('scan_after_hours')->default(6);
             $table->boolean('use_other_merchant_points')->default(false);
+            $table->longText('description')->nullable();
+
             $table->string('status')->default(1);
 
             $table->timestamps();

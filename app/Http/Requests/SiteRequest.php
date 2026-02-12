@@ -35,6 +35,7 @@ class SiteRequest extends FormRequest
             'location' => ['nullable', 'string', 'max:255'],
             'coordinates' => ['nullable', 'string', 'max:255'],
             'use_merchant_logo' => ['nullable', 'boolean'],
+            'description' => ['nullable', 'string'],
             'file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp'],
         ];
     }

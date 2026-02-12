@@ -5,10 +5,12 @@ namespace App\Dto;
 class MerchantDto
 {
     public ?string $name;
+    public ?string $merchant_category_id;
     public ?int $max_sites;
     public ?int $spin_after_days;
     public ?int $scan_after_hours;
     public ?bool $use_other_merchant_points;
+    public ?string $description;
     public ?int $user_id;
     public $file;
 
@@ -20,10 +22,12 @@ class MerchantDto
     public function __construct($request)
     {
         $this->name = isset($request['merchant_name']) ? $request['merchant_name'] : null;
+        $this->merchant_category_id = !empty($request['merchant_category_id']) ? $request['merchant_category_id'] : null;
         $this->max_sites = isset($request['max_sites']) ? (int)$request['max_sites'] : null;
         $this->spin_after_days = isset($request['spin_after_days']) ? (int)$request['spin_after_days'] : null;
         $this->scan_after_hours = isset($request['scan_after_hours']) ? (int)$request['scan_after_hours'] : null;
         $this->use_other_merchant_points = isset($request['use_other_merchant_points']) ? (bool)$request['use_other_merchant_points'] : false;
+        $this->description = $request['description'] ?? null;
         $this->user_id = isset($request['user_id']) ? (int)$request['user_id'] : auth()->id();
         $this->file = request()->hasFile('file') ? request()->file('file') : null;
     }
@@ -43,7 +47,7 @@ class MerchantDto
         if ($this->name !== null) {
             $data['name'] = $this->name;
         }
-        
+        $data['merchant_category_id'] = $this->merchant_category_id;
         if ($this->max_sites !== null) {
             $data['max_sites'] = $this->max_sites;
         }
@@ -57,7 +61,8 @@ class MerchantDto
         }
         
         $data['use_other_merchant_points'] = $this->use_other_merchant_points ?? false;
-        
+        $data['description'] = $this->description;
+
         if ($this->user_id !== null) {
             $data['user_id'] = $this->user_id;
         }

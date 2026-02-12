@@ -4,11 +4,14 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Api\MerchantApiController;
 use App\Http\Controllers\Api\PasswordApiController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
+Route::get('merchant-categories', [MerchantApiController::class, 'merchantCategories']);
+Route::get('merchants', [MerchantApiController::class, 'merchants']);
+Route::get('merchants/{id}', [MerchantApiController::class, 'merchantDetail']);
 Route::post('login', [LoginController::class, 'loginWithApi']);
 Route::post('register', [RegisterController::class, 'registerApi']);
 

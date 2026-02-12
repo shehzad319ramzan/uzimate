@@ -3,19 +3,15 @@
     min-height: 250px;
 }
 </style>
-@props(['value' => null])
+@props(['value' => null, 'name' => 'article', 'label' => 'Description', 'id' => null])
+@php $fieldId = $id ?? $name; @endphp
 
 <div class="mt-3">
-    <label for="article" class="form-label">Description</label>
-    <textarea class="form-control" id="article" name="article" rows="50" placeholder="Your post description"
-        value="{{ $value != null ? $value : '' }}">
-@if ($value != null)
-{!! $value !!}
-@endif
-</textarea>
+    <label for="{{ $fieldId }}" class="form-label">{{ $label }}</label>
+    <textarea class="form-control" id="{{ $fieldId }}" name="{{ $name }}" rows="50" placeholder="Your post description">{{ $value ?? '' }}</textarea>
 
-    @if ($errors->has('article'))
-        <span for="article" class="text-danger">{{ $errors->first('article') }}</span>
+    @if ($errors->has($name))
+        <span for="{{ $fieldId }}" class="text-danger">{{ $errors->first($name) }}</span>
     @endif
 
 </div>
@@ -23,9 +19,9 @@
 <script src="https://cdn.ckeditor.com/ckeditor5/36.0.0/classic/ckeditor.js"></script>
 <script>
     ClassicEditor
-        .create(document.querySelector('#article'), {
+        .create(document.querySelector('#{{ $fieldId }}'), {
             ckfinder: {
-                uploadUrl: "{{ route('uploadPostImage') . '?_token=' . csrf_token() }}"
+                uploadUrl: "{{ Route::has('uploadPostImage') ? route('uploadPostImage') . '?_token=' . csrf_token() : '' }}"
             }
         })
         .catch(error => {

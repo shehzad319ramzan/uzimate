@@ -24,10 +24,12 @@ class MerchantRequest extends FormRequest
         // dd(request()->all());
         return [
             'merchant_name' => ['required', 'string', 'max:255'],
+            'merchant_category_id' => ['nullable', 'exists:merchant_categories,id'],
             'max_sites' => ['required', 'integer', 'min:1'],
             'spin_after_days' => ['nullable', 'integer', 'min:0'],
             'scan_after_hours' => ['nullable', 'integer', 'min:0'],
             'use_other_merchant_points' => ['nullable', 'boolean'],
+            'description' => ['nullable', 'string'],
             'file' => ['nullable', 'image'],
         ];
     }

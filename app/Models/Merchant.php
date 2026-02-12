@@ -22,8 +22,10 @@ class Merchant extends Model
         'spin_after_days',
         'scan_after_hours',
         'use_other_merchant_points',
+        'description',
         'status',
         'user_id',
+        'merchant_category_id',
     ];
 
     public function logo()
@@ -34,5 +36,15 @@ class Merchant extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(MerchantCategory::class, 'merchant_category_id');
+    }
+
+    public function sites()
+    {
+        return $this->hasMany(Site::class);
     }
 }

@@ -1,3 +1,4 @@
+@php $filters = $filters ?? []; $categories = $categories ?? collect(); @endphp
 <x-layouts.auth>
     <x-slot name="pageTitle">All Merchants</x-slot>
 
@@ -5,6 +6,25 @@
         <div class="col-md-12">
             <x-all-list title="Merchants List" :data="$data['all']">
                 <x-slot name="headerCustom">
+                    <form method="GET" action="{{ route('merchants.index') }}" class="row g-2 align-items-end w-100 mb-3">
+                        <div class="col-lg-3 col-md-6">
+                            <label class="form-label text-muted small">Search</label>
+                            <input type="text" name="search" class="form-control" placeholder="Search merchants" value="{{ $filters['search'] ?? '' }}">
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <label class="form-label text-muted small">Category</label>
+                            <select name="merchant_category_id" class="form-select">
+                                <option value="">All Categories</option>
+                                @foreach($categories as $cat)
+                                    <option value="{{ $cat->id }}" {{ ($filters['merchant_category_id'] ?? '') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-lg-4 col-md-12 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary mt-3">Apply</button>
+                            <a href="{{ route('merchants.index') }}" class="btn btn-outline-secondary mt-3">Reset</a>
+                        </div>
+                    </form>
                     @can('add_merchant')
                     <x-auth.href-link link-href="{{ route('merchants.create') }}" link-value="{{ __('Create New Merchant') }}"
                         link-class="btn btn-primary" />
@@ -41,7 +61,16 @@
                                         </div>
                                     @endif
                                 </td>
-                                <td>{{ $merchant?->name }}</td>
+                                <td>
+                                    <span class="fw-semibold">{{ $merchant?->name }}</span>
+                                    <div class="text-muted small mt-1">
+                                        Category: @if($merchant?->category)
+                                            <span class="badge bg-primary">{{ $merchant?->category?->name }}</span>
+                                        @else
+                                            <span class="badge bg-secondary">Not Assign</span>
+                                        @endif
+                                    </div>
+                                </td>
                                 <td>{{ $merchant?->max_sites ?? '-' }}</td>
                                 <td>{{ $merchant?->spin_after_days ?? '-' }}</td>
                                 <td>{{ $merchant?->scan_after_hours ?? '-' }}</td>

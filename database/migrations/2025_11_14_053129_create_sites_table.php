@@ -32,6 +32,8 @@ return new class extends Migration
             $table->string('location')->nullable();
             $table->string('coordinates')->nullable();
             $table->boolean('use_merchant_logo')->default(false);
+            $table->longText('description')->nullable();
+
             $table->string('status')->default(1);
 
             $table->timestamps();

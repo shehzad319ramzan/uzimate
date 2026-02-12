@@ -3,21 +3,40 @@
 namespace App\Http\Controllers;
 
 use App\Dto\MerchantDto;
-use App\Repositories\MerchantRepository;
 use App\Http\Requests\MerchantRequest;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\MerchantCategory;
+use App\Repositories\MerchantRepository;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class MerchantController extends BaseController
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return $reauest, $modal
-     */
     public function __construct(MerchantRepository $repo)
     {
         $this->setRepo($repo, 'auth/pages/merchants', 'merchants');
+    }
+
+    public function index()
+    {
+        $filters = request()->only(['search', 'merchant_category_id']);
+        $data['all'] = $this->_repo->listWithFilters($filters);
+        $categories = MerchantCategory::where('status', '1')->orderBy('name')->get();
+        return view($this->_directory . '.all', ['data' => $data, 'filters' => $filters, 'categories' => $categories]);
+    }
+
+    public function create()
+    {
+        $categories = MerchantCategory::where('status', '1')->orderBy('name')->get();
+        return view($this->_directory . '.create', ['categories' => $categories]);
+    }
+
+    public function edit($id)
+    {
+        $data = $this->_repo->show($id);
+        if ($data == null) {
+            abort(404);
+        }
+        $categories = MerchantCategory::where('status', '1')->orderBy('name')->get();
+        return view($this->_directory . '.edit', ['data' => $data, 'categories' => $categories]);
     }
 
     /**

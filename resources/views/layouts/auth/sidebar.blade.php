@@ -45,6 +45,13 @@
             @endcan
 
             @can('view_merchant')
+            {{-- Merchant Categories --}}
+            <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'merchantcategories.') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ Route::has('merchantcategories.index') ? route('merchantcategories.index') : '#' }}">
+                    <i class="align-middle me-2 fas fa-layer-group"></i>
+                    <span class="align-middle">Merchant Categories</span>
+                </a>
+            </li>
             {{-- Merchants --}}
             <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'merchants.') || request()->route()->getName() == 'merchants.index' ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ Route::has('merchants.index') ? route('merchants.index') : '#' }}">

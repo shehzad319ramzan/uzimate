@@ -24,24 +24,41 @@ class MerchantRepository extends BaseRepository
         $this->setModel($model);
     }
 
-    /**
-     * Display a listing of the resource.
-     */
+    public function listWithFilters(array $filters = [])
+    {
+        return $this->buildFilteredQuery($filters)->with('category')->orderBy('created_at', 'desc')->paginate(20)->withQueryString();
+    }
+
+    protected function buildFilteredQuery(array $filters = [])
+    {
+        $query = $this->_model->newQuery();
+        if ($this->shouldLimitByMerchant()) {
+            $merchantIds = $this->accessibleMerchantIds();
+            if (empty($merchantIds)) {
+                return $query->whereRaw('1 = 0');
+            }
+            $query->whereIn('id', $merchantIds);
+        }
+        if (!empty($filters['merchant_category_id'])) {
+            $query->where('merchant_category_id', $filters['merchant_category_id']);
+        }
+        if (!empty($filters['search'])) {
+            $query->where('name', 'like', '%' . $filters['search'] . '%');
+        }
+        return $query;
+    }
+
     public function index()
     {
         $query = $this->_model->newQuery();
-
         if ($this->shouldLimitByMerchant()) {
             $merchantIds = $this->accessibleMerchantIds();
-
             if (empty($merchantIds)) {
                 return $query->whereRaw('1 = 0')->paginate(20);
             }
-
             $query->whereIn('id', $merchantIds);
         }
-
-        return $query->orderBy('created_at', 'desc')->paginate(20);
+        return $query->with('category')->orderBy('created_at', 'desc')->paginate(20);
     }
 
     /**

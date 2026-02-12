@@ -38,6 +38,7 @@ class SiteSeeder extends Seeder
         $site1->postcode = '44000';
         $site1->country = 'United Kingdom';
         $site1->use_merchant_logo = false;
+        $site1->description = '<p>Convenient location offering quick service and a wide range of menu items. Open daily with dine-in, takeaway, and delivery options available.</p>';
         $site1->status = '1';
         $site1->created_at = Carbon::createFromFormat('d/m/Y H:i', '02/10/2024 17:26');
         $site1->updated_at = Carbon::createFromFormat('d/m/Y H:i', '02/10/2024 17:26');
@@ -53,6 +54,7 @@ class SiteSeeder extends Seeder
         $site2->postcode = 'RM6 4EJ';
         $site2->country = 'United Kingdom';
         $site2->use_merchant_logo = false;
+        $site2->description = '<p>Our Super Market Branch provides quality products and excellent customer service. Featuring clean, modern facilities and family-friendly atmosphere.</p>';
         $site2->status = '1';
         $site2->created_at = Carbon::createFromFormat('d/m/Y H:i', '05/06/2024 21:05');
         $site2->updated_at = Carbon::createFromFormat('d/m/Y H:i', '05/06/2024 21:05');
@@ -68,6 +70,7 @@ class SiteSeeder extends Seeder
         $site3->postcode = 'IG11 9AH';
         $site3->country = 'United Kingdom';
         $site3->use_merchant_logo = false;
+        $site3->description = '<p>Seven Kings Branch is known for quick service and consistent quality. Offers a wide range of items including burgers, fries, and beverages. Drive-thru and delivery available.</p>';
         $site3->status = '1';
         $site3->created_at = Carbon::createFromFormat('d/m/Y H:i', '15/08/2024 14:30');
         $site3->updated_at = Carbon::createFromFormat('d/m/Y H:i', '15/08/2024 14:30');
@@ -83,6 +86,7 @@ class SiteSeeder extends Seeder
         $site4->postcode = 'TW9 2ND';
         $site4->country = 'United Kingdom';
         $site4->use_merchant_logo = false;
+        $site4->description = '<p>Ilford Lane Branch focuses on affordability and convenience. Clean, modern design with dine-in, takeaway, and delivery services. Family-friendly environment.</p>';
         $site4->status = '1';
         $site4->created_at = Carbon::createFromFormat('d/m/Y H:i', '20/08/2024 16:45');
         $site4->updated_at = Carbon::createFromFormat('d/m/Y H:i', '20/08/2024 16:45');
@@ -98,6 +102,7 @@ class SiteSeeder extends Seeder
         $site5->postcode = 'SW5 9RL';
         $site5->country = 'United Kingdom';
         $site5->use_merchant_logo = false;
+        $site5->description = '<p>Richmond location offering premium service and a diverse menu. Breakfast options, signature items, and seasonal specials. Emphasizes food safety and quality standards.</p>';
         $site5->status = '1';
         $site5->created_at = Carbon::createFromFormat('d/m/Y H:i', '25/08/2024 11:20');
         $site5->updated_at = Carbon::createFromFormat('d/m/Y H:i', '25/08/2024 11:20');
@@ -113,6 +118,7 @@ class SiteSeeder extends Seeder
         $site6->postcode = '44623';
         $site6->country = 'United Kingdom';
         $site6->use_merchant_logo = false;
+        $site6->description = '<p>Earl\'s Court branch - central London location. Quick service, consistent quality, and local taste preferences. Open for breakfast, lunch, and dinner.</p>';
         $site6->status = '1';
         $site6->created_at = Carbon::createFromFormat('d/m/Y H:i', '30/08/2024 13:15');
         $site6->updated_at = Carbon::createFromFormat('d/m/Y H:i', '30/08/2024 13:15');
@@ -128,6 +134,7 @@ class SiteSeeder extends Seeder
         $site7->postcode = 'RM6';
         $site7->country = 'United Kingdom';
         $site7->use_merchant_logo = false;
+        $site7->description = '<p>Bahria Town Phase location. Community-focused outlet with modern facilities. Dine-in, takeaway, and delivery services. Regular menu updates to match local preferences.</p>';
         $site7->status = '1';
         $site7->created_at = Carbon::createFromFormat('d/m/Y H:i', '05/09/2024 10:00');
         $site7->updated_at = Carbon::createFromFormat('d/m/Y H:i', '05/09/2024 10:00');
@@ -143,6 +150,7 @@ class SiteSeeder extends Seeder
         $site8->postcode = 'E1 6QL';
         $site8->country = 'United Kingdom';
         $site8->use_merchant_logo = false;
+        $site8->description = '<p>Romford Branch - your local favourite. Offering signature items and daily specials. Clean, welcoming space for customers of all ages. Drive-thru available.</p>';
         $site8->status = '1';
         $site8->created_at = Carbon::createFromFormat('d/m/Y H:i', '10/09/2024 15:30');
         $site8->updated_at = Carbon::createFromFormat('d/m/Y H:i', '10/09/2024 15:30');
@@ -158,6 +166,7 @@ class SiteSeeder extends Seeder
         $site9->postcode = 'IG11 9HQ';
         $site9->country = 'United Kingdom';
         $site9->use_merchant_logo = false;
+        $site9->description = '<p>Newbury Branch provides quality food and excellent service. Modern design, family-friendly atmosphere. Takeaway and delivery options for your convenience.</p>';
         $site9->status = '1';
         $site9->created_at = Carbon::createFromFormat('d/m/Y H:i', '15/09/2024 09:45');
         $site9->updated_at = Carbon::createFromFormat('d/m/Y H:i', '15/09/2024 09:45');
@@ -173,6 +182,7 @@ class SiteSeeder extends Seeder
         $site10->postcode = 'E16 4RT';
         $site10->country = 'United Kingdom';
         $site10->use_merchant_logo = false;
+        $site10->description = '<p>Becton KFC branch - famous for our signature chicken. Quick service, consistent taste, and friendly staff. Dine-in, takeaway, and delivery services available.</p>';
         $site10->status = '1';
         $site10->created_at = Carbon::createFromFormat('d/m/Y H:i', '20/09/2024 12:00');
         $site10->updated_at = Carbon::createFromFormat('d/m/Y H:i', '20/09/2024 12:00');

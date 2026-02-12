@@ -39,6 +39,10 @@
                             <td>{{ $data->scan_after_hours ?? '-' }}</td>
                         </tr>
                         <tr>
+                            <th>Info</th>
+                            <td>{!! $data->description ?? '-' !!}</td>
+                        </tr>
+                        <tr>
                             <th>Use Other Merchant Points</th>
                             <td>
                                 @if($data->use_other_merchant_points ?? false)

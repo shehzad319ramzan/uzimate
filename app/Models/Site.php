@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Site extends Model
 {
@@ -31,6 +32,7 @@ class Site extends Model
         'location',
         'coordinates',
         'use_merchant_logo',
+        'description',
         'status',
         'user_id',
     ];
@@ -41,6 +43,11 @@ class Site extends Model
     public function merchant(): BelongsTo
     {
         return $this->belongsTo(Merchant::class);
+    }
+
+    public function offers(): HasMany
+    {
+        return $this->hasMany(Offer::class);
     }
 
     public function user(): BelongsTo
