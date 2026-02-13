@@ -27,6 +27,17 @@
                             <x-role-list />
                         </div>
 
+                        <div class="col-md-6">
+                            <x-auth.input-field type="password" name="password" id="password" required="true"
+                                place="{{ __('Enter password') }}" val="" extraclasses="mb-3"
+                                label="{{ __('Password') }}" />
+                        </div>
+                        <div class="col-md-6">
+                            <x-auth.input-field type="password" name="password_confirmation" id="password_confirmation" required="true"
+                                place="{{ __('Confirm password') }}" val="" extraclasses="mb-3"
+                                label="{{ __('Confirm Password') }}" />
+                        </div>
+
                         <div class="col-md-12">
                             <x-auth.text-area type="text" name="about" id="about" required="true"
                                 place="{{ __('language.biography_staff_placeholder') }}" val="" extraclasses="mb-3"

@@ -118,9 +118,11 @@ class UserRepository extends BaseRepository implements UserInterface
             $user->file()->create($profileUpload);
         }
 
-        $token = Password::broker()->createToken($user);
-
-        $user->notify(new UserCreatedResetNotification($token));
+        // Only send password reset email when no password was set during creation
+        if (!isset($dataArray['password'])) {
+            $token = Password::broker()->createToken($user);
+            $user->notify(new UserCreatedResetNotification($token));
+        }
 
         return $user;
     }

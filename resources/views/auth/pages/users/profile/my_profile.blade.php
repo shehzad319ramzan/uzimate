@@ -18,10 +18,15 @@
                                 extraclasses="mb-3" label="{{ __('language.last_name_label') }}" />
                         </div>
 
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <x-auth.input-field type="email" name="email" id="email" required="true"
                                 place="{{ __('language.email_placeholder') }}" val="{{ auth()->user()->email }}"
                                 extraclasses="mb-3 disabled" label="{{ __('language.email_label') }}" />
+                        </div>
+                        <div class="col-md-6">
+                            <x-auth.input-field type="date" name="date_of_birth" id="date_of_birth"
+                                place="" val="{{ auth()->user()->date_of_birth?->format('Y-m-d') ?? '' }}"
+                                extraclasses="mb-3" label="{{ __('Date of Birth') }}" />
                         </div>
 
                         <div class="col-md-12">

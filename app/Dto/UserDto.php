@@ -11,6 +11,7 @@ class UserDto
     public ?string $role;
     public $file;
     public ?string $date_of_birth;
+    public ?string $password;
 
     /**
      * Create a new controller instance.
@@ -26,6 +27,7 @@ class UserDto
         $this->role = isset($request['role']) ? $request['role'] : null;
         $this->file = isset(request()->file) ? request()->file : null;
         $this->date_of_birth = isset($request['date_of_birth']) ? $request['date_of_birth'] : null;
+        $this->password = isset($request['password']) ? $request['password'] : null;
     }
 
     public static function fromRequest($request)
@@ -57,6 +59,9 @@ class UserDto
         }
         if ($this->date_of_birth != null) {
             $data['date_of_birth'] = $this->date_of_birth;
+        }
+        if ($this->password != null) {
+            $data['password'] = $this->password;
         }
 
         return $data;
