@@ -209,9 +209,7 @@ class UserController extends BaseController
     {
         // dd($request->all());
         try {
-            $this->_repo->update(Auth::id(), UserDto::fromRequest($request->validated()));
-
-            $user = Auth::user();
+            $user = $this->_repo->update(Auth::id(), UserDto::fromRequest($request->validated()));
             $user->load('roles');
 
             return response()->json([
