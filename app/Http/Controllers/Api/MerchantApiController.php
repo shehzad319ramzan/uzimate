@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Http\Resources\MerchantCategoryResource;
 use App\Http\Resources\MerchantResource;
 use App\Http\Resources\OfferResource;
@@ -13,13 +12,15 @@ use App\Models\Offer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class MerchantApiController extends Controller
+class MerchantApiController extends ApiBaseController
 {
     public function merchantCategories(): JsonResponse
     {
-        $categories = MerchantCategory::where('status', '1')
-            ->orderBy('name')
-            ->get();
+        $categories = $this->get_by_column_without_pagination(
+            new MerchantCategory(),
+            ['status' => '1']
+        );
+        $categories = $categories->sortBy('name')->values();
 
         return response()->json([
             'success' => true,
@@ -57,9 +58,7 @@ class MerchantApiController extends Controller
 
     public function merchantDetail(string $id): JsonResponse
     {
-        $merchant = Merchant::with(['category', 'sites', 'sites.merchant'])
-            ->withCount('sites')
-            ->find($id);
+        $merchant = $this->get_by_id(new Merchant(), $id, ['category', 'sites', 'sites.merchant']);
 
         if (!$merchant) {
             return response()->json([
@@ -76,6 +75,8 @@ class MerchantApiController extends Controller
             ->get();
 
         $info = $merchant->description ?? $merchant->sites->first()?->description ?? '';
+
+        $merchant->loadCount('sites');
 
         return response()->json([
             'success' => true,

@@ -19,6 +19,8 @@ class OfferResource extends JsonResource
             'image' => $this->image(),
             'status' => $this->status,
             'merchant_name' => $this->merchant?->name ?? null,
+            'merchant_logo' => $this->merchant?->logo() ?? null,
+            'merchant_id' => $this->merchant_id,
         ];
     }
 }
