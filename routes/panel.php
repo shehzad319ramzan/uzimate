@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\CustomerLogController;
+use App\Http\Controllers\CustomerScansController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InboxController;
@@ -136,6 +137,10 @@ Route::group(
         Route::prefix('customer-logs')->as('customerlogs.')->controller(CustomerLogController::class)->group(function () {
             Route::get('', 'index')->name('index');
             Route::get('detail/{id}', 'show')->name('show');
+        });
+
+        Route::prefix('customer-scans')->as('customer-scans.')->controller(CustomerScansController::class)->middleware('permission:view_customer_scan|view_offer_scan')->group(function () {
+            Route::get('', 'index')->name('index');
         });
 
         Route::prefix('inbox')->as('inbox.')->controller(InboxController::class)->group(function () {

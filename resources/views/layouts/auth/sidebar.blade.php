@@ -91,25 +91,15 @@
             </li>
             @endcan
 
-            @can('view_customer_scan')
-            {{-- Customer Scans (Advanced Mode Only) --}}
+            @canany(['view_customer_scan', 'view_offer_scan'])
+            {{-- Scans (QR code scans) --}}
             <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'customer-scans.') || request()->route()->getName() == 'customer-scans.index' ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ Route::has('customer-scans.index') ? route('customer-scans.index') : '#' }}">
-                    <i class="align-middle me-2 fas fa-bullseye"></i>
-                    <span class="align-middle">Customer Scans</span>
-                </a>
-            </li>
-            @endcan
-
-            @can('view_offer_scan')
-            {{-- Offer Scans (Advanced Mode Only) --}}
-            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'offer-scans.') || request()->route()->getName() == 'offer-scans.index' ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ Route::has('offer-scans.index') ? route('offer-scans.index') : '#' }}">
                     <i class="align-middle me-2 fas fa-qrcode"></i>
-                    <span class="align-middle">Offer Scans</span>
+                    <span class="align-middle">Scan QR Code</span>
                 </a>
             </li>
-            @endcan
+            @endcanany
 
             @can('view_point_award')
             {{-- Point Awards (Advanced Mode Only) --}}

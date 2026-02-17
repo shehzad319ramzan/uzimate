@@ -10,6 +10,7 @@ use App\Models\Site;
 use App\Models\User;
 use App\Support\Concerns\HasMerchantScope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CustomerLogRepository extends BaseRepository
@@ -29,6 +30,18 @@ class CustomerLogRepository extends BaseRepository
     public function listWithFilters(array $filters = [])
     {
         return $this->buildFilteredQuery($filters)
+            ->paginate(20)
+            ->withQueryString();
+    }
+
+    /**
+     * List QR code scan logs only (action_type = qr_code_scanned), with Offer relation loaded.
+     */
+    public function listScanLogs(array $filters = []): LengthAwarePaginator
+    {
+        $filters['action_type'] = 'qr_code_scanned';
+        return $this->buildFilteredQuery($filters)
+            ->with(array_merge($this->with, ['relatedModel']))
             ->paginate(20)
             ->withQueryString();
     }
