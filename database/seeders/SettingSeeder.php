@@ -2,17 +2,33 @@
 
 namespace Database\Seeders;
 
+use App\Constants\Constants;
 use App\Models\Setting;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class SettingSeeder extends Seeder
 {
     /**
+     * Copy default logo.webp to storage and return the path for DB.
+     */
+    private function getDefaultLogoPath(): string
+    {
+        $sourcePath = public_path('dashboard/images/default/logo.webp');
+        $storagePath = 'settings/logo.webp';
+
+        if (File::exists($sourcePath)) {
+            Storage::disk('public')->put($storagePath, File::get($sourcePath));
+        }
+
+        return $storagePath;
+    }
+
+    /**
      * Run the database seeds.
      */
-    # Looking to send emails in production? Check out our Email API/SMTP product!
-
     public function run(): void
     {
         $setting = new Setting();
@@ -31,6 +47,11 @@ class SettingSeeder extends Seeder
 
         $setting->save();
 
-        $setting->file()->create(['name' => 'logo.webp', 'path' => 'settings/logo.webp', 'type' => 'logo']);
+        $setting->file()->create([
+            'name' => 'logo.webp',
+            'path' => $this->getDefaultLogoPath(),
+            'type' => Constants::LOGOTYPE,
+        ]);
     }
 }
+

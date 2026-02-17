@@ -35,6 +35,8 @@ class SiteSeeder extends Seeder
         $site1->name = 'ISB2';
         $site1->phone = '044';
         $site1->points = 10;
+        $site1->start_time = '09:00';
+        $site1->closed_time = '18:00';
         $site1->postcode = '44000';
         $site1->country = 'United Kingdom';
         $site1->use_merchant_logo = false;
@@ -51,6 +53,8 @@ class SiteSeeder extends Seeder
         $site2->name = 'Super Market Branch';
         $site2->phone = '0778';
         $site2->points = 10;
+        $site2->start_time = '08:00';
+        $site2->closed_time = '22:00';
         $site2->postcode = 'RM6 4EJ';
         $site2->country = 'United Kingdom';
         $site2->use_merchant_logo = false;
@@ -67,6 +71,8 @@ class SiteSeeder extends Seeder
         $site3->name = 'Seven Kings Branch';
         $site3->phone = '07789652562';
         $site3->points = 10;
+        $site3->start_time = '07:30';
+        $site3->closed_time = '23:00';
         $site3->postcode = 'IG11 9AH';
         $site3->country = 'United Kingdom';
         $site3->use_merchant_logo = false;
@@ -83,6 +89,8 @@ class SiteSeeder extends Seeder
         $site4->name = 'Ilford Lane Branch';
         $site4->phone = '07789652563';
         $site4->points = 10;
+        $site4->start_time = '10:00';
+        $site4->closed_time = '21:00';
         $site4->postcode = 'TW9 2ND';
         $site4->country = 'United Kingdom';
         $site4->use_merchant_logo = false;
@@ -99,6 +107,8 @@ class SiteSeeder extends Seeder
         $site5->name = 'Richmond';
         $site5->phone = '07789652564';
         $site5->points = 10;
+        $site5->start_time = '08:00';
+        $site5->closed_time = '20:00';
         $site5->postcode = 'SW5 9RL';
         $site5->country = 'United Kingdom';
         $site5->use_merchant_logo = false;
@@ -115,6 +125,8 @@ class SiteSeeder extends Seeder
         $site6->name = 'Earl\'s Court';
         $site6->phone = '07789652565';
         $site6->points = 10;
+        $site6->start_time = '09:00';
+        $site6->closed_time = '22:30';
         $site6->postcode = '44623';
         $site6->country = 'United Kingdom';
         $site6->use_merchant_logo = false;
@@ -131,6 +143,8 @@ class SiteSeeder extends Seeder
         $site7->name = 'Bahria Town Phase';
         $site7->phone = '07789652566';
         $site7->points = 10;
+        $site7->start_time = '06:00';
+        $site7->closed_time = '00:00';
         $site7->postcode = 'RM6';
         $site7->country = 'United Kingdom';
         $site7->use_merchant_logo = false;
@@ -147,6 +161,8 @@ class SiteSeeder extends Seeder
         $site8->name = 'Romford Branch';
         $site8->phone = '07789652567';
         $site8->points = 10;
+        $site8->start_time = '11:00';
+        $site8->closed_time = '23:00';
         $site8->postcode = 'E1 6QL';
         $site8->country = 'United Kingdom';
         $site8->use_merchant_logo = false;
@@ -163,6 +179,8 @@ class SiteSeeder extends Seeder
         $site9->name = 'Newbury Branch';
         $site9->phone = '07789652568';
         $site9->points = 10;
+        $site9->start_time = '08:30';
+        $site9->closed_time = '19:30';
         $site9->postcode = 'IG11 9HQ';
         $site9->country = 'United Kingdom';
         $site9->use_merchant_logo = false;
@@ -179,6 +197,8 @@ class SiteSeeder extends Seeder
         $site10->name = 'Becton KFC';
         $site10->phone = '07789652569';
         $site10->points = 10;
+        $site10->start_time = '07:00';
+        $site10->closed_time = '23:30';
         $site10->postcode = 'E16 4RT';
         $site10->country = 'United Kingdom';
         $site10->use_merchant_logo = false;

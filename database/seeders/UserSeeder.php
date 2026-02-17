@@ -3,18 +3,53 @@
 namespace Database\Seeders;
 
 use App\Constants\Constants;
-use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserSeeder extends Seeder
 {
+    /**
+     * Copy default profile_logo.png to storage and return the path for DB.
+     */
+    private function getProfileLogoPath(): string
+    {
+        $sourcePath = public_path('dashboard/images/default/profile_logo.png');
+        $storagePath = 'users/profile_logo.png';
+
+        if (File::exists($sourcePath)) {
+            Storage::disk('public')->put($storagePath, File::get($sourcePath));
+        }
+
+        return $storagePath;
+    }
+
+    /**
+     * Copy default user_logo.png to storage and return the path for DB.
+     */
+    private function getUserLogoPath(): string
+    {
+        $sourcePath = public_path('dashboard/images/default/user_logo.png');
+        $storagePath = 'users/user_logo.png';
+
+        if (File::exists($sourcePath)) {
+            Storage::disk('public')->put($storagePath, File::get($sourcePath));
+        }
+
+        return $storagePath;
+    }
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        $profileLogoPath = $this->getProfileLogoPath();
+        $userLogoPath = $this->getUserLogoPath();
+
         // Super Admin User
         $user1 = new User();
         $user1->first_name = 'Super';
@@ -26,7 +61,11 @@ class UserSeeder extends Seeder
         $user1->created_at = now();
         $user1->save();
         $user1->assignRole(Constants::SUPERADMIN);
-        $user1->file()->create(['name' => 'avatar.png', 'path' => 'users/avatar.png', 'type' => 'profile']);
+        $user1->file()->create([
+            'name' => 'profile_logo.png',
+            'path' => $profileLogoPath,
+            'type' => Constants::PROFILETYPE,
+        ]);
 
         // Business Admin User
         $user2 = new User();
@@ -39,7 +78,11 @@ class UserSeeder extends Seeder
         $user2->created_at = now();
         $user2->save();
         $user2->assignRole(Constants::Manager);
-        $user2->file()->create(['name' => 'avatar.png', 'path' => 'users/avatar.png', 'type' => 'profile']);
+        $user2->file()->create([
+            'name' => 'profile_logo.png',
+            'path' => $profileLogoPath,
+            'type' => Constants::PROFILETYPE,
+        ]);
 
         // Manager/Staff User
         $user3 = new User();
@@ -52,7 +95,11 @@ class UserSeeder extends Seeder
         $user3->created_at = now();
         $user3->save();
         $user3->assignRole(Constants::Admin);
-        $user3->file()->create(['name' => 'avatar.png', 'path' => 'users/avatar.png', 'type' => 'profile']);
+        $user3->file()->create([
+            'name' => 'profile_logo.png',
+            'path' => $profileLogoPath,
+            'type' => Constants::PROFILETYPE,
+        ]);
 
         // Customer User
         $user4 = new User();
@@ -65,6 +112,10 @@ class UserSeeder extends Seeder
         $user4->created_at = now();
         $user4->save();
         $user4->assignRole(Constants::CUSTOMER);
-        $user4->file()->create(['name' => 'avatar.png', 'path' => 'users/avatar.png', 'type' => 'profile']);
+        $user4->file()->create([
+            'name' => 'user_logo.png',
+            'path' => $userLogoPath,
+            'type' => Constants::PROFILETYPE,
+        ]);
     }
 }

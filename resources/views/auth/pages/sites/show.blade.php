@@ -45,6 +45,14 @@
                             <td>{{ $data->points ?? '-' }}</td>
                         </tr>
                         <tr>
+                            <th>Start Time</th>
+                            <td>{{ $data->start_time ? \Carbon\Carbon::parse($data->start_time)->format('g:i A') : '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Closed Time</th>
+                            <td>{{ $data->closed_time ? \Carbon\Carbon::parse($data->closed_time)->format('g:i A') : '-' }}</td>
+                        </tr>
+                        <tr>
                             <th>Address Line 1</th>
                             <td>{{ $data->address_line_1 ?? '-' }}</td>
                         </tr>

@@ -11,6 +11,7 @@ use Spatie\Permission\Models\Role;
 use App\Http\Requests\User\UpdateProfileRequest;
 use App\Http\Requests\User\UserUpdateRequest;
 use App\Interface\UserInterface;
+use App\Models\CustomerLog;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Support\Facades\Auth;
 

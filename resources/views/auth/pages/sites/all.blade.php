@@ -18,6 +18,7 @@
                             <th>Logo</th>
                             <th>Merchant &amp; Site</th>
                             <th>Phone</th>
+                            <th>Hours</th>
                             <th>City</th>
                             <th>Status</th>
                             @canany(['view_site', 'edit_site', 'delete_site'])
@@ -53,6 +54,15 @@
                                     </small>
                                 </td>
                                 <td>{{ $site?->phone ?? '-' }}</td>
+                                <td>
+                                    @if($site?->start_time || $site?->closed_time)
+                                        {{ $site->start_time ? \Carbon\Carbon::parse($site->start_time)->format('g:i A') : '-' }}
+                                        -
+                                        {{ $site->closed_time ? \Carbon\Carbon::parse($site->closed_time)->format('g:i A') : '-' }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
                                 <td>{{ $site?->city ?? '-' }}</td>
                                 <td>
                                     @if($site?->status == 1)

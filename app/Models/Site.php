@@ -23,6 +23,8 @@ class Site extends Model
         'name',
         'phone',
         'points',
+        'start_time',
+        'closed_time',
         'address_line_1',
         'address_line_2',
         'city',

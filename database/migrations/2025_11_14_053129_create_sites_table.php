@@ -19,7 +19,8 @@ return new class extends Migration
             $table->UUID('merchant_id');
             $table->foreign('merchant_id')->references('id')->on('merchants')->onDelete('cascade');
             $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
-
+            $table->time('start_time')->nullable();
+            $table->time('closed_time')->nullable();
             $table->string('name');
             $table->string('phone')->nullable();
             $table->integer('points')->default(0);

@@ -26,6 +26,8 @@ class SiteRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:255'],
             'points' => ['required', 'integer', 'min:0'],
+            'start_time' => ['nullable', 'date_format:H:i'],
+            'closed_time' => ['nullable', 'date_format:H:i'],
             'address_line_1' => ['required', 'string', 'max:255'],
             'address_line_2' => ['nullable', 'string', 'max:255'],
             'city' => ['required', 'string', 'max:255'],

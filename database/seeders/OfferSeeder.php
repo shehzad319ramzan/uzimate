@@ -9,14 +9,36 @@ use App\Models\Site;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class OfferSeeder extends Seeder
 {
+    /**
+     * Copy default site.png to storage and return the path for DB.
+     */
+    private function getDefaultOfferImagePath(): string
+    {
+        $sourcePath = public_path('dashboard/images/default/site.png');
+        $storagePath = 'offers/site.png';
+
+        if (File::exists($sourcePath)) {
+            Storage::disk('public')->put(
+                $storagePath,
+                File::get($sourcePath)
+            );
+        }
+
+        return $storagePath;
+    }
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        $defaultImagePath = $this->getDefaultOfferImagePath();
+
         // Get all existing merchants and sites
         $merchants = Merchant::all();
         $sites = Site::all();
@@ -42,9 +64,9 @@ class OfferSeeder extends Seeder
         $offer1->created_at = Carbon::now()->subDays(10);
         $offer1->updated_at = Carbon::now()->subDays(10);
         $offer1->save();
-        $offer1->files()->create([
-            'name' => 'weekend-offer.jpg',
-            'path' => 'offers/weekend-offer.jpg',
+        $offer1->file()->create([
+            'name' => 'site.png',
+            'path' => $defaultImagePath,
             'type' => Constants::IMAGETYPE,
         ]);
 
@@ -61,9 +83,9 @@ class OfferSeeder extends Seeder
         $offer2->created_at = Carbon::now()->subDays(8);
         $offer2->updated_at = Carbon::now()->subDays(8);
         $offer2->save();
-        $offer2->files()->create([
-            'name' => 'lunch-deal.jpg',
-            'path' => 'offers/lunch-deal.jpg',
+        $offer2->file()->create([
+            'name' => 'site.png',
+            'path' => $defaultImagePath,
             'type' => Constants::IMAGETYPE,
         ]);
 
@@ -80,9 +102,9 @@ class OfferSeeder extends Seeder
         $offer3->created_at = Carbon::now()->subDays(5);
         $offer3->updated_at = Carbon::now()->subDays(5);
         $offer3->save();
-        $offer3->files()->create([
-            'name' => 'all-week-offer.jpg',
-            'path' => 'offers/all-week-offer.jpg',
+        $offer3->file()->create([
+            'name' => 'site.png',
+            'path' => $defaultImagePath,
             'type' => Constants::IMAGETYPE,
         ]);
 
@@ -99,9 +121,9 @@ class OfferSeeder extends Seeder
         $offer4->created_at = Carbon::now()->subDays(3);
         $offer4->updated_at = Carbon::now()->subDays(3);
         $offer4->save();
-        $offer4->files()->create([
-            'name' => 'monday-madness.jpg',
-            'path' => 'offers/monday-madness.jpg',
+        $offer4->file()->create([
+            'name' => 'site.png',
+            'path' => $defaultImagePath,
             'type' => Constants::IMAGETYPE,
         ]);
 
@@ -118,9 +140,9 @@ class OfferSeeder extends Seeder
         $offer5->created_at = Carbon::now()->subDays(2);
         $offer5->updated_at = Carbon::now()->subDays(2);
         $offer5->save();
-        $offer5->files()->create([
-            'name' => 'friday-happy-hour.jpg',
-            'path' => 'offers/friday-happy-hour.jpg',
+        $offer5->file()->create([
+            'name' => 'site.png',
+            'path' => $defaultImagePath,
             'type' => Constants::IMAGETYPE,
         ]);
 
@@ -137,9 +159,9 @@ class OfferSeeder extends Seeder
         $offer6->created_at = Carbon::now()->subDays(1);
         $offer6->updated_at = Carbon::now()->subDays(1);
         $offer6->save();
-        $offer6->files()->create([
-            'name' => 'midweek-special.jpg',
-            'path' => 'offers/midweek-special.jpg',
+        $offer6->file()->create([
+            'name' => 'site.png',
+            'path' => $defaultImagePath,
             'type' => Constants::IMAGETYPE,
         ]);
 
@@ -156,9 +178,9 @@ class OfferSeeder extends Seeder
         $offer7->created_at = Carbon::now();
         $offer7->updated_at = Carbon::now();
         $offer7->save();
-        $offer7->files()->create([
-            'name' => 'permanent-offer.jpg',
-            'path' => 'offers/permanent-offer.jpg',
+        $offer7->file()->create([
+            'name' => 'site.png',
+            'path' => $defaultImagePath,
             'type' => Constants::IMAGETYPE,
         ]);
 

@@ -8,6 +8,8 @@ class SiteDto
     public ?string $name;
     public ?string $phone;
     public ?int $points;
+    public ?string $start_time;
+    public ?string $closed_time;
     public ?string $address_line_1;
     public ?string $address_line_2;
     public ?string $city;
@@ -32,6 +34,8 @@ class SiteDto
         $this->name = isset($request['name']) ? $request['name'] : null;
         $this->phone = isset($request['phone']) ? $request['phone'] : null;
         $this->points = isset($request['points']) ? (int)$request['points'] : null;
+        $this->start_time = isset($request['start_time']) ? $request['start_time'] : null;
+        $this->closed_time = isset($request['closed_time']) ? $request['closed_time'] : null;
         $this->address_line_1 = isset($request['address_line_1']) ? $request['address_line_1'] : null;
         $this->address_line_2 = isset($request['address_line_2']) ? $request['address_line_2'] : null;
         $this->city = isset($request['city']) ? $request['city'] : null;
@@ -72,6 +76,14 @@ class SiteDto
         
         if ($this->points !== null) {
             $data['points'] = $this->points;
+        }
+        
+        if ($this->start_time !== null) {
+            $data['start_time'] = $this->start_time;
+        }
+        
+        if ($this->closed_time !== null) {
+            $data['closed_time'] = $this->closed_time;
         }
         
         if ($this->address_line_1 !== null) {

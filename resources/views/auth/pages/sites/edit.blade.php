@@ -81,6 +81,19 @@
                 </div>
                 <!-- Right Column -->
                 <div class="col-md-6">
+                    <x-auth.input-field type="time" name="start_time" id="start_time"
+                        place="" val="{{ old('start_time', $data->start_time ? \Carbon\Carbon::parse($data->start_time)->format('H:i') : '') }}" extraclasses="mb-3"
+                        label="Start Time" />
+                </div>
+
+                <!-- Left Column -->
+                <div class="col-md-6">
+                    <x-auth.input-field type="time" name="closed_time" id="closed_time"
+                        place="" val="{{ old('closed_time', $data->closed_time ? \Carbon\Carbon::parse($data->closed_time)->format('H:i') : '') }}" extraclasses="mb-3"
+                        label="Closed Time" />
+                </div>
+                <!-- Right Column -->
+                <div class="col-md-6">
                     <x-auth.input-field type="text" name="address_line_1" id="address_line_1" required="true"
                         place="Enter address line 1" val="{{ old('address_line_1', $data->address_line_1 ?? '') }}" extraclasses="mb-3"
                         label="Address Line 1" />

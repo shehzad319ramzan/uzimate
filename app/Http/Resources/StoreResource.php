@@ -33,7 +33,14 @@ class StoreResource extends JsonResource
             'logo' => $this->displayLogo(),
             'info' => $this->description,
             'points' => $this->points,
-            'operating_hours' => null,
+            'start_time' => $this->start_time,
+            'closed_time' => $this->closed_time,
+            'operating_hours' => ($this->start_time || $this->closed_time)
+                ? collect([
+                    $this->start_time ? date('g:i A', strtotime($this->start_time)) : null,
+                    $this->closed_time ? date('g:i A', strtotime($this->closed_time)) : null,
+                ])->filter()->implode(' - ')
+                : null,
         ];
     }
 }
