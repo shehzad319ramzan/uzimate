@@ -53,6 +53,14 @@
                         <span class="text-danger d-block mt-2">{{ $message }}</span>
                     @enderror
                 </div>
+                <!-- QR Code -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label mb-2 d-block" style="font-weight: 500;">QR Code</label>
+                    <div class="border rounded p-3 bg-light text-muted text-center" style="min-height: 120px;">
+                        <i class="fas fa-qrcode fa-2x mb-2"></i>
+                        <small class="d-block">QR code will be auto-generated when you create the offer</small>
+                    </div>
+                </div>
 
                 <!-- Title and Points Required -->
                 <div class="col-md-8 mb-3">

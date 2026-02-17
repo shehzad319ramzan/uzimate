@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Constants\Constants;
+use App\Helper\QrCodeHelper;
 use App\Models\Merchant;
 use App\Models\Offer;
 use App\Models\Site;
@@ -64,6 +65,7 @@ class OfferSeeder extends Seeder
         $offer1->created_at = Carbon::now()->subDays(10);
         $offer1->updated_at = Carbon::now()->subDays(10);
         $offer1->save();
+        $offer1->update(['qr_code' => QrCodeHelper::generateAndSave($offer1->id, 'offers/qr/')]);
         $offer1->file()->create([
             'name' => 'site.png',
             'path' => $defaultImagePath,
@@ -83,6 +85,7 @@ class OfferSeeder extends Seeder
         $offer2->created_at = Carbon::now()->subDays(8);
         $offer2->updated_at = Carbon::now()->subDays(8);
         $offer2->save();
+        $offer2->update(['qr_code' => QrCodeHelper::generateAndSave($offer2->id, 'offers/qr/')]);
         $offer2->file()->create([
             'name' => 'site.png',
             'path' => $defaultImagePath,
@@ -102,6 +105,7 @@ class OfferSeeder extends Seeder
         $offer3->created_at = Carbon::now()->subDays(5);
         $offer3->updated_at = Carbon::now()->subDays(5);
         $offer3->save();
+        $offer3->update(['qr_code' => QrCodeHelper::generateAndSave($offer3->id, 'offers/qr/')]);
         $offer3->file()->create([
             'name' => 'site.png',
             'path' => $defaultImagePath,
@@ -121,6 +125,7 @@ class OfferSeeder extends Seeder
         $offer4->created_at = Carbon::now()->subDays(3);
         $offer4->updated_at = Carbon::now()->subDays(3);
         $offer4->save();
+        $offer4->update(['qr_code' => QrCodeHelper::generateAndSave($offer4->id, 'offers/qr/')]);
         $offer4->file()->create([
             'name' => 'site.png',
             'path' => $defaultImagePath,
@@ -140,6 +145,7 @@ class OfferSeeder extends Seeder
         $offer5->created_at = Carbon::now()->subDays(2);
         $offer5->updated_at = Carbon::now()->subDays(2);
         $offer5->save();
+        $offer5->update(['qr_code' => QrCodeHelper::generateAndSave($offer5->id, 'offers/qr/')]);
         $offer5->file()->create([
             'name' => 'site.png',
             'path' => $defaultImagePath,
@@ -159,6 +165,7 @@ class OfferSeeder extends Seeder
         $offer6->created_at = Carbon::now()->subDays(1);
         $offer6->updated_at = Carbon::now()->subDays(1);
         $offer6->save();
+        $offer6->update(['qr_code' => QrCodeHelper::generateAndSave($offer6->id, 'offers/qr/')]);
         $offer6->file()->create([
             'name' => 'site.png',
             'path' => $defaultImagePath,
@@ -178,6 +185,7 @@ class OfferSeeder extends Seeder
         $offer7->created_at = Carbon::now();
         $offer7->updated_at = Carbon::now();
         $offer7->save();
+        $offer7->update(['qr_code' => QrCodeHelper::generateAndSave($offer7->id, 'offers/qr/')]);
         $offer7->file()->create([
             'name' => 'site.png',
             'path' => $defaultImagePath,
@@ -197,6 +205,7 @@ class OfferSeeder extends Seeder
         $offer8->created_at = Carbon::now()->subDays(30);
         $offer8->updated_at = Carbon::now()->subDays(5);
         $offer8->save();
+        $offer8->update(['qr_code' => QrCodeHelper::generateAndSave($offer8->id, 'offers/qr/')]);
     }
 }
 

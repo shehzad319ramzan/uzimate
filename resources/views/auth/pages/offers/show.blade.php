@@ -73,6 +73,17 @@
                             </td>
                         </tr>
                         <tr>
+                            <th>QR Code</th>
+                            <td>
+                                @if($data->qrCodeImageUrl())
+                                    <img src="{{ $data->qrCodeImageUrl() }}" alt="QR Code" class="img-thumbnail" style="max-width: 200px;" />
+                                    <small class="d-block text-muted mt-2">Customer scans this to earn {{ $data->points_required }} points</small>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                        </tr>
+                        <tr>
                             <th>Description</th>
                             <td>
                                 @if($data->description)

@@ -54,6 +54,16 @@
                         <span class="text-danger d-block mt-2">{{ $message }}</span>
                     @enderror
                 </div>
+                <!-- QR Code -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label mb-2 d-block" style="font-weight: 500;">QR Code</label>
+                    @if($data->qrCodeImageUrl())
+                        <img src="{{ $data->qrCodeImageUrl() }}" alt="QR Code" class="img-thumbnail" style="max-width: 150px;" />
+                        <small class="d-block text-muted mt-1">Scan to earn {{ $data->points_required }} points</small>
+                    @else
+                        <span class="text-muted">QR code will be generated on save</span>
+                    @endif
+                </div>
 
                 <!-- Title and Points Required -->
                 <div class="col-md-8 mb-3">

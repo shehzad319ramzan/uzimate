@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Constants\Constants;
 use App\Dto\OfferDto;
+use App\Helper\QrCodeHelper;
 use App\Models\Merchant;
 use App\Models\Offer;
 use App\Models\Site;
@@ -36,6 +37,9 @@ class OfferRepository extends BaseRepository
         unset($dataArray['image']);
 
         $dataResult = $this->add($this->_model, $dataArray);
+
+        $qrPath = QrCodeHelper::generateAndSave($dataResult->id, 'offers/qr/');
+        $dataResult->update(['qr_code' => $qrPath]);
 
         if ($image != null) {
             $imageUploaded = $this->uploadFile($image, $this->_imgPath);

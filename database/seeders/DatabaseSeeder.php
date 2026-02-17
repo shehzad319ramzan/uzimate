@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
         $this->call(SpinHistorySeeder::class);
         $this->call(InboxSeeder::class);
         $this->call(FeedbackSeeder::class);
-        $this->call(CustomerLogSeeder::class);
+        // $this->call(CustomerLogSeeder::class);
 
         // User::factory(10)->create();
 

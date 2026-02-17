@@ -23,8 +23,10 @@ return new class extends Migration
             $table->date('expires_on')->nullable();
             $table->json('weekdays')->nullable();
             $table->string('description', 255)->nullable();
+            $table->string('qr_code')->nullable();
+
             $table->string('status')->default(1);
-            
+
             $table->timestamps();
 
             $table->foreign('merchant_id')->references('id')->on('merchants')->onDelete('cascade');

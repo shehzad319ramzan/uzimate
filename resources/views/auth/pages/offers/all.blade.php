@@ -16,6 +16,7 @@
                         <tr>
                             <th>Sr#</th>
                             <th>Image</th>
+                            <th>QR Code</th>
                             <th>Title</th>
                             <th>Merchant & Site</th>
                             <th>Points Required</th>
@@ -42,6 +43,13 @@
                                              style="width: 50px; height: 50px; background-color: #4A148D; font-size: 18px;">
                                             {{ strtoupper(substr($offer->title ?? 'O', 0, 1)) }}
                                         </div>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($offer->qrCodeImageUrl())
+                                        <img src="{{ $offer->qrCodeImageUrl() }}" alt="QR Code" class="rounded" width="40" height="40" style="object-fit: contain;" />
+                                    @else
+                                        <span class="text-muted">-</span>
                                     @endif
                                 </td>
                                 <td>

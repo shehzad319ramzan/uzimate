@@ -85,8 +85,8 @@ class AppServiceProvider extends ServiceProvider
     {
         // Only register observers if customer_logs table exists
         if (Schema::hasTable('customer_logs')) {
-            PointAward::observe(PointAwardObserver::class);
-            SpinHistory::observe(SpinHistoryObserver::class);
+            // PointAward::observe(PointAwardObserver::class);
+            // SpinHistory::observe(SpinHistoryObserver::class);
         }
     }
 

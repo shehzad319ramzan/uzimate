@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Constants\Constants;
+use App\Helper\QrCodeHelper;
 use App\Relationships\FileRelationship;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -26,6 +27,7 @@ class Offer extends Model
         'expires_on',
         'weekdays',
         'description',
+        'qr_code',
         'status',
     ];
 
@@ -64,5 +66,14 @@ class Offer extends Model
     public function image()
     {
         return $this->fileUrl(Constants::IMAGETYPE);
+    }
+
+
+    public function qrCodeImageUrl(): ?string
+    {
+        if (empty($this->qr_code) || strpos($this->qr_code, '/') === false) {
+            return null;
+        }
+        return QrCodeHelper::url($this->qr_code);
     }
 }

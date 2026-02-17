@@ -7,9 +7,10 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\Api\MerchantApiController;
 use App\Http\Controllers\Api\OfferApiController;
 use App\Http\Controllers\Api\PasswordApiController;
+use App\Http\Controllers\Api\ScanOfferApiController;
 use Illuminate\Support\Facades\Route;
 
-// Public routes
+// Merchant routes
 Route::get('merchant-categories', [MerchantApiController::class, 'merchantCategories']);
 Route::get('merchants', [MerchantApiController::class, 'merchants']);
 Route::get('merchants/{id}', [MerchantApiController::class, 'merchantDetail']);
@@ -28,4 +29,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('profile', [UserController::class, 'profileApi']);
     Route::post('edit-profile', [UserController::class, 'edit_profile']);
     Route::post('password-change', [PasswordApiController::class, 'change_password']);
+    Route::post('scan-offer', [ScanOfferApiController::class, 'scan']);
 });
