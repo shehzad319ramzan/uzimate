@@ -9,6 +9,10 @@ use Illuminate\Http\Request;
 
 class ScanOfferService
 {
+    public function __construct(
+        protected RewardRuleService $rewardRuleService
+    ) {}
+
     /**
      * Find and return a valid (active) offer by ID.
      */
@@ -58,25 +62,32 @@ class ScanOfferService
     {
         return CustomerLog::where('user_id', $userId)
             ->where('action_type', 'qr_code_scanned')
-            ->where('related_model_type', Offer::class)
-            ->where('related_model_id', $offerId)
+            ->where('offer_id', $offerId)
             ->exists();
     }
 
     /**
      * Create scan log and credit points.
+     * When reward rule for qr_code_scanned is inactive: still create log but with 0 points (audit trail, no reward).
+     * @return int Points actually awarded (0 when rule inactive).
      */
-    public function createScanLog(Offer $offer, object $user, Request $request): void
+    public function createScanLog(Offer $offer, object $user, Request $request): int
     {
-        $pointsEarned = (int) $offer->points_required;
+        $pointsEarned = 0;
+        if ($this->rewardRuleService->shouldAwardPointsForAction('qr_code_scanned', $offer->merchant_id)) {
+            $pointsEarned = (int) $offer->points_required;
+        }
 
         CustomerLog::create([
             'merchant_id' => $offer->merchant_id,
             'site_id' => $offer->site_id,
+            'offer_id' => $offer->id,
             'user_id' => $user->id,
             'action_type' => 'qr_code_scanned',
             'action_category' => 'scans',
-            'description' => "Scanned offer: {$offer->title} - earned {$pointsEarned} points",
+            'description' => $pointsEarned > 0
+                ? "Scanned offer: {$offer->title} - earned {$pointsEarned} points"
+                : "Scanned offer: {$offer->title}",
             'points_affected' => $pointsEarned,
             'related_model_type' => Offer::class,
             'related_model_id' => $offer->id,
@@ -88,6 +99,8 @@ class ScanOfferService
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
+
+        return $pointsEarned;
     }
 
     /**
@@ -98,5 +111,15 @@ class ScanOfferService
         return max(0, (int) CustomerLog::where('user_id', $userId)
             ->whereNotNull('points_affected')
             ->sum('points_affected'));
+    }
+
+
+    public function getRewardHistory(string $userId, int $perPage = 20)
+    {
+        return CustomerLog::where('user_id', $userId)
+            ->whereNotNull('points_affected')
+            ->with(['relatedModel', 'offer', 'merchant', 'site'])
+            ->latest()
+            ->paginate($perPage);
     }
 }

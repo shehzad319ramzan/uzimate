@@ -12,6 +12,7 @@ use App\Http\Requests\User\UpdateProfileRequest;
 use App\Http\Requests\User\UserUpdateRequest;
 use App\Interface\UserInterface;
 use App\Models\CustomerLog;
+use App\Services\ScanOfferService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,7 +23,7 @@ class UserController extends BaseController
      *
      * @return $reauest, $modal
      */
-    public function __construct(UserInterface $repo)
+    public function __construct(UserInterface $repo, protected ScanOfferService $scanOfferService)
     {
         $this->setRepo($repo, "auth/pages/users", "users");
     }
@@ -184,6 +185,8 @@ class UserController extends BaseController
         $user = $request->user();
         $user->load('roles');
 
+        $pointsBalance = $this->scanOfferService->getUserPointsBalance($user->id);
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -198,6 +201,7 @@ class UserController extends BaseController
                     'full_name' => $user->full_name ?? ($user->first_name . ' ' . $user->last_name),
                     'roles' => $user->roles->pluck('name'),
                     'profile_image' => $user->profile(),
+                    'points_balance' => $pointsBalance,
                 ]
             ]
         ], 200);

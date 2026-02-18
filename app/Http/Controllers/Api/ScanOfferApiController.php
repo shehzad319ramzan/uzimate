@@ -41,14 +41,17 @@ class ScanOfferApiController extends ApiBaseController
             return $this->errorResponse('You have already scanned this offer', 400);
         }
 
-        $this->scanOfferService->createScanLog($offer, $user, $request);
+        $pointsEarned = $this->scanOfferService->createScanLog($offer, $user, $request);
 
-        $pointsEarned = (int) $offer->points_required;
         $newBalance = $this->scanOfferService->getUserPointsBalance($user->id);
+
+        $message = $pointsEarned > 0
+            ? "Successfully scanned! You earned {$pointsEarned} points."
+            : 'Scan recorded.';
 
         return response()->json([
             'success' => true,
-            'message' => "Successfully scanned! You earned {$pointsEarned} points.",
+            'message' => $message,
             'data' => [
                 'offer' => [
                     'id' => $offer->id,

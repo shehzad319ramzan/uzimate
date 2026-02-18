@@ -4,20 +4,31 @@ namespace App\Observers;
 
 use App\Models\CustomerLog;
 use App\Models\SpinHistory;
+use App\Services\RewardRuleService;
 use Illuminate\Support\Facades\Log;
 
 class SpinHistoryObserver
 {
+    public function __construct(protected RewardRuleService $rewardRuleService)
+    {
+    }
+
     /**
      * Handle the SpinHistory "created" event.
-     * Automatically creates a customer log when a spin is completed.
+     * Always create customer log; points only when reward rule for spin_completed is active.
      */
     public function created(SpinHistory $spinHistory): void
     {
         try {
-            // Determine description based on result type
+            $points = 0;
+            if ($this->rewardRuleService->shouldAwardPointsForAction('spin_completed', $spinHistory->merchant_id)) {
+                $points = (int) ($spinHistory->points_earned ?? 0);
+            }
+
             $description = match($spinHistory->spin_result_type) {
-                'points' => "Won {$spinHistory->points_earned} points from spin wheel (Spin #{$spinHistory->spin_number})",
+                'points' => $points > 0
+                    ? "Won {$points} points from spin wheel (Spin #{$spinHistory->spin_number})"
+                    : "Spin completed (Spin #{$spinHistory->spin_number})",
                 'offer' => "Won offer from spin wheel (Spin #{$spinHistory->spin_number})",
                 'discount' => "Won " . ($spinHistory->reward_value ? number_format($spinHistory->reward_value, 2) . '%' : '') . " discount from spin wheel (Spin #{$spinHistory->spin_number})",
                 'nothing' => "Spin completed - no reward (Spin #{$spinHistory->spin_number})",
@@ -31,7 +42,7 @@ class SpinHistoryObserver
                 'action_type' => 'spin_completed',
                 'action_category' => 'spins',
                 'description' => $description,
-                'points_affected' => $spinHistory->points_earned ?? 0,
+                'points_affected' => $points > 0 ? $points : null,
                 'related_model_type' => SpinHistory::class,
                 'related_model_id' => $spinHistory->id,
                 'performed_by_id' => auth()->id(),

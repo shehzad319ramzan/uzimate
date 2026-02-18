@@ -121,6 +121,16 @@
             </li>
             @endcan
 
+            @can('view_reward_rule')
+            {{-- Reward Rules (labels & points setup) --}}
+            <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'reward-rules.') || request()->route()->getName() == 'reward-rules.index' ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ Route::has('reward-rules.index') ? route('reward-rules.index') : '#' }}">
+                    <i class="align-middle me-2 fas fa-cog"></i>
+                    <span class="align-middle">Reward Rules</span>
+                </a>
+            </li>
+            @endcan
+
             @can('view_customer_log')
             {{-- Customer Logs --}}
             <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'customerlogs.') || request()->route()->getName() == 'customerlogs.index' ? 'active' : '' }}">

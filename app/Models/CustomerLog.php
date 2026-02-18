@@ -20,6 +20,7 @@ class CustomerLog extends Model
     protected $fillable = [
         'merchant_id',
         'site_id',
+        'offer_id',
         'user_id',
         'action_type',
         'action_category',
@@ -66,6 +67,14 @@ class CustomerLog extends Model
     public function site(): BelongsTo
     {
         return $this->belongsTo(Site::class);
+    }
+
+    /**
+     * Get the offer (when log is for offer scan).
+     */
+    public function offer(): BelongsTo
+    {
+        return $this->belongsTo(Offer::class);
     }
 
     /**

@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\Api\MerchantApiController;
 use App\Http\Controllers\Api\OfferApiController;
 use App\Http\Controllers\Api\PasswordApiController;
+use App\Http\Controllers\Api\RewardsApiController;
 use App\Http\Controllers\Api\ScanOfferApiController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +28,7 @@ Route::post('reset-password', [PasswordApiController::class, 'reset_password'])-
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('logout', [HomeController::class, 'logoutApi']);
     Route::get('profile', [UserController::class, 'profileApi']);
+    Route::get('my-rewards', [RewardsApiController::class, 'index']);
     Route::post('edit-profile', [UserController::class, 'edit_profile']);
     Route::post('password-change', [PasswordApiController::class, 'change_password']);
     Route::post('scan-offer', [ScanOfferApiController::class, 'scan']);

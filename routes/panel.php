@@ -12,6 +12,7 @@ use App\Http\Controllers\OfferController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PointAwardController;
+use App\Http\Controllers\RewardRuleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SiteUserController;
@@ -125,6 +126,16 @@ Route::group(
             Route::get('edit/{id}', 'edit')->name('edit');
         });
         Route::prefix('spin-history')->as('spinhistories.')->controller(SpinHistoryController::class)->group(function () {
+            Route::get('create', 'create')->name('create');
+            Route::get('', 'index')->name('index');
+            Route::post('store', 'store')->name('store');
+            Route::put('update/{id}', 'update')->name('update');
+            Route::delete('delete/{id}', 'destroy')->name('destroy');
+            Route::get('detail/{id}', 'show')->name('show');
+            Route::get('edit/{id}', 'edit')->name('edit');
+        });
+
+        Route::prefix('reward-rules')->as('reward-rules.')->controller(RewardRuleController::class)->group(function () {
             Route::get('create', 'create')->name('create');
             Route::get('', 'index')->name('index');
             Route::post('store', 'store')->name('store');

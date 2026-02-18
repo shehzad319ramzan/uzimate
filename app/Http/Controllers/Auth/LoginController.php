@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Auth;
 use App\Constants\Constants;
 use App\Http\Controllers\Controller;
 use App\Models\CustomerLog;
+use App\Services\RewardRuleService;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class LoginController extends Controller
 {
@@ -45,7 +47,7 @@ class LoginController extends Controller
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(protected RewardRuleService $rewardRuleService)
     {
         $this->middleware('guest')->except('logout');
     }
@@ -77,21 +79,13 @@ class LoginController extends Controller
                 $request->session()->put('auth.password_confirmed_at', time());
             }
 
-            // Auto-create customer log for customer login
+            // Auto-create customer log for customer login (always create; points only when rule active)
             $user = auth()->user();
             if ($user && $user->hasRole(Constants::CUSTOMER)) {
                 try {
-                    CustomerLog::create([
-                        'user_id' => $user->id,
-                        'action_type' => 'login',
-                        'action_category' => 'system',
-                        'description' => 'Customer logged in',
-                        'ip_address' => $request->ip(),
-                        'user_agent' => $request->userAgent(),
-                    ]);
+                    $this->createLoginCustomerLog($user->id, $request, 'Customer logged in');
                 } catch (\Exception $e) {
-                    // Log error but don't break login
-                    \Log::error('Failed to create customer log for login: ' . $e->getMessage());
+                    Log::error('Failed to create customer log for login: ' . $e->getMessage());
                 }
             }
 
@@ -127,17 +121,10 @@ class LoginController extends Controller
             // Create API token
             $token = $user->createToken('auth_token')->plainTextToken;
 
-            // Auto-create customer log for customer login
+            // Auto-create customer log for customer login (always create; points only when rule active)
             if ($user && $user->hasRole(Constants::CUSTOMER)) {
                 try {
-                    CustomerLog::create([
-                        'user_id' => $user->id,
-                        'action_type' => 'login',
-                        'action_category' => 'system',
-                        'description' => 'Customer logged in via API',
-                        'ip_address' => $request->ip(),
-                        'user_agent' => $request->userAgent(),
-                    ]);
+                    $this->createLoginCustomerLog($user->id, $request, 'Customer logged in via API');
                 } catch (\Exception $e) {
                     \Log::error('Failed to create customer log for API login: ' . $e->getMessage());
                 }
@@ -166,5 +153,37 @@ class LoginController extends Controller
             'success' => false,
             'message' => 'Invalid credentials'
         ], 401);
+    }
+
+    /**
+     * Create customer log for login. Always create log; points only when reward rule is active (and first_time_only respected).
+     */
+    protected function createLoginCustomerLog($userId, Request $request, string $description): void
+    {
+        $points = 0;
+        if ($this->rewardRuleService->shouldAwardPointsForAction('login', null)) {
+            $points = (int) ($this->rewardRuleService->getPointsForAction('login', null) ?? 0);
+            if ($points > 0 && $this->rewardRuleService->isFirstTimeOnly('login', null)) {
+                // Only skip if user already received points for a previous login (not just any login log)
+                $alreadyReceivedLoginPoints = CustomerLog::where('user_id', $userId)
+                    ->where('action_type', 'login')
+                    ->whereNotNull('points_affected')
+                    ->where('points_affected', '>', 0)
+                    ->exists();
+                if ($alreadyReceivedLoginPoints) {
+                    $points = 0;
+                }
+            }
+        }
+
+        CustomerLog::create([
+            'user_id' => $userId,
+            'action_type' => 'login',
+            'action_category' => 'system',
+            'description' => $points > 0 ? "{$description} - earned {$points} points" : $description,
+            'points_affected' => $points > 0 ? $points : null,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
     }
 }

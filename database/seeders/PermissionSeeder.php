@@ -54,6 +54,7 @@ class PermissionSeeder extends Seeder
             'Offer Scans' => 'offer_scan',
             'Point Awards' => 'point_award',
             'Spin History' => 'spin_history',
+            'Reward Rules' => 'reward_rule',
             'Customer Logs' => 'customer_log',
             'Inbox' => 'inbox',
             'Feedbacks' => 'feedback',

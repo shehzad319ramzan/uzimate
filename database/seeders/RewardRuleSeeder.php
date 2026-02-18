@@ -1,0 +1,29 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\RewardRule;
+use Illuminate\Database\Seeder;
+
+class RewardRuleSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $defaults = RewardRule::defaultActionTypes();
+
+        foreach ($defaults as $actionType => $label) {
+            RewardRule::updateOrCreate(
+                [
+                    'action_type' => $actionType,
+                    'merchant_id' => null,
+                ],
+                [
+                    'label' => $label,
+                    'points' => $actionType === 'login' ? 80 : null,
+                    'trigger_condition' => $actionType === 'login' ? RewardRule::TRIGGER_FIRST_TIME_ONLY : RewardRule::TRIGGER_EVERY_TIME,
+                    'is_active' => true,
+                ]
+            );
+        }
+    }
+}
