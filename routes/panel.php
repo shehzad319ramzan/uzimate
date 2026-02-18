@@ -180,6 +180,7 @@ Route::group(
 
             Route::put('basic_info/update', 'basic_info')->name('basic_info');
             Route::put('smtp/update', 'smtp_update')->name('smtp_update');
+            Route::put('spin/update', 'spin_update')->name('spin_update');
             Route::put('social-logins/update', 'social_logins_update')->name('social_logins_update');
             Route::put('registration/update', 'registeration_update')->name('registeration_update');
             Route::post('clear-cache', 'clear_cache')->name('clear_cache');

@@ -9,8 +9,10 @@ use App\Dto\SiteSettings\InstallLanguageDto;
 use App\Dto\SiteSettings\RegisterDto;
 use App\Dto\SiteSettings\SmtpDto;
 use App\Dto\SiteSettings\SocialDto;
+use App\Dto\SiteSettings\SpinDto;
 use App\Dto\SiteSettings\UpdateDefaultLanguageDto;
 use App\Models\Setting;
+use App\Services\SettingService;
 use Illuminate\Support\Facades\Artisan;
 
 class SettingRepository extends BaseRepository
@@ -58,7 +60,7 @@ class SettingRepository extends BaseRepository
 
         $dataResult->update($dataArray);
 
-        app(\App\Services\SettingService::class)->clearCache();
+        app(SettingService::class)->clearCache();
 
         return true;
     }
@@ -70,12 +72,17 @@ class SettingRepository extends BaseRepository
 
         $dataResult->update($dataArray);
 
-        app(\App\Services\SettingService::class)->clearCache();
+        app(SettingService::class)->clearCache();
 
         return true;
     }
 
     public function smtp_update(SmtpDto $data)
+    {
+        return $this->updateData($data);
+    }
+
+    public function spin_update(SpinDto $data)
     {
         return $this->updateData($data);
     }
@@ -110,7 +117,7 @@ class SettingRepository extends BaseRepository
         $updatedLanguages['installed_languages'] = implode(',', $languages);
         $dataResult->update($updatedLanguages);
 
-        app(\App\Services\SettingService::class)->clearCache();
+        app(SettingService::class)->clearCache();
 
         return true;
     }
@@ -141,7 +148,7 @@ class SettingRepository extends BaseRepository
         $updatedLanguages['languages'] = implode(',', $languages);
         $dataResult->update($updatedLanguages);
 
-        app(\App\Services\SettingService::class)->clearCache();
+        app(SettingService::class)->clearCache();
 
         return true;
     }

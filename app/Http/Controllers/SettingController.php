@@ -7,6 +7,7 @@ use App\Dto\SiteSettings\BasicInfoDto;
 use App\Dto\SiteSettings\RegisterDto;
 use App\Dto\SiteSettings\SmtpDto;
 use App\Dto\SiteSettings\SocialDto;
+use App\Dto\SiteSettings\SpinDto;
 use App\Dto\SiteSettings\UpdateDefaultLanguageDto;
 use App\Dto\SiteSettings\InstallLanguageDto;
 use App\Helper\Exception;
@@ -17,6 +18,7 @@ use App\Http\Requests\SiteSettings\BasicInfoRequest;
 use App\Http\Requests\SiteSettings\InstallLanguageRequest;
 use App\Http\Requests\SiteSettings\RegisterRequest;
 use App\Http\Requests\SiteSettings\SmtpRequest;
+use App\Http\Requests\SiteSettings\SpinRequest;
 use App\Http\Requests\SiteSettings\SocialLoginRequest;
 use App\Http\Requests\SiteSettings\UpdateDefaultLanguage;
 use Illuminate\Http\Request;
@@ -46,8 +48,11 @@ class SettingController extends Controller
     {
         try {
             $view = $this->_directory . '.' . $blade;
-
             $data = $this->_repo->index();
+            if ($blade === 'spin') {
+                $sites = \App\Models\Site::select('id', 'name')->orderBy('name')->get();
+                return view($view, compact('data', 'sites'));
+            }
             return view($view, compact('data'));
         } catch (\Throwable $th) {
             return Exception::handle($th);
@@ -86,6 +91,16 @@ class SettingController extends Controller
         try {
             $this->_repo->smtp_update(SmtpDto::fromRequest($request->validated()));
             return redirect()->back()->with('success', 'Updated succesfully');
+        } catch (\Throwable $th) {
+            return Exception::handle($th);
+        }
+    }
+
+    public function spin_update(SpinRequest $request)
+    {
+        try {
+            $this->_repo->spin_update(SpinDto::fromRequest($request->validated()));
+            return redirect()->back()->with('success', 'Spin wheel settings updated successfully.');
         } catch (\Throwable $th) {
             return Exception::handle($th);
         }
