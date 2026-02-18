@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Dto\SpinHistoryDto;
 use App\Models\Offer;
-use App\Models\Site;
 use App\Models\SpinHistory;
 use App\Repositories\SpinHistoryRepository;
 use Illuminate\Http\Request;
@@ -17,24 +16,14 @@ class SpinService
     }
 
     /**
-     * Check if user can spin (eligibility: 1 per day by default).
+     * Check if user can spin (eligibility: spins per day by user_id only; site_id not used for limit).
      */
     public function getEligibility(string $userId, ?string $siteId = null): array
     {
-        $siteId = $siteId ?: $this->getDefaultSiteId();
-        if (!$siteId) {
-            return [
-                'eligible' => false,
-                'message' => 'No spin site configured.',
-                'next_spin_at' => null,
-            ];
-        }
-
         $spinsPerDay = (int) config('spin.spins_per_day', 1);
         $today = Carbon::today()->toDateString();
 
         $spinsToday = SpinHistory::where('user_id', $userId)
-            ->where('site_id', $siteId)
             ->whereDate('created_at', $today)
             ->count();
 
@@ -59,16 +48,11 @@ class SpinService
     }
 
     /**
-     * Perform spin: check eligibility, determine result, store via SpinHistoryRepository (observer creates customer log).
+     * Perform spin: check eligibility by user_id only, determine result, store (no site_id required).
      */
     public function performSpin(string $userId, Request $request, ?string $siteId = null): SpinHistory
     {
-        $siteId = $siteId ?: $this->getDefaultSiteId();
-        if (!$siteId) {
-            throw new \InvalidArgumentException('No spin site configured.');
-        }
-
-        $eligibility = $this->getEligibility($userId, $siteId);
+        $eligibility = $this->getEligibility($userId);
         if (!$eligibility['eligible']) {
             throw new \RuntimeException($eligibility['message']);
         }
@@ -82,7 +66,7 @@ class SpinService
             'points_earned' => $result['points'] ?? 0,
             'offer_id' => $result['offer_id'] ?? null,
             'reward_value' => $result['reward_value'] ?? null,
-            'spin_number' => 0, // let repository calculate next spin number
+            'spin_number' => 0,
             'is_eligible' => true,
             'last_spin_date' => Carbon::today()->toDateString(),
             'notes' => null,
@@ -97,9 +81,9 @@ class SpinService
     }
 
     /**
-     * Weighted random outcome: nothing, points, offer, discount.
+     * Weighted random outcome: nothing, points, offer, discount. site_id optional (offer from any site when null).
      */
-    protected function determineResult(string $siteId): array
+    protected function determineResult(?string $siteId = null): array
     {
         $outcomes = config('spin.outcomes', [
             'nothing' => 50,
@@ -125,7 +109,9 @@ class SpinService
             $range = config('spin.points_range', [25, 100]);
             $result['points'] = random_int($range[0], $range[1]);
         } elseif ($type === 'offer') {
-            $offer = $this->pickRandomOfferForSite($siteId);
+            $offer = $siteId
+                ? $this->pickRandomOfferForSite($siteId)
+                : $this->pickRandomOffer();
             $result['offer_id'] = $offer?->id;
         } elseif ($type === 'discount') {
             $range = config('spin.discount_range', [5, 20]);
@@ -148,13 +134,17 @@ class SpinService
             ->first();
     }
 
-    public function getDefaultSiteId(): ?string
+    /** Pick a random valid offer from any site (used when spin is user-only, no site_id). */
+    protected function pickRandomOffer(): ?Offer
     {
-        $id = config('spin.default_site_id');
-        if ($id) {
-            return Site::where('id', $id)->exists() ? $id : null;
-        }
-        $first = Site::select('id')->first();
-        return $first?->id;
+        return Offer::whereNotNull('site_id')
+            ->where(function ($q) {
+                $q->where('status', '1')->orWhere('status', 1);
+            })
+            ->where(function ($q) {
+                $q->whereNull('expires_on')->orWhere('expires_on', '>=', now());
+            })
+            ->inRandomOrder()
+            ->first();
     }
 }

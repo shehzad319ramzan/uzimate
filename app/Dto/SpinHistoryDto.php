@@ -4,7 +4,7 @@ namespace App\Dto;
 
 class SpinHistoryDto
 {
-    public readonly string $site_id;
+    public readonly ?string $site_id;
     public readonly int $user_id;
     public readonly string $spin_result_type;
     public readonly int $points_earned;
@@ -22,7 +22,7 @@ class SpinHistoryDto
      */
     public function __construct(array $data)
     {
-        $this->site_id = $data['site_id'];
+        $this->site_id = isset($data['site_id']) ? (string) $data['site_id'] : null;
         $this->user_id = (int) $data['user_id'];
         $this->spin_result_type = $data['spin_result_type'] ?? 'nothing';
         $this->points_earned = isset($data['points_earned']) ? (int) $data['points_earned'] : 0;
@@ -48,7 +48,6 @@ class SpinHistoryDto
     public function toArray(): array
     {
         $data = [
-            'site_id' => $this->site_id,
             'user_id' => $this->user_id,
             'spin_result_type' => $this->spin_result_type,
             'points_earned' => $this->points_earned,
@@ -69,6 +68,10 @@ class SpinHistoryDto
 
         if ($this->last_spin_date !== null) {
             $data['last_spin_date'] = $this->last_spin_date;
+        }
+
+        if ($this->site_id !== null) {
+            $data['site_id'] = $this->site_id;
         }
 
         return $data;

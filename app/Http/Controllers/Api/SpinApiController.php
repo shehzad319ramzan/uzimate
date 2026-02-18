@@ -31,9 +31,6 @@ class SpinApiController extends ApiBaseController
         ], 200);
     }
 
-    /**
-     * POST /api/spin – Perform one spin.
-     */
     public function spin(Request $request): JsonResponse
     {
         $request->validate([

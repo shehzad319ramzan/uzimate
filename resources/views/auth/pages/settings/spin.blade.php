@@ -19,7 +19,8 @@
                     <x-auth.input-field type="number" name="spins_per_day" id="spins_per_day" place="e.g. 1"
                         val="{{ $data->spin_spins_per_day ?? config('spin.spins_per_day', 1) }}" required="true" label="Spins per day (per user)" />
                 </div>
-                <div class="col-md-6">
+                {{-- Default site: hidden for now (not used in code yet). Uncomment to show. --}}
+                <div class="col-md-6 d-none">
                     <label for="default_site_id" class="form-label text-muted">Default site</label>
                     <select name="default_site_id" id="default_site_id" class="form-select">
                         <option value="">— Use first available —</option>

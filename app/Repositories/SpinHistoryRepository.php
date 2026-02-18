@@ -97,11 +97,9 @@ class SpinHistoryRepository extends BaseRepository
     {
         $payload = $this->preparePayload($data);
 
-        // Calculate spin number
         if (!isset($payload['spin_number']) || $payload['spin_number'] <= 0) {
             $lastSpin = $this->_model
                 ->where('user_id', $payload['user_id'])
-                ->where('merchant_id', $payload['merchant_id'])
                 ->orderBy('spin_number', 'desc')
                 ->first();
 
@@ -136,8 +134,12 @@ class SpinHistoryRepository extends BaseRepository
     protected function preparePayload(SpinHistoryDto $data): array
     {
         $payload = $data->toArray();
-        $site = Site::select('id', 'merchant_id')->findOrFail($payload['site_id']);
-        $payload['merchant_id'] = $site->merchant_id;
+        if (! empty($payload['site_id'])) {
+            $site = Site::select('id', 'merchant_id')->find($payload['site_id']);
+            $payload['merchant_id'] = $site?->merchant_id;
+        } else {
+            $payload['merchant_id'] = null;
+        }
 
         return $payload;
     }
