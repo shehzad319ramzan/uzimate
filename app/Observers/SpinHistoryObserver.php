@@ -25,11 +25,15 @@ class SpinHistoryObserver
                 $points = (int) ($spinHistory->points_earned ?? 0);
             }
 
+            $offerTitle = $spinHistory->offer_id ? $spinHistory->offer?->title : null;
+
             $description = match($spinHistory->spin_result_type) {
                 'points' => $points > 0
                     ? "Won {$points} points from spin wheel (Spin #{$spinHistory->spin_number})"
                     : "Spin completed (Spin #{$spinHistory->spin_number})",
-                'offer' => "Won offer from spin wheel (Spin #{$spinHistory->spin_number})",
+                'offer' => $offerTitle
+                    ? "Won offer: {$offerTitle} from spin wheel (Spin #{$spinHistory->spin_number})"
+                    : "Won offer from spin wheel (Spin #{$spinHistory->spin_number})",
                 'discount' => "Won " . ($spinHistory->reward_value ? number_format($spinHistory->reward_value, 2) . '%' : '') . " discount from spin wheel (Spin #{$spinHistory->spin_number})",
                 'nothing' => "Spin completed - no reward (Spin #{$spinHistory->spin_number})",
                 default => "Spin completed (Spin #{$spinHistory->spin_number})",

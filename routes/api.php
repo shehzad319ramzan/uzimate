@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\OfferApiController;
 use App\Http\Controllers\Api\PasswordApiController;
 use App\Http\Controllers\Api\RewardsApiController;
 use App\Http\Controllers\Api\ScanOfferApiController;
+use App\Http\Controllers\Api\SpinApiController;
 use Illuminate\Support\Facades\Route;
 
 // Merchant routes
@@ -29,7 +30,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('logout', [HomeController::class, 'logoutApi']);
     Route::get('profile', [UserController::class, 'profileApi']);
     Route::get('my-rewards', [RewardsApiController::class, 'index']);
+    Route::get('my-scans', [ScanOfferApiController::class, 'index']);
     Route::post('edit-profile', [UserController::class, 'edit_profile']);
     Route::post('password-change', [PasswordApiController::class, 'change_password']);
     Route::post('scan-offer', [ScanOfferApiController::class, 'scan']);
+
+    Route::get('spin/eligibility', [SpinApiController::class, 'eligibility']);
+    Route::post('spin', [SpinApiController::class, 'spin']);
 });

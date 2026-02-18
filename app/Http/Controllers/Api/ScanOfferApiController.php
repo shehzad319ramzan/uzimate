@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\OfferScan;
 use App\Services\ScanOfferService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,6 +13,42 @@ class ScanOfferApiController extends ApiBaseController
     public function __construct(
         protected ScanOfferService $scanOfferService
     ) {}
+
+    /**
+     * List current user's offer scans (scan history from offer_scans table).
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $user = Auth::user();
+        $perPage = min((int) $request->get('per_page', 20), 50);
+
+        $scans = OfferScan::where('user_id', $user->id)
+            ->with(['offer:id,title,points_required', 'merchant:id,name'])
+            ->latest()
+            ->paginate($perPage);
+
+        $items = $scans->getCollection()->map(function (OfferScan $scan) {
+            return [
+                'id' => $scan->id,
+                'offer_id' => $scan->offer_id,
+                'offer_title' => $scan->offer?->title ?? ($scan->metadata['offer_title'] ?? null),
+                'points_earned' => $scan->points_earned,
+                'scanned_at' => $scan->created_at->toIso8601String(),
+                'merchant_name' => $scan->merchant?->name,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'scans' => $items,
+                'current_page' => $scans->currentPage(),
+                'last_page' => $scans->lastPage(),
+                'per_page' => $scans->perPage(),
+                'total' => $scans->total(),
+            ],
+        ], 200);
+    }
 
     public function scan(Request $request): JsonResponse
     {

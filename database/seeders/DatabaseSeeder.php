@@ -23,8 +23,8 @@ class DatabaseSeeder extends Seeder
         $this->call(SiteUserSeeder::class);
         $this->call(OfferSeeder::class);
         $this->call(RewardRuleSeeder::class);
-        $this->call(PointAwardSeeder::class);
-        $this->call(SpinHistorySeeder::class);
+        // $this->call(PointAwardSeeder::class);
+        // $this->call(SpinHistorySeeder::class);
         $this->call(InboxSeeder::class);
         $this->call(FeedbackSeeder::class);
         // $this->call(CustomerLogSeeder::class);

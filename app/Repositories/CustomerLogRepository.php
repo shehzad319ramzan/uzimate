@@ -34,14 +34,12 @@ class CustomerLogRepository extends BaseRepository
             ->withQueryString();
     }
 
-    /**
-     * List QR code scan logs only (action_type = qr_code_scanned), with Offer relation loaded.
-     */
+
     public function listScanLogs(array $filters = []): LengthAwarePaginator
     {
         $filters['action_type'] = 'qr_code_scanned';
         return $this->buildFilteredQuery($filters)
-            ->with(array_merge($this->with, ['relatedModel']))
+            ->with(array_merge($this->with, ['relatedModel', 'offer']))
             ->paginate(20)
             ->withQueryString();
     }

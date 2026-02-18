@@ -86,8 +86,8 @@
                                     <small class="text-muted">{{ $log->user->email ?? 'N/A' }}</small>
                                 </td>
                                 <td>
-                                    @php $offer = $log->relatedModel; @endphp
-                                    @if($offer && $offer instanceof \App\Models\Offer)
+                                    @php $offer = $log->offer ?? ($log->relatedModel instanceof \App\Models\Offer ? $log->relatedModel : null); @endphp
+                                    @if($offer)
                                         <a href="{{ route('offers.show', $offer->id) }}" class="text-dark fw-semibold">{{ $offer->title ?? '-' }}</a>
                                     @else
                                         <span class="text-muted">-</span>

@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Resources\OfferResource;
 use App\Models\Offer;
+use App\Models\OfferScan;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OfferApiController extends ApiBaseController
 {
@@ -46,6 +48,16 @@ class OfferApiController extends ApiBaseController
         $perPage = min((int) $request->get('per_page', 20), 100);
         $offers = $query->paginate($perPage);
 
+        if (Auth::check()) {
+            $scans = OfferScan::where('user_id', Auth::id())
+                ->whereIn('offer_id', $offers->pluck('id'))
+                ->get()
+                ->keyBy('offer_id');
+            $offers->getCollection()->each(function ($offer) use ($scans) {
+                $offer->user_scan = $scans->get($offer->id);
+            });
+        }
+
         return response()->json([
             'success' => true,
             'data' => OfferResource::collection($offers->getCollection()),
@@ -70,6 +82,12 @@ class OfferApiController extends ApiBaseController
                 'success' => false,
                 'message' => 'Offer not found',
             ], 404);
+        }
+
+        if (Auth::check()) {
+            $offer->user_scan = OfferScan::where('user_id', Auth::id())
+                ->where('offer_id', $offer->id)
+                ->first();
         }
 
         return response()->json([

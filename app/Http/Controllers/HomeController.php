@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Constants\Constants;
-use App\Models\CustomerLog;
+use App\Events\CustomerLoggedOut;
 use App\Models\Merchant;
-use App\Services\RewardRuleService;
 use App\Models\Site;
 use App\Models\SiteUser;
 use App\Models\User;
@@ -21,7 +20,7 @@ use App\Mail\VerificationMail;
 
 class HomeController extends Controller
 {
-    public function __construct(protected RewardRuleService $rewardRuleService)
+    public function __construct()
     {
         $this->middleware('auth');
     }
@@ -841,7 +840,7 @@ class HomeController extends Controller
         $user = Auth::user();
         if ($user && $user->hasRole(Constants::CUSTOMER)) {
             try {
-                $this->createLogoutCustomerLog($user->id, $request, 'Customer logged out');
+                CustomerLoggedOut::dispatch($user->id, $request, 'Customer logged out');
             } catch (\Exception $e) {
                 Log::error('Failed to create customer log for logout: ' . $e->getMessage());
             }
@@ -861,7 +860,7 @@ class HomeController extends Controller
         // Create customer log for logout only when reward rule for logout is active
         if ($user && $user->hasRole(Constants::CUSTOMER)) {
             try {
-                $this->createLogoutCustomerLog($user->id, $request, 'Customer logged out via API');
+                CustomerLoggedOut::dispatch($user->id, $request, 'Customer logged out via API');
             } catch (\Exception $e) {
                 Log::error('Failed to create customer log for API logout: ' . $e->getMessage());
             }
@@ -874,26 +873,6 @@ class HomeController extends Controller
             'success' => true,
             'message' => 'Logged out successfully'
         ], 200);
-    }
-
-    /**
-     * Create customer log for logout only when reward rule for logout is active.
-     */
-    private function createLogoutCustomerLog($userId, Request $request, string $description): void
-    {
-        if (!$this->rewardRuleService->shouldAwardPointsForAction('logout', null)) {
-            return;
-        }
-        $points = (int) ($this->rewardRuleService->getPointsForAction('logout', null) ?? 0);
-        CustomerLog::create([
-            'user_id' => $userId,
-            'action_type' => 'logout',
-            'action_category' => 'system',
-            'description' => $points > 0 ? "{$description} - earned {$points} points" : $description,
-            'points_affected' => $points > 0 ? $points : null,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
     }
 
     /**

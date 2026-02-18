@@ -18,7 +18,14 @@ use App\Observers\PointAwardObserver;
 use App\Observers\SpinHistoryObserver;
 use App\Repositories\UserRepository;
 use App\Services\SettingService;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
+use App\Events\CustomerLoggedIn;
+use App\Events\CustomerLoggedOut;
+use App\Listeners\CreateCustomerLogForLogin;
+use App\Listeners\CreateCustomerLogForLogout;
+use App\Models\OfferScan;
+use App\Observers\OfferScanObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -79,15 +86,21 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register model observers for automatic customer log creation.
+     * Register model observers and event listeners for automatic customer log creation.
+     * Observers: PointAward, SpinHistory, OfferScan. Events: login, logout.
      */
     private function registerObservers(): void
     {
-        // Only register observers if customer_logs table exists
-        if (Schema::hasTable('customer_logs')) {
-            // PointAward::observe(PointAwardObserver::class);
-            // SpinHistory::observe(SpinHistoryObserver::class);
+        if (!Schema::hasTable('customer_logs')) {
+            return;
         }
+        PointAward::observe(PointAwardObserver::class);
+        SpinHistory::observe(SpinHistoryObserver::class);
+        if (Schema::hasTable('offer_scans')) {
+            OfferScan::observe(OfferScanObserver::class);
+        }
+        Event::listen(CustomerLoggedIn::class, CreateCustomerLogForLogin::class);
+        Event::listen(CustomerLoggedOut::class, CreateCustomerLogForLogout::class);
     }
 
     private function registerBladeComponents(): void

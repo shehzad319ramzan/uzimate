@@ -9,7 +9,7 @@ class OfferResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        return [
+        $arr = [
             'id' => $this->id,
             'title' => $this->title,
             'points_required' => $this->points_required,
@@ -23,5 +23,13 @@ class OfferResource extends JsonResource
             'merchant_id' => $this->merchant_id,
             'qr_code_image' => $this->resource->qrCodeImageUrl(),
         ];
+
+        if (isset($this->user_scan)) {
+            $arr['user_has_scanned'] = true;
+            $arr['scanned_at'] = $this->user_scan->created_at?->toIso8601String();
+            $arr['points_earned'] = $this->user_scan->points_earned ?? null;
+        }
+
+        return $arr;
     }
 }

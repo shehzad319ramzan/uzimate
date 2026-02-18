@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\CustomerLog;
 use App\Models\Offer;
+use App\Models\OfferScan;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -60,8 +61,7 @@ class ScanOfferService
      */
     public function hasUserScannedOffer(string $userId, string $offerId): bool
     {
-        return CustomerLog::where('user_id', $userId)
-            ->where('action_type', 'qr_code_scanned')
+        return OfferScan::where('user_id', $userId)
             ->where('offer_id', $offerId)
             ->exists();
     }
@@ -78,26 +78,18 @@ class ScanOfferService
             $pointsEarned = (int) $offer->points_required;
         }
 
-        CustomerLog::create([
+        OfferScan::create([
             'merchant_id' => $offer->merchant_id,
             'site_id' => $offer->site_id,
             'offer_id' => $offer->id,
             'user_id' => $user->id,
-            'action_type' => 'qr_code_scanned',
-            'action_category' => 'scans',
-            'description' => $pointsEarned > 0
-                ? "Scanned offer: {$offer->title} - earned {$pointsEarned} points"
-                : "Scanned offer: {$offer->title}",
-            'points_affected' => $pointsEarned,
-            'related_model_type' => Offer::class,
-            'related_model_id' => $offer->id,
-            'performed_by_id' => $user->id,
+            'points_earned' => $pointsEarned,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
             'metadata' => [
                 'offer_title' => $offer->title,
                 'points_earned' => $pointsEarned,
             ],
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
         ]);
 
         return $pointsEarned;

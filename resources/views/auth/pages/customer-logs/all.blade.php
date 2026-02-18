@@ -88,7 +88,7 @@
                         <ul class="mb-0 small">
                             <li><i class="fas fa-check-circle text-success me-2"></i>Logs are <strong>automatically created</strong> - no manual entry needed</li>
                             <li><i class="fas fa-check-circle text-success me-2"></i><strong>Point Awards</strong> → Creates log when admin awards points</li>
-                            <li><i class="fas fa-check-circle text-success me-2"></i><strong>Spin Completed</strong> → Creates log when customer spins</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i><strong>Spin to Win</strong> → Creates log when customer spins (action type: Spin Completed)</li>
                             <li><i class="fas fa-check-circle text-success me-2"></i><strong>Customer Login</strong> → Creates log when customer logs in</li>
                             <li><i class="fas fa-check-circle text-success me-2"></i><strong>Customer Logout</strong> → Creates log when customer logs out</li>
                             <li><i class="fas fa-check-circle text-success me-2"></i>All logs created <strong>instantly</strong> when action happens</li>
