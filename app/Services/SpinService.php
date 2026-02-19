@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Dto\SpinHistoryDto;
-use App\Models\Offer;
 use App\Models\SpinHistory;
 use App\Repositories\SpinHistoryRepository;
 use Illuminate\Http\Request;
@@ -80,21 +79,17 @@ class SpinService
         return $spinHistory->load(['offer', 'site', 'merchant']);
     }
 
-    /**
-     * Weighted random outcome: nothing, points, offer, discount. site_id optional (offer from any site when null).
-     */
+
     protected function determineResult(?string $siteId = null): array
     {
-        $outcomes = config('spin.outcomes', [
-            'nothing' => 50,
-            'points' => 30,
-            'offer' => 15,
-            'discount' => 5,
-        ]);
+        $allOutcomes = config('spin.outcomes', ['nothing' => 50, 'points' => 50]);
+        $outcomes = array_intersect_key($allOutcomes, array_flip(['nothing', 'points']));
+        if (empty($outcomes) || array_sum($outcomes) <= 0) {
+            $outcomes = ['nothing' => 50, 'points' => 50];
+        }
         $rand = random_int(1, 100);
         $cumulative = 0;
         $type = 'nothing';
-
         foreach ($outcomes as $outcomeType => $percent) {
             $cumulative += $percent;
             if ($rand <= $cumulative) {
@@ -108,43 +103,8 @@ class SpinService
         if ($type === 'points') {
             $range = config('spin.points_range', [25, 100]);
             $result['points'] = random_int($range[0], $range[1]);
-        } elseif ($type === 'offer') {
-            $offer = $siteId
-                ? $this->pickRandomOfferForSite($siteId)
-                : $this->pickRandomOffer();
-            $result['offer_id'] = $offer?->id;
-        } elseif ($type === 'discount') {
-            $range = config('spin.discount_range', [5, 20]);
-            $result['reward_value'] = (float) random_int($range[0], $range[1]);
         }
 
         return $result;
-    }
-
-    protected function pickRandomOfferForSite(string $siteId): ?Offer
-    {
-        return Offer::where('site_id', $siteId)
-            ->where(function ($q) {
-                $q->where('status', '1')->orWhere('status', 1);
-            })
-            ->where(function ($q) {
-                $q->whereNull('expires_on')->orWhere('expires_on', '>=', now());
-            })
-            ->inRandomOrder()
-            ->first();
-    }
-
-    /** Pick a random valid offer from any site (used when spin is user-only, no site_id). */
-    protected function pickRandomOffer(): ?Offer
-    {
-        return Offer::whereNotNull('site_id')
-            ->where(function ($q) {
-                $q->where('status', '1')->orWhere('status', 1);
-            })
-            ->where(function ($q) {
-                $q->whereNull('expires_on')->orWhere('expires_on', '>=', now());
-            })
-            ->inRandomOrder()
-            ->first();
     }
 }

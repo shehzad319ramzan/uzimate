@@ -20,13 +20,13 @@ class SpinDto
         $this->spin_spins_per_day = (int) ($request['spins_per_day'] ?? 1);
         $this->spin_default_site_id = !empty($request['default_site_id']) ? (string) $request['default_site_id'] : null;
         $this->spin_outcome_nothing = (int) ($request['outcome_nothing'] ?? 50);
-        $this->spin_outcome_points = (int) ($request['outcome_points'] ?? 30);
-        $this->spin_outcome_offer = (int) ($request['outcome_offer'] ?? 15);
-        $this->spin_outcome_discount = (int) ($request['outcome_discount'] ?? 5);
+        $this->spin_outcome_points = (int) ($request['outcome_points'] ?? 50);
+        $this->spin_outcome_offer = (int) ($request['outcome_offer'] ?? 0);
+        $this->spin_outcome_discount = (int) ($request['outcome_discount'] ?? 0);
         $this->spin_points_min = (int) ($request['points_min'] ?? 25);
         $this->spin_points_max = (int) ($request['points_max'] ?? 100);
-        $this->spin_discount_min = (int) ($request['discount_min'] ?? 5);
-        $this->spin_discount_max = (int) ($request['discount_max'] ?? 20);
+        $this->spin_discount_min = (int) ($request['discount_min'] ?? 0);
+        $this->spin_discount_max = (int) ($request['discount_max'] ?? 0);
     }
 
     public static function fromRequest(array $request): self

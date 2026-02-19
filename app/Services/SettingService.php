@@ -54,9 +54,7 @@ class SettingService
             'spin.default_site_id' => $setting->spin_default_site_id ?? config('spin.default_site_id'),
             'spin.outcomes' => [
                 'nothing' => (int) ($setting->spin_outcome_nothing ?? config('spin.outcomes.nothing', 50)),
-                'points' => (int) ($setting->spin_outcome_points ?? config('spin.outcomes.points', 30)),
-                'offer' => (int) ($setting->spin_outcome_offer ?? config('spin.outcomes.offer', 15)),
-                'discount' => (int) ($setting->spin_outcome_discount ?? config('spin.outcomes.discount', 5)),
+                'points' => (int) ($setting->spin_outcome_points ?? config('spin.outcomes.points', 50)),
             ],
             'spin.points_range' => [
                 (int) ($setting->spin_points_min ?? config('spin.points_range.0', 25)),

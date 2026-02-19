@@ -45,6 +45,17 @@ class SettingSeeder extends Seeder
         $setting->smtp_sender_name = env('APP_NAME', 'Laravel');
         $setting->smtp_encryption = 'tls';
 
+        // Spin wheel: points only (no offer or discount)
+        $setting->spin_spins_per_day = 1;
+        $setting->spin_outcome_nothing = 50;
+        $setting->spin_outcome_points = 50;
+        $setting->spin_outcome_offer = 0;
+        $setting->spin_outcome_discount = 0;
+        $setting->spin_points_min = 10;
+        $setting->spin_points_max = 90;
+        $setting->spin_discount_min = 0;
+        $setting->spin_discount_max = 0;
+
         $setting->save();
 
         $setting->file()->create([

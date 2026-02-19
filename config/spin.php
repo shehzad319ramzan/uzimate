@@ -19,14 +19,13 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Wheel outcome chances (percent, must sum to 100).
+    | Wheel outcome chances (percent, must sum to 100). Only Nothing and Points
+    | are used; Offer and Discount are not awarded in this application.
     |--------------------------------------------------------------------------
     */
     'outcomes' => [
         'nothing' => (int) env('SPIN_OUTCOME_NOTHING', 50),
-        'points' => (int) env('SPIN_OUTCOME_POINTS', 30),
-        'offer' => (int) env('SPIN_OUTCOME_OFFER', 15),
-        'discount' => (int) env('SPIN_OUTCOME_DISCOUNT', 5),
+        'points' => (int) env('SPIN_OUTCOME_POINTS', 50),
     ],
 
     /*
@@ -41,7 +40,8 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Discount range when result is "discount" (percent) [min, max].
+    | Discount range (not used: this app awards only points).
+    | Kept for backward compatibility.
     |--------------------------------------------------------------------------
     */
     'discount_range' => [
