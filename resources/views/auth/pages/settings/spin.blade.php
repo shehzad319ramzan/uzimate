@@ -3,13 +3,6 @@
         <x-auth.form form-action="{{ route('settings.spin_update') }}">
             @method('PUT')
 
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
-
             <div class="alert alert-info mb-3 p-3">
                 <strong class="d-block mb-2">How the Spin Wheel works</strong>
                 <ul class="mb-0 ps-3 small">

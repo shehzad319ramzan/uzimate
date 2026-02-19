@@ -28,15 +28,15 @@
         setTimeout(function() {
             const advanceModeToggle = document.getElementById('advanceModeToggle');
             const advanceModeItems = document.querySelectorAll('.advance-mode-item');
-            
+
             console.log('Advanced Mode Items Found:', advanceModeItems.length);
             console.log('Toggle Element:', advanceModeToggle);
-            
+
             if (!advanceModeItems.length) {
                 console.warn('No advanced mode items found');
                 return;
             }
-            
+
             // Function to toggle visibility
             function toggleAdvancedItems(show) {
                 console.log('Toggling advanced items:', show, 'Items count:', advanceModeItems.length);
@@ -53,11 +53,11 @@
                     }
                 });
             }
-            
+
             // Load saved state from localStorage
             const savedState = localStorage.getItem('advanceMode');
             console.log('Saved state:', savedState);
-            
+
             if (savedState === 'true') {
                 if (advanceModeToggle) {
                     advanceModeToggle.checked = true;
@@ -70,16 +70,16 @@
                     advanceModeToggle.checked = false;
                 }
             }
-            
+
             // Handle toggle change
             if (advanceModeToggle) {
                 advanceModeToggle.addEventListener('change', function() {
                     const isEnabled = this.checked;
                     console.log('Toggle changed:', isEnabled);
-                    
+
                     // Save state to localStorage
                     localStorage.setItem('advanceMode', isEnabled);
-                    
+
                     // Show/hide advanced mode items
                     toggleAdvancedItems(isEnabled);
                 });
