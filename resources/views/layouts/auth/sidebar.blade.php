@@ -109,17 +109,15 @@
                 </li> --}}
             {{-- @endcan --}}
 
-            @can('view_survey')
-                {{-- Surveys --}}
+            {{-- @can('view_survey')
                 <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'surveys.') ? 'active' : '' }}">
                     <a class="sidebar-link" href="{{ Route::has('surveys.index') ? route('surveys.index') : '#' }}">
                         <i class="align-middle me-2 fas fa-clipboard-list"></i>
                         <span class="align-middle">Surveys</span>
                     </a>
                 </li>
-            @endcan
+            @endcan --}}
 
-            {{-- Activity & Engagement (Scan QR Code, Survey Responses, Spin History) --}}
             @canany(['view_customer_scan', 'view_offer_scan', 'view_survey', 'view_spin_history'])
                 <li class="sidebar-header">Activity &amp; Engagement</li>
                 <li class="sidebar-item">
@@ -139,7 +137,7 @@
                                 </a>
                             </li>
                         @endcanany
-                        @can('view_survey')
+                        {{-- @can('view_survey')
                             <li
                                 class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'surveyresponses.') ? 'active' : '' }}">
                                 <a class="sidebar-link"
@@ -147,7 +145,7 @@
                                     <i class="fas fa-angle-double-right me-2"></i> Survey Responses
                                 </a>
                             </li>
-                        @endcan
+                        @endcan --}}
                         @can('view_spin_history')
                             <li
                                 class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'spinhistories.') || request()->route()->getName() == 'spinhistories.index' ? 'active' : '' }}">
