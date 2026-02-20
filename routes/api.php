@@ -39,8 +39,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('spin/eligibility', [SpinApiController::class, 'eligibility']);
     Route::post('spin', [SpinApiController::class, 'spin']);
 
-    Route::get('surveys', [SurveyApiController::class, 'index']);
-    Route::get('surveys/{id}', [SurveyApiController::class, 'show']);
-    Route::get('surveys/{id}/form', [SurveyApiController::class, 'form']);
-    Route::post('surveys/{id}/submit', [SurveyApiController::class, 'submit']);
+    // Route::get('surveys', [SurveyApiController::class, 'index']);
+    // Route::get('surveys/{id}', [SurveyApiController::class, 'show']);
+    // Route::get('surveys/{id}/form', [SurveyApiController::class, 'form']);
+    // Route::post('surveys/{id}/submit', [SurveyApiController::class, 'submit']);
 });
