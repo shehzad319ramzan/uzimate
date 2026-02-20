@@ -52,6 +52,7 @@ class RewardRule extends Model
             'point_expired' => 'Point Expired',
             'point_adjusted' => 'Point Adjusted',
             'spin_completed' => 'Spin Completed',
+            'survey_completed' => 'Survey Completed',
             'offer_viewed' => 'Offer Viewed',
             'offer_redeemed' => 'Offer Redeemed',
             'qr_code_scanned' => 'QR Code Scanned',

@@ -7,10 +7,10 @@
                     $profileImage = $user->profile();
                     $hasProfileImage = !empty($profileImage) && trim($profileImage) !== '';
                 @endphp
-                @if($hasProfileImage)
+                @if ($hasProfileImage)
                     <div class="sidebar-logo-container">
                         <img src="{{ $profileImage }}" alt="{{ $user->first_name ?? 'User' }}"
-                             class="sidebar-profile-logo" />
+                            class="sidebar-profile-logo" />
                     </div>
                 @endif
                 <div class="user-details">
@@ -36,170 +36,216 @@
 
             {{-- STAFF MANAGEMENT --}}
             @can('all_user')
-            <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'users.') ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ route('users.index') }}">
-                    <i class="align-middle me-2 fas fa-file-invoice-dollar"></i>
-                    <span class="align-middle">{{ __('language.staff_management') }}</span>
-                </a>
-            </li>
+                <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'users.') ? 'active' : '' }}">
+                    <a class="sidebar-link" href="{{ route('users.index') }}">
+                        <i class="align-middle me-2 fas fa-file-invoice-dollar"></i>
+                        <span class="align-middle">{{ __('language.staff_management') }}</span>
+                    </a>
+                </li>
             @endcan
 
             @can('view_merchant')
-            {{-- Merchant Categories --}}
-            <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'merchantcategories.') ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ Route::has('merchantcategories.index') ? route('merchantcategories.index') : '#' }}">
-                    <i class="align-middle me-2 fas fa-layer-group"></i>
-                    <span class="align-middle">Merchant Categories</span>
-                </a>
-            </li>
-            {{-- Merchants --}}
-            <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'merchants.') || request()->route()->getName() == 'merchants.index' ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ Route::has('merchants.index') ? route('merchants.index') : '#' }}">
-                    <i class="align-middle me-2 fas fa-store"></i>
-                    <span class="align-middle">Merchants</span>
-                </a>
-            </li>
+                {{-- Merchant Categories --}}
+                <li
+                    class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'merchantcategories.') ? 'active' : '' }}">
+                    <a class="sidebar-link"
+                        href="{{ Route::has('merchantcategories.index') ? route('merchantcategories.index') : '#' }}">
+                        <i class="align-middle me-2 fas fa-layer-group"></i>
+                        <span class="align-middle">Merchant Categories</span>
+                    </a>
+                </li>
+                {{-- Merchants --}}
+                <li
+                    class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'merchants.') || request()->route()->getName() == 'merchants.index' ? 'active' : '' }}">
+                    <a class="sidebar-link" href="{{ Route::has('merchants.index') ? route('merchants.index') : '#' }}">
+                        <i class="align-middle me-2 fas fa-store"></i>
+                        <span class="align-middle">Merchants</span>
+                    </a>
+                </li>
             @endcan
 
             @can('view_site')
-            {{-- Sites (Advanced Mode Only) --}}
-            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'sites.') ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ route('sites.index') }}">
-                    <i class="align-middle me-2 fas fa-th-large"></i>
-                    <span class="align-middle">Sites</span>
-                </a>
-            </li>
+                {{-- Sites (Advanced Mode Only) --}}
+                <li
+                    class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'sites.') ? 'active' : '' }}">
+                    <a class="sidebar-link" href="{{ route('sites.index') }}">
+                        <i class="align-middle me-2 fas fa-th-large"></i>
+                        <span class="align-middle">Sites</span>
+                    </a>
+                </li>
             @endcan
 
             @can('view_site_user')
-            {{-- Site Users (Advanced Mode Only) --}}
-            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'siteusers.') ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ Route::has('siteusers.index') ? route('siteusers.index') : '#' }}">
-                    <i class="align-middle me-2 fas fa-user-plus"></i>
-                    <span class="align-middle">Site Users</span>
-                </a>
-            </li>
+                {{-- Site Users (Advanced Mode Only) --}}
+                <li
+                    class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'siteusers.') ? 'active' : '' }}">
+                    <a class="sidebar-link" href="{{ Route::has('siteusers.index') ? route('siteusers.index') : '#' }}">
+                        <i class="align-middle me-2 fas fa-user-plus"></i>
+                        <span class="align-middle">Site Users</span>
+                    </a>
+                </li>
             @endcan
 
             @can('view_offer')
-            {{-- Offers (Advanced Mode Only) --}}
-            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'offers.') || request()->route()->getName() == 'offers.index' ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ Route::has('offers.index') ? route('offers.index') : '#' }}">
-                    <i class="align-middle me-2 fas fa-tag"></i>
-                    <span class="align-middle">Offers</span>
-                </a>
-            </li>
+                {{-- Offers (Advanced Mode Only) --}}
+                <li
+                    class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'offers.') || request()->route()->getName() == 'offers.index' ? 'active' : '' }}">
+                    <a class="sidebar-link" href="{{ Route::has('offers.index') ? route('offers.index') : '#' }}">
+                        <i class="align-middle me-2 fas fa-tag"></i>
+                        <span class="align-middle">Offers</span>
+                    </a>
+                </li>
             @endcan
 
-            @canany(['view_customer_scan', 'view_offer_scan'])
-            {{-- Scans (QR code scans) --}}
-            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'customer-scans.') || request()->route()->getName() == 'customer-scans.index' ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ Route::has('customer-scans.index') ? route('customer-scans.index') : '#' }}">
-                    <i class="align-middle me-2 fas fa-qrcode"></i>
-                    <span class="align-middle">Scan QR Code</span>
-                </a>
-            </li>
+            {{-- @can('view_point_award') --}}
+                {{-- Point Awards  --}}
+                {{-- <li
+                    class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'pointawards.') || request()->route()->getName() == 'pointawards.index' ? 'active' : '' }}">
+                    <a class="sidebar-link"
+                        href="{{ Route::has('pointawards.index') ? route('pointawards.index') : '#' }}">
+                        <i class="align-middle me-2 fas fa-award"></i>
+                        <span class="align-middle">Point Awards</span>
+                    </a>
+                </li> --}}
+            {{-- @endcan --}}
+
+            @can('view_survey')
+                {{-- Surveys --}}
+                <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'surveys.') ? 'active' : '' }}">
+                    <a class="sidebar-link" href="{{ Route::has('surveys.index') ? route('surveys.index') : '#' }}">
+                        <i class="align-middle me-2 fas fa-clipboard-list"></i>
+                        <span class="align-middle">Surveys</span>
+                    </a>
+                </li>
+            @endcan
+
+            {{-- Activity & Engagement (Scan QR Code, Survey Responses, Spin History) --}}
+            @canany(['view_customer_scan', 'view_offer_scan', 'view_survey', 'view_spin_history'])
+                <li class="sidebar-header">Activity &amp; Engagement</li>
+                <li class="sidebar-item">
+                    <a data-bs-target="#activityEngagementCollapse" data-bs-toggle="collapse" class="sidebar-link collapsed">
+                        <i class="align-middle me-2 fas fa-chart-line"></i>
+                        <span class="align-middle">Activity &amp; Engagement</span>
+                    </a>
+                    <ul id="activityEngagementCollapse"
+                        class="sidebar-dropdown list-unstyled collapse {{ Str::startsWith(request()->route()->getName(), 'customer-scans.') || request()->route()->getName() == 'customer-scans.index' || Str::startsWith(request()->route()->getName(), 'surveyresponses.') || Str::startsWith(request()->route()->getName(), 'spinhistories.') || request()->route()->getName() == 'spinhistories.index' ? 'show' : '' }}"
+                        data-bs-parent="#sidebar">
+                        @canany(['view_customer_scan', 'view_offer_scan'])
+                            <li
+                                class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'customer-scans.') || request()->route()->getName() == 'customer-scans.index' ? 'active' : '' }}">
+                                <a class="sidebar-link"
+                                    href="{{ Route::has('customer-scans.index') ? route('customer-scans.index') : '#' }}">
+                                    <i class="fas fa-angle-double-right me-2"></i> Scan QR Code
+                                </a>
+                            </li>
+                        @endcanany
+                        @can('view_survey')
+                            <li
+                                class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'surveyresponses.') ? 'active' : '' }}">
+                                <a class="sidebar-link"
+                                    href="{{ Route::has('surveyresponses.index') ? route('surveyresponses.index') : '#' }}">
+                                    <i class="fas fa-angle-double-right me-2"></i> Survey Responses
+                                </a>
+                            </li>
+                        @endcan
+                        @can('view_spin_history')
+                            <li
+                                class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'spinhistories.') || request()->route()->getName() == 'spinhistories.index' ? 'active' : '' }}">
+                                <a class="sidebar-link"
+                                    href="{{ Route::has('spinhistories.index') ? route('spinhistories.index') : '#' }}">
+                                    <i class="fas fa-angle-double-right me-2"></i> Spin History
+                                </a>
+                            </li>
+                        @endcan
+                    </ul>
+                </li>
             @endcanany
 
-            @can('view_point_award')
-            {{-- Point Awards (Advanced Mode Only) --}}
-            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'pointawards.') || request()->route()->getName() == 'pointawards.index' ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ Route::has('pointawards.index') ? route('pointawards.index') : '#' }}">
-                    <i class="align-middle me-2 fas fa-award"></i>
-                    <span class="align-middle">Point Awards</span>
-                </a>
-            </li>
-            @endcan
-
-            @can('view_spin_history')
-            {{-- Spin History (Advanced Mode Only) --}}
-            <li class="sidebar-item advance-mode-item {{ Str::startsWith(request()->route()->getName(), 'spinhistories.') || request()->route()->getName() == 'spinhistories.index' ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ Route::has('spinhistories.index') ? route('spinhistories.index') : '#' }}">
-                    <i class="align-middle me-2 fas fa-redo"></i>
-                    <span class="align-middle">Spin History</span>
-                </a>
-            </li>
-            @endcan
-
             @can('view_reward_rule')
-            {{-- Reward Rules (labels & points setup) --}}
-            <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'reward-rules.') || request()->route()->getName() == 'reward-rules.index' ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ Route::has('reward-rules.index') ? route('reward-rules.index') : '#' }}">
-                    <i class="align-middle me-2 fas fa-cog"></i>
-                    <span class="align-middle">Reward Rules</span>
-                </a>
-            </li>
+                {{-- Reward Rules (labels & points setup) --}}
+                <li
+                    class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'reward-rules.') || request()->route()->getName() == 'reward-rules.index' ? 'active' : '' }}">
+                    <a class="sidebar-link"
+                        href="{{ Route::has('reward-rules.index') ? route('reward-rules.index') : '#' }}">
+                        <i class="align-middle me-2 fas fa-cog"></i>
+                        <span class="align-middle">Reward Rules</span>
+                    </a>
+                </li>
             @endcan
 
             @can('view_customer_log')
-            {{-- Customer Logs --}}
-            <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'customerlogs.') || request()->route()->getName() == 'customerlogs.index' ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ Route::has('customerlogs.index') ? route('customerlogs.index') : '#' }}">
-                    <i class="align-middle me-2 fas fa-clipboard-list"></i>
-                    <span class="align-middle">Customer Logs</span>
-                </a>
-            </li>
+                {{-- Customer Logs --}}
+                <li
+                    class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'customerlogs.') || request()->route()->getName() == 'customerlogs.index' ? 'active' : '' }}">
+                    <a class="sidebar-link"
+                        href="{{ Route::has('customerlogs.index') ? route('customerlogs.index') : '#' }}">
+                        <i class="align-middle me-2 fas fa-clipboard-list"></i>
+                        <span class="align-middle">Customer Logs</span>
+                    </a>
+                </li>
             @endcan
 
             @can('view_inbox')
-            {{-- Inbox --}}
-            <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'inbox.') || request()->route()->getName() == 'inbox.index' ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ Route::has('inbox.index') ? route('inbox.index') : '#' }}">
-                    <i class="align-middle me-2 fas fa-inbox"></i>
-                    <span class="align-middle">Inbox</span>
-                </a>
-            </li>
+                {{-- Inbox --}}
+                <li
+                    class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'inbox.') || request()->route()->getName() == 'inbox.index' ? 'active' : '' }}">
+                    <a class="sidebar-link" href="{{ Route::has('inbox.index') ? route('inbox.index') : '#' }}">
+                        <i class="align-middle me-2 fas fa-inbox"></i>
+                        <span class="align-middle">Inbox</span>
+                    </a>
+                </li>
             @endcan
 
             @can('view_feedback')
-            {{-- Feedbacks --}}
-            <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'feedbacks.') || request()->route()->getName() == 'feedbacks.index' ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ Route::has('feedbacks.index') ? route('feedbacks.index') : '#' }}">
-                    <i class="align-middle me-2 fas fa-comment-dots"></i>
-                    <span class="align-middle">Feedbacks</span>
-                </a>
-            </li>
+                {{-- Feedbacks --}}
+                <li
+                    class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'feedbacks.') || request()->route()->getName() == 'feedbacks.index' ? 'active' : '' }}">
+                    <a class="sidebar-link" href="{{ Route::has('feedbacks.index') ? route('feedbacks.index') : '#' }}">
+                        <i class="align-middle me-2 fas fa-comment-dots"></i>
+                        <span class="align-middle">Feedbacks</span>
+                    </a>
+                </li>
             @endcan
 
             {{-- SYSTEM SETTINGS (Dropdown) --}}
             @canany(['all_role', 'site_setting'])
-            <li class="sidebar-header">System Settings</li>
-            <li class="sidebar-item">
-                <a data-bs-target="#settingsCollapse" data-bs-toggle="collapse" class="sidebar-link collapsed">
-                    <i class="align-middle me-2 fas fa-cogs"></i>
-                    <span class="align-middle">{{ __('language.configuration') }}</span>
-                </a>
-                <ul id="settingsCollapse"
-                    class="sidebar-dropdown list-unstyled collapse {{ Str::startsWith(request()->route()->getName(), 'roles.') || Str::startsWith(request()->route()->getName(), 'settings.') || Str::startsWith(request()->route()->getName(), 'tags.') || Str::startsWith(request()->route()->getName(), 'systemstatuses.') ? 'show' : '' }}"
-                    data-bs-parent="#sidebar">
-                    @can('all_role')
-                    <li
-                        class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'roles.') ? 'active' : '' }}">
-                        <a class="sidebar-link" href="{{ route('roles.index') }}">
-                            <i class="fas fa-angle-double-right me-2"></i>  Roles
-                        </a>
-                    </li>
-                    @endcan
+                <li class="sidebar-header">System Settings</li>
+                <li class="sidebar-item">
+                    <a data-bs-target="#settingsCollapse" data-bs-toggle="collapse" class="sidebar-link collapsed">
+                        <i class="align-middle me-2 fas fa-cogs"></i>
+                        <span class="align-middle">{{ __('language.configuration') }}</span>
+                    </a>
+                    <ul id="settingsCollapse"
+                        class="sidebar-dropdown list-unstyled collapse {{ Str::startsWith(request()->route()->getName(), 'roles.') || Str::startsWith(request()->route()->getName(), 'settings.') || Str::startsWith(request()->route()->getName(), 'tags.') || Str::startsWith(request()->route()->getName(), 'systemstatuses.') ? 'show' : '' }}"
+                        data-bs-parent="#sidebar">
+                        @can('all_role')
+                            <li
+                                class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'roles.') ? 'active' : '' }}">
+                                <a class="sidebar-link" href="{{ route('roles.index') }}">
+                                    <i class="fas fa-angle-double-right me-2"></i> Roles
+                                </a>
+                            </li>
+                        @endcan
 
-                    @can('view_permission')
-                    <li
-                        class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'permissions.') ? 'active' : '' }}">
-                        <a class="sidebar-link" href="{{ route('permissions.index') }}">
-                            <i class="fas fa-angle-double-right me-2"></i> Permissions
-                        </a>
-                    </li>
-                    @endcan
+                        @can('view_permission')
+                            <li
+                                class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'permissions.') ? 'active' : '' }}">
+                                <a class="sidebar-link" href="{{ route('permissions.index') }}">
+                                    <i class="fas fa-angle-double-right me-2"></i> Permissions
+                                </a>
+                            </li>
+                        @endcan
 
-                    @can('site_setting')
-                    <li
-                        class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'settings.') ? 'active' : '' }}">
-                        <a class="sidebar-link" href="{{ route('settings.index', 'basic-info') }}">
-                            <i class="fas fa-angle-double-right me-2"></i> {{ __('language.site_configuration') }}
-                        </a>
-                    </li>
-                    @endcan
-                </ul>
-            </li>
+                        @can('site_setting')
+                            <li
+                                class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'settings.') ? 'active' : '' }}">
+                                <a class="sidebar-link" href="{{ route('settings.index', 'basic-info') }}">
+                                    <i class="fas fa-angle-double-right me-2"></i> {{ __('language.site_configuration') }}
+                                </a>
+                            </li>
+                        @endcan
+                    </ul>
+                </li>
             @endcanany
             {{--  --}}
             {{-- <li class="sidebar-item {{ request()->is('messages*') ? 'active' : '' }}">
@@ -225,7 +271,8 @@
         {{-- Footer Logo --}}
         <div class="sidebar-footer">
             <div class="uzimate-footer-logo">
-                <img src="{{ asset('dashboard/images/logo-text-on-dark.svg') }}" alt="Uzimate" class="uzimate-footer-logo-img" />
+                <img src="{{ asset('dashboard/images/logo-text-on-dark.svg') }}" alt="Uzimate"
+                    class="uzimate-footer-logo-img" />
             </div>
         </div>
     </div>

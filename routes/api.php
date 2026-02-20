@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\PasswordApiController;
 use App\Http\Controllers\Api\RewardsApiController;
 use App\Http\Controllers\Api\ScanOfferApiController;
 use App\Http\Controllers\Api\SpinApiController;
+use App\Http\Controllers\Api\SurveyApiController;
 use Illuminate\Support\Facades\Route;
 
 // Merchant routes
@@ -37,4 +38,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('spin/eligibility', [SpinApiController::class, 'eligibility']);
     Route::post('spin', [SpinApiController::class, 'spin']);
+
+    Route::get('surveys', [SurveyApiController::class, 'index']);
+    Route::get('surveys/{id}', [SurveyApiController::class, 'show']);
+    Route::get('surveys/{id}/form', [SurveyApiController::class, 'form']);
+    Route::post('surveys/{id}/submit', [SurveyApiController::class, 'submit']);
 });

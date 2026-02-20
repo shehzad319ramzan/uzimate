@@ -17,6 +17,8 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SiteUserController;
 use App\Http\Controllers\SpinHistoryController;
+use App\Http\Controllers\SurveyController;
+use App\Http\Controllers\SurveyResponseController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -133,6 +135,24 @@ Route::group(
             Route::delete('delete/{id}', 'destroy')->name('destroy');
             Route::get('detail/{id}', 'show')->name('show');
             Route::get('edit/{id}', 'edit')->name('edit');
+        });
+
+        Route::prefix('surveys')->as('surveys.')->controller(SurveyController::class)->group(function () {
+            Route::get('', 'index')->name('index')->middleware('can:view_survey');
+            Route::get('create', 'create')->name('create')->middleware('can:add_survey');
+            Route::post('store', 'store')->name('store')->middleware('can:add_survey');
+            Route::get('detail/{id}', 'show')->name('show')->middleware('can:view_survey');
+            Route::get('edit/{id}', 'edit')->name('edit')->middleware('can:edit_survey');
+            Route::put('update/{id}', 'update')->name('update')->middleware('can:edit_survey');
+            Route::delete('delete/{id}', 'destroy')->name('destroy')->middleware('can:delete_survey');
+            Route::post('{id}/questions', 'storeQuestion')->name('questions.store')->middleware('can:edit_survey');
+            Route::delete('questions/{questionId}', 'destroyQuestion')->name('questions.destroy')->middleware('can:edit_survey');
+            Route::get('{id}/questions-preview', 'questionsPreview')->name('questions.preview')->middleware('can:view_survey');
+        });
+
+        Route::prefix('survey-responses')->as('surveyresponses.')->controller(SurveyResponseController::class)->middleware('can:view_survey')->group(function () {
+            Route::get('', 'index')->name('index');
+            Route::get('detail/{id}', 'show')->name('show');
         });
 
         Route::prefix('reward-rules')->as('reward-rules.')->controller(RewardRuleController::class)->group(function () {
