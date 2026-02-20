@@ -73,10 +73,10 @@
                         </div>
                     </form>
 
-                    @can('add_spin_history')
+                    {{-- @can('add_spin_history')
                         <x-auth.href-link link-href="{{ route('spinhistories.create') }}" link-value="{{ __('Add Spin History') }}"
                             link-class="btn btn-primary" />
-                    @endcan
+                    @endcan --}}
                 </x-slot>
 
                 <x-auth.datatable>
