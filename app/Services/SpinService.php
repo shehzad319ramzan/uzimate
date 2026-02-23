@@ -26,6 +26,9 @@ class SpinService
             ->whereDate('created_at', $today)
             ->count();
 
+        $pointsRange = config('spin.points_range', [25, 100]);
+        $maxPoints = (int) ($pointsRange[1] ?? 100);
+
         if ($spinsToday >= $spinsPerDay) {
             $nextSpinAt = Carbon::today()->addDay()->startOfDay();
             return [
@@ -34,6 +37,7 @@ class SpinService
                 'next_spin_at' => $nextSpinAt->toIso8601String(),
                 'spins_used' => $spinsToday,
                 'spins_per_day' => $spinsPerDay,
+                'max_points' => $maxPoints,
             ];
         }
 
@@ -43,6 +47,7 @@ class SpinService
             'next_spin_at' => null,
             'spins_used' => $spinsToday,
             'spins_per_day' => $spinsPerDay,
+            'max_points' => $maxPoints,
         ];
     }
 

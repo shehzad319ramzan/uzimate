@@ -15,6 +15,7 @@ class SpinEligibilityResource extends JsonResource
             'next_spin_at' => $this->resource['next_spin_at'] ?? null,
             'spins_used' => $this->resource['spins_used'] ?? 0,
             'spins_per_day' => $this->resource['spins_per_day'] ?? 1,
+            'max_points' => $this->resource['max_points'] ?? (int) (config('spin.points_range')[1] ?? 100),
         ];
     }
 }
