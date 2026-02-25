@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\InviteFriend;
 use App\Relationships\FileRelationship;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -25,7 +26,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'provider_id',
         'provider',
-        'email_verified_at'
+        'email_verified_at',
+        'referral_code',
     ];
 
     protected $hidden = [
@@ -47,12 +49,35 @@ class User extends Authenticatable implements MustVerifyEmail
         static::creating(function ($user) {
             $user->first_name = Str::title($user->first_name ?? '');
             $user->last_name = Str::title($user->last_name ?? '');
+            if (empty($user->referral_code)) {
+                $user->referral_code = self::generateUniqueReferralCode();
+            }
         });
 
         static::updating(function ($user) {
             $user->first_name = Str::title($user->first_name ?? '');
             $user->last_name = Str::title($user->last_name ?? '');
         });
+    }
+
+    public static function generateUniqueReferralCode(): string
+    {
+        do {
+            $code = (string) random_int(1000000, 9999999);
+        } while (self::where('referral_code', $code)->exists());
+        return $code;
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<InviteFriend> */
+    public function referredFriends()
+    {
+        return $this->hasMany(InviteFriend::class, 'referrer_id');
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<InviteFriend> */
+    public function referredBy()
+    {
+        return $this->hasOne(InviteFriend::class, 'referred_user_id');
     }
 
     public function getFullNameAttribute(): string

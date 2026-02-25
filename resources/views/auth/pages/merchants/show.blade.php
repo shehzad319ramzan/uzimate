@@ -13,7 +13,7 @@
                         @if($data->logo())
                             <img src="{{ $data->logo() }}" alt="Merchant Logo" class="rounded-circle" width="128" height="128" style="object-fit: cover;" />
                         @else
-                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center text-white fw-bold mx-auto" 
+                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center text-white fw-bold mx-auto"
                                  style="width: 128px; height: 128px; background-color: #4A148D; font-size: 48px;">
                                 {{ strtoupper(substr($data->name ?? 'M', 0, 1)) }}
                             </div>
@@ -30,14 +30,14 @@
                             <th>Max Sites</th>
                             <td>{{ $data->max_sites ?? '-' }}</td>
                         </tr>
-                        <tr>
+                        {{-- <tr>
                             <th>Spin After (days)</th>
                             <td>{{ $data->spin_after_days ?? '-' }}</td>
                         </tr>
                         <tr>
                             <th>Scan After (hours)</th>
                             <td>{{ $data->scan_after_hours ?? '-' }}</td>
-                        </tr>
+                        </tr> --}}
                         <tr>
                             <th>Info</th>
                             <td>{!! $data->description ?? '-' !!}</td>

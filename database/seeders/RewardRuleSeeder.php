@@ -19,7 +19,11 @@ class RewardRuleSeeder extends Seeder
                 ],
                 [
                     'label' => $label,
-                    'points' => $actionType === 'login' ? 80 : null,
+                    'points' => match ($actionType) {
+                        'login' => 80,
+                        'referral_completed' => 5000,
+                        default => null,
+                    },
                     'trigger_condition' => $actionType === 'login' ? RewardRule::TRIGGER_FIRST_TIME_ONLY : RewardRule::TRIGGER_EVERY_TIME,
                     'is_active' => true,
                 ]

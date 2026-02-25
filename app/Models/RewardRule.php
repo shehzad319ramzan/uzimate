@@ -61,6 +61,7 @@ class RewardRule extends Model
             'login' => 'Login',
             'logout' => 'Logout',
             'account_created' => 'Account Created',
+            'referral_completed' => 'Referral Completed',
             'custom' => 'Custom',
         ];
     }

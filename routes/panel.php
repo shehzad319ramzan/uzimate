@@ -6,6 +6,7 @@ use App\Http\Controllers\CustomerScansController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InboxController;
+use App\Http\Controllers\InviteFriendController;
 use App\Http\Controllers\MerchantCategoryController;
 use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\OfferController;
@@ -153,6 +154,12 @@ Route::group(
         Route::prefix('survey-responses')->as('surveyresponses.')->controller(SurveyResponseController::class)->middleware('can:view_survey')->group(function () {
             Route::get('', 'index')->name('index');
             Route::get('detail/{id}', 'show')->name('show');
+        });
+
+        Route::prefix('invite-friends')->as('invitefriends.')->controller(InviteFriendController::class)->middleware('can:view_invite_friend')->group(function () {
+            Route::get('', 'index')->name('index');
+            Route::get('detail/{id}', 'show')->name('show');
+            Route::delete('delete/{id}', 'destroy')->name('destroy')->middleware('can:delete_invite_friend');
         });
 
         Route::prefix('reward-rules')->as('reward-rules.')->controller(RewardRuleController::class)->group(function () {

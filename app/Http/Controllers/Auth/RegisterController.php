@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use App\Constants\Constants;
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\CustomerLog;
+use App\Models\InviteFriend;
 use App\Models\Merchant;
 use App\Models\Permission;
+use App\Models\User;
+use App\Services\RewardRuleService;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -139,6 +142,7 @@ class RegisterController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'password_confirmation' => ['required', 'string', 'min:8'],
             'date_of_birth' => ['required', 'date'],
+            'referral_code' => ['nullable', 'string', 'max:20'],
         ]);
 
         if ($validator->fails()) {
@@ -162,6 +166,39 @@ class RegisterController extends Controller
             $user = User::create($userArr);
 
             $user->assignRole(Constants::CUSTOMER);
+
+            $referralPoints = 0;
+            if ($request->filled('referral_code')) {
+                $referrer = User::where('referral_code', $request->referral_code)
+                    ->where('id', '!=', $user->id)
+                    ->first();
+                if ($referrer) {
+                    $rewardRuleService = app(RewardRuleService::class);
+                    if ($rewardRuleService->shouldAwardPointsForAction('referral_completed', null)) {
+                        $referralPoints = (int) ($rewardRuleService->getPointsForAction('referral_completed', null) ?? config('referral.points_per_referral', 5000));
+                    }
+                    $inviteFriend = InviteFriend::create([
+                        'referrer_id' => $referrer->id,
+                        'referred_user_id' => $user->id,
+                        'points_awarded' => $referralPoints,
+                    ]);
+                    CustomerLog::create([
+                        'merchant_id' => null,
+                        'site_id' => null,
+                        'user_id' => $referrer->id,
+                        'action_type' => 'referral_completed',
+                        'action_category' => 'referrals',
+                        'description' => "Referred friend: {$user->first_name} {$user->last_name} ({$user->email})",
+                        'points_affected' => $referralPoints > 0 ? $referralPoints : null,
+                        'related_model_type' => InviteFriend::class,
+                        'related_model_id' => $inviteFriend->id,
+                        'performed_by_id' => $user->id,
+                        'metadata' => ['referred_user_id' => $user->id],
+                        'ip_address' => $request->ip(),
+                        'user_agent' => $request->userAgent(),
+                    ]);
+                }
+            }
 
             $token = $user->createToken('auth_token')->plainTextToken;
 

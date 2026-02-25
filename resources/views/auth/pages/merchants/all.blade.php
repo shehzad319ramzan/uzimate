@@ -38,8 +38,8 @@
                             <th>Logo</th>
                             <th>Name</th>
                             <th>Max Sites</th>
-                            <th>Spin After (days)</th>
-                            <th>Scan After (hours)</th>
+                            {{-- <th>Spin After (days)</th>
+                            <th>Scan After (hours)</th> --}}
                             <th>Use Other Merchant Points</th>
                             <th>Status</th>
                             @canany(['view_merchant', 'edit_merchant', 'delete_merchant'])
@@ -55,7 +55,7 @@
                                     @if($merchant->logo())
                                         <img src="{{ $merchant->logo() }}" alt="{{ $merchant->name }}" class="rounded-circle" width="40" height="40" style="object-fit: cover;" />
                                     @else
-                                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center text-white fw-bold" 
+                                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center text-white fw-bold"
                                              style="width: 40px; height: 40px; background-color: #4A148D; font-size: 16px;">
                                             {{ strtoupper(substr($merchant->name ?? 'M', 0, 1)) }}
                                         </div>
@@ -72,8 +72,8 @@
                                     </div>
                                 </td>
                                 <td>{{ $merchant?->max_sites ?? '-' }}</td>
-                                <td>{{ $merchant?->spin_after_days ?? '-' }}</td>
-                                <td>{{ $merchant?->scan_after_hours ?? '-' }}</td>
+                                {{-- <td>{{ $merchant?->spin_after_days ?? '-' }}</td>
+                                <td>{{ $merchant?->scan_after_hours ?? '-' }}</td> --}}
                                 <td>
                                     @if($merchant?->use_other_merchant_points ?? false)
                                         <span class="badge bg-success">Yes</span>
@@ -100,13 +100,13 @@
                                                 <i class="fas fa-eye me-2 text-primary"></i> View Merchant
                                             </a>
                                             @endcan
-                                            
+
                                             @can('edit_merchant')
                                             <a class="dropdown-item" href="{{ route('merchants.edit', $merchant?->id) }}">
                                                 <i class="fas fa-edit me-2 text-warning"></i> Edit Merchant
                                             </a>
                                             @endcan
-                                            
+
                                             @can('delete_merchant')
                                             <form action="{{ route('merchants.destroy', $merchant?->id) }}" method="POST"
                                                 onsubmit="return confirm('Are you sure you want to delete this Merchant?');">

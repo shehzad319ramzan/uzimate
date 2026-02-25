@@ -30,7 +30,7 @@
                         place="Enter max sites" val="{{ old('max_sites', '1') }}" extraclasses="mb-3"
                         label="Max Sites" />
                 </div>
-                <div class="col-md-6">
+                {{-- <div class="col-md-6">
                     <x-auth.input-field type="number" name="spin_after_days" id="spin_after_days"
                         place="Enter spin after days" val="{{ old('spin_after_days', '1') }}" extraclasses="mb-3"
                         label="Spin After (days)" />
@@ -39,7 +39,7 @@
                     <x-auth.input-field type="number" name="scan_after_hours" id="scan_after_hours"
                         place="Enter scan after hours" val="{{ old('scan_after_hours', '6') }}" extraclasses="mb-3"
                         label="Scan After (hours)" />
-                </div>
+                </div> --}}
                 <div class="col-md-12">
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="checkbox" name="use_other_merchant_points"

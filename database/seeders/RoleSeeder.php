@@ -55,6 +55,7 @@ class RoleSeeder extends Seeder
             'spin_history',
             'survey',
             'customer_log',
+            'invite_friend',
             'inbox',
             'feedback',
             'permission',
@@ -86,6 +87,7 @@ class RoleSeeder extends Seeder
             'spin_history',
             'survey',
             'customer_log',
+            'invite_friend',
             'inbox',
             'feedback',
         ];

@@ -57,6 +57,7 @@ class PermissionSeeder extends Seeder
             'Surveys' => 'survey',
             'Reward Rules' => 'reward_rule',
             'Customer Logs' => 'customer_log',
+            'Invite Friends' => 'invite_friend',
             'Inbox' => 'inbox',
             'Feedbacks' => 'feedback',
             'Permissions' => 'permission',

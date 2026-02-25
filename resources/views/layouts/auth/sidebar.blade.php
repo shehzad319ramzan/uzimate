@@ -109,16 +109,16 @@
                 </li> --}}
             {{-- @endcan --}}
 
-            {{-- @can('view_survey')
+            @can('view_survey')
                 <li class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'surveys.') ? 'active' : '' }}">
                     <a class="sidebar-link" href="{{ Route::has('surveys.index') ? route('surveys.index') : '#' }}">
                         <i class="align-middle me-2 fas fa-clipboard-list"></i>
                         <span class="align-middle">Surveys</span>
                     </a>
                 </li>
-            @endcan --}}
+            @endcan
 
-            @canany(['view_customer_scan', 'view_offer_scan', 'view_survey', 'view_spin_history'])
+            @canany(['view_customer_scan', 'view_offer_scan', 'view_survey', 'view_spin_history', 'view_invite_friend'])
                 <li class="sidebar-header">Activity &amp; Engagement</li>
                 <li class="sidebar-item">
                     <a data-bs-target="#activityEngagementCollapse" data-bs-toggle="collapse" class="sidebar-link collapsed">
@@ -126,7 +126,7 @@
                         <span class="align-middle">Activity &amp; Engagement</span>
                     </a>
                     <ul id="activityEngagementCollapse"
-                        class="sidebar-dropdown list-unstyled collapse {{ Str::startsWith(request()->route()->getName(), 'customer-scans.') || request()->route()->getName() == 'customer-scans.index' || Str::startsWith(request()->route()->getName(), 'surveyresponses.') || Str::startsWith(request()->route()->getName(), 'spinhistories.') || request()->route()->getName() == 'spinhistories.index' ? 'show' : '' }}"
+                        class="sidebar-dropdown list-unstyled collapse {{ Str::startsWith(request()->route()->getName(), 'customer-scans.') || request()->route()->getName() == 'customer-scans.index' || Str::startsWith(request()->route()->getName(), 'surveyresponses.') || Str::startsWith(request()->route()->getName(), 'spinhistories.') || request()->route()->getName() == 'spinhistories.index' || Str::startsWith(request()->route()->getName(), 'invitefriends.') || request()->route()->getName() == 'invitefriends.index' ? 'show' : '' }}"
                         data-bs-parent="#sidebar">
                         @canany(['view_customer_scan', 'view_offer_scan'])
                             <li
@@ -137,7 +137,7 @@
                                 </a>
                             </li>
                         @endcanany
-                        {{-- @can('view_survey')
+                        @can('view_survey')
                             <li
                                 class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'surveyresponses.') ? 'active' : '' }}">
                                 <a class="sidebar-link"
@@ -145,13 +145,22 @@
                                     <i class="fas fa-angle-double-right me-2"></i> Survey Responses
                                 </a>
                             </li>
-                        @endcan --}}
+                        @endcan
                         @can('view_spin_history')
                             <li
                                 class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'spinhistories.') || request()->route()->getName() == 'spinhistories.index' ? 'active' : '' }}">
                                 <a class="sidebar-link"
                                     href="{{ Route::has('spinhistories.index') ? route('spinhistories.index') : '#' }}">
                                     <i class="fas fa-angle-double-right me-2"></i> Spin History
+                                </a>
+                            </li>
+                        @endcan
+                        @can('view_invite_friend')
+                            <li
+                                class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'invitefriends.') || request()->route()->getName() == 'invitefriends.index' ? 'active' : '' }}">
+                                <a class="sidebar-link"
+                                    href="{{ Route::has('invitefriends.index') ? route('invitefriends.index') : '#' }}">
+                                    <i class="fas fa-angle-double-right me-2"></i> Invite Friends
                                 </a>
                             </li>
                         @endcan
