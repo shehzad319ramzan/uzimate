@@ -21,6 +21,7 @@ use App\Http\Controllers\SpinHistoryController;
 use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\SurveyResponseController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VoucherController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/logout', [HomeController::class, 'logout'])->name('logout');
@@ -160,6 +161,17 @@ Route::group(
             Route::get('', 'index')->name('index');
             Route::get('detail/{id}', 'show')->name('show');
             Route::delete('delete/{id}', 'destroy')->name('destroy')->middleware('can:delete_invite_friend');
+        });
+
+        Route::prefix('vouchers')->as('vouchers.')->controller(VoucherController::class)->middleware('can:view_voucher')->group(function () {
+            Route::get('', 'index')->name('index');
+            Route::get('create', 'create')->name('create')->middleware('can:add_voucher');
+            Route::post('store', 'store')->name('store')->middleware('can:add_voucher');
+            Route::get('{id}/preview', 'preview')->name('preview');
+            Route::get('detail/{id}', 'show')->name('show');
+            Route::get('edit/{id}', 'edit')->name('edit')->middleware('can:edit_voucher');
+            Route::put('update/{id}', 'update')->name('update')->middleware('can:edit_voucher');
+            Route::delete('delete/{id}', 'destroy')->name('destroy')->middleware('can:delete_voucher');
         });
 
         Route::prefix('reward-rules')->as('reward-rules.')->controller(RewardRuleController::class)->group(function () {

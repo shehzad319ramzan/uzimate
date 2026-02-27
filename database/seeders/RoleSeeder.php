@@ -56,6 +56,7 @@ class RoleSeeder extends Seeder
             'survey',
             'customer_log',
             'invite_friend',
+            'voucher',
             'inbox',
             'feedback',
             'permission',
@@ -88,6 +89,7 @@ class RoleSeeder extends Seeder
             'survey',
             'customer_log',
             'invite_friend',
+            'voucher',
             'inbox',
             'feedback',
         ];

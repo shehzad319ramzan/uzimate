@@ -35,7 +35,7 @@
         @foreach ($loopData as $item)
         @php
             $value = (string) ($item->id ?? $item['id'] ?? '');
-            $label = $item->name ?? $item['name'] ?? $value;
+            $label = $item->name ?? $item['name'] ?? $item->title ?? $item['title'] ?? $value;
             $dataMerchant = $item->merchant_id ?? $item['merchant_id'] ?? '';
         @endphp
         <option value="{{ $value }}" {{ $dataMerchant !== '' ? 'data-merchant="'.$dataMerchant.'"' : '' }}

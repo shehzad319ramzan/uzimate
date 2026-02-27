@@ -168,6 +168,17 @@
                 </li>
             @endcanany
 
+            @can('view_voucher')
+                {{-- Vouchers --}}
+                <li
+                    class="sidebar-item {{ Str::startsWith(request()->route()->getName(), 'vouchers.') || request()->route()->getName() == 'vouchers.index' ? 'active' : '' }}">
+                    <a class="sidebar-link" href="{{ Route::has('vouchers.index') ? route('vouchers.index') : '#' }}">
+                        <i class="align-middle me-2 fas fa-ticket-alt"></i>
+                        <span class="align-middle">Vouchers</span>
+                    </a>
+                </li>
+            @endcan
+
             @can('view_reward_rule')
                 {{-- Reward Rules (labels & points setup) --}}
                 <li

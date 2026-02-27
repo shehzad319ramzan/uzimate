@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\ScanOfferApiController;
 use App\Http\Controllers\Api\SpinApiController;
 use App\Http\Controllers\Api\InviteFriendApiController;
 use App\Http\Controllers\Api\SurveyApiController;
+use App\Http\Controllers\Api\VoucherApiController;
 use Illuminate\Support\Facades\Route;
 
 // Merchant routes
@@ -39,6 +40,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('referral-code', [InviteFriendApiController::class, 'referralCode']);
     Route::get('invited-friends', [InviteFriendApiController::class, 'invitedFriends']);
+
+    Route::get('vouchers', [VoucherApiController::class, 'index']);
+    Route::get('vouchers/{id}', [VoucherApiController::class, 'show']);
+    Route::post('vouchers/{id}/redeem', [VoucherApiController::class, 'redeem']);
 
     Route::get('spin/eligibility', [SpinApiController::class, 'eligibility']);
     Route::post('spin', [SpinApiController::class, 'spin']);

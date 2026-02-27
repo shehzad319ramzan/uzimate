@@ -3,6 +3,7 @@
 <link href="{{ asset('dashboard/css/dark.css') }}" rel="stylesheet">
 <link href="{{ asset('dashboard/css/light.css') }}" rel="stylesheet"> --}}
 <link href="{{ asset('dashboard/css/custom.css') }}" rel="stylesheet">
+<link href="{{ asset('dashboard/css/voucher-preview.css') }}" rel="stylesheet">
 <style>
   /* Critical inline overrides for sidebar visibility - Highest priority */
   #sidebar,
@@ -10,7 +11,7 @@
     background-color: #202938 !important;
     background: #202938 !important;
   }
-  
+
   /* Override modern.css .sidebar-nav background: #fff */
   #sidebar .sidebar-nav,
   nav#sidebar .sidebar-nav,
@@ -19,7 +20,7 @@
     background: transparent !important;
     background-color: transparent !important;
   }
-  
+
   #sidebar .sidebar-link,
   #sidebar a.sidebar-link,
   nav#sidebar .sidebar-link,
@@ -29,7 +30,7 @@
     visibility: visible !important;
     opacity: 1 !important;
   }
-  
+
   #sidebar .sidebar-link i,
   #sidebar .sidebar-link .fas,
   #sidebar .sidebar-link .far,
@@ -46,7 +47,7 @@
     display: inline-block !important;
     visibility: visible !important;
   }
-  
+
   #sidebar .sidebar-link span,
   #sidebar a.sidebar-link span,
   #sidebar .sidebar-link .align-middle,
@@ -57,7 +58,7 @@
     display: inline !important;
     visibility: visible !important;
   }
-  
+
   #sidebar .sidebar-dropdown .sidebar-link,
   #sidebar .sidebar-dropdown a.sidebar-link,
   nav#sidebar .sidebar-dropdown .sidebar-link,
@@ -68,7 +69,7 @@
     display: block !important;
     visibility: visible !important;
   }
-  
+
   #sidebar .sidebar-item,
   #sidebar li,
   nav#sidebar .sidebar-item,
@@ -77,7 +78,7 @@
     visibility: visible !important;
     opacity: 1 !important;
   }
-  
+
   #sidebar .sidebar-nav,
   nav#sidebar .sidebar-nav {
     display: flex !important;
@@ -86,7 +87,7 @@
     background: transparent !important;
     background-color: transparent !important;
   }
-  
+
   /* Force all text inside sidebar to be white - but exclude logo icons */
   #sidebar .sidebar-link,
   #sidebar .sidebar-link span,
@@ -102,12 +103,12 @@
   nav#sidebar .user-email {
     color: rgba(255, 255, 255, 0.9) !important;
   }
-  
+
   #sidebar .sidebar-header,
   nav#sidebar .sidebar-header {
     color: rgba(255, 255, 255, 0.6) !important;
   }
-  
+
   /* Override all icon colors */
   #sidebar i,
   #sidebar .fas,
@@ -123,19 +124,19 @@
   nav#sidebar svg {
     color: rgba(255, 255, 255, 0.8) !important;
   }
-  
+
   /* Override hover states */
   #sidebar .sidebar-link:hover,
   nav#sidebar .sidebar-link:hover {
     background-color: rgba(255, 255, 255, 0.1) !important;
     color: #FFFFFF !important;
   }
-  
+
   #sidebar .sidebar-link:hover i,
   nav#sidebar .sidebar-link:hover i {
     color: #FFFFFF !important;
   }
-  
+
   /* Advanced Mode Items - Force hide/show */
   #sidebar .advance-mode-item:not(.show),
   nav#sidebar .advance-mode-item:not(.show) {
@@ -147,7 +148,7 @@
     margin: 0 !important;
     padding: 0 !important;
   }
-  
+
   #sidebar .advance-mode-item.show,
   nav#sidebar .advance-mode-item.show {
     display: list-item !important;

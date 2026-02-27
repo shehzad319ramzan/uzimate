@@ -1,0 +1,136 @@
+
+
+.voucher-gift-card {
+    --voucher-red: #c41e3a;
+    --voucher-red-dark: #a01830;
+    --voucher-yellow: #f4c430;
+    --voucher-cream: #fffef5;
+    max-width: 420px;
+    margin: 0 auto;
+    display: flex;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-top: 3px dashed rgba(0, 0, 0, 0.12);
+    border-bottom: 3px dashed rgba(0, 0, 0, 0.12);
+}
+
+.voucher-gift-panel {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    padding: 14px 10px;
+    background: var(--voucher-red);
+    background-image: radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.04) 0%, transparent 40%);
+}
+
+.voucher-gift-panel-center {
+    min-width: 120px;
+}
+
+.voucher-gift-panel:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    border-right: 2px dashed rgba(255, 255, 255, 0.5);
+    z-index: 1;
+}
+
+.voucher-gift-panel-center {
+    background: #f0f0f0;
+    padding: 0;
+    display: flex;
+    align-items: stretch;
+}
+
+.voucher-gift-panel-center::after {
+    border-right-color: rgba(0, 0, 0, 0.12);
+}
+
+.voucher-gift-logo-box {
+    background: var(--voucher-yellow);
+    color: var(--voucher-red-dark);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 6px 10px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.voucher-gift-title-cursive {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 22px;
+    color: var(--voucher-yellow);
+    font-style: italic;
+    line-height: 1.1;
+    margin-bottom: 2px;
+}
+
+.voucher-gift-title-upper {
+    font-size: 14px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.12em;
+    margin-bottom: 12px;
+}
+
+.voucher-gift-valid {
+    font-size: 9px;
+    color: rgba(255, 255, 255, 0.95);
+    letter-spacing: 0.04em;
+    margin-top: auto;
+    position: absolute;
+    bottom: 14px;
+    left: 10px;
+    right: 10px;
+}
+
+.voucher-gift-value-box {
+    background: var(--voucher-yellow);
+    color: var(--voucher-red-dark);
+    font-size: 24px;
+    font-weight: 800;
+    padding: 14px 10px;
+    border-radius: 10px;
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.voucher-gift-value-box span {
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0.9;
+}
+
+.voucher-gift-details {
+    font-size: 9px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.5;
+}
+
+.voucher-gift-details strong {
+    color: #fff;
+}
+
+.voucher-gift-img-wrap {
+    width: 100%;
+    min-height: 140px;
+    background: repeating-conic-gradient(#e0e0e0 0% 25%, #f5f5f5 0% 50%) 50% / 16px 16px;
+}
+
+.voucher-gift-img-wrap img {
+    width: 100%;
+    height: 100%;
+    min-height: 140px;
+    object-fit: cover;
+    display: block;
+}
