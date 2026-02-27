@@ -167,6 +167,7 @@ Route::group(
             Route::get('', 'index')->name('index');
             Route::get('create', 'create')->name('create')->middleware('can:add_voucher');
             Route::post('store', 'store')->name('store')->middleware('can:add_voucher');
+            Route::get('offers-by-merchant/{merchantId}', 'offersByMerchant')->name('offers-by-merchant')->middleware('can:add_voucher');
             Route::get('{id}/preview', 'preview')->name('preview');
             Route::get('detail/{id}', 'show')->name('show');
             Route::get('edit/{id}', 'edit')->name('edit')->middleware('can:edit_voucher');

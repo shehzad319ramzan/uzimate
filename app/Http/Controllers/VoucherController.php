@@ -25,7 +25,7 @@ class VoucherController extends BaseController
 
     public function create()
     {
-        $options = $this->_repo->formOptions(Auth::user());
+        $options = $this->_repo->formOptions(Auth::user(), null);
         return view($this->_directory . '.create', $options);
     }
 
@@ -65,7 +65,7 @@ class VoucherController extends BaseController
         if ($data === null) {
             abort(404);
         }
-        $options = $this->_repo->formOptions(Auth::user());
+        $options = $this->_repo->formOptions(Auth::user(), $data->merchant_id);
         return view($this->_directory . '.edit', array_merge(['data' => $data], $options));
     }
 
@@ -90,5 +90,15 @@ class VoucherController extends BaseController
         } catch (\Throwable $th) {
             return redirect()->route($this->_route . '.index')->with('error', $th->getMessage() ?? 'Something went wrong.');
         }
+    }
+
+    /**
+     * Get offers for the given merchant (for voucher create form dropdown).
+     * Only offers belonging to the selected merchant are returned.
+     */
+    public function offersByMerchant(string $merchantId)
+    {
+        $offers = $this->_repo->offersByMerchant($merchantId);
+        return response()->json($offers);
     }
 }

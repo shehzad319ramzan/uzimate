@@ -95,15 +95,43 @@ class VoucherRepository extends BaseRepository
         return true;
     }
 
-    public function formOptions(?User $user = null): array
+    public function formOptions(?User $user = null, string|int|null $merchantId = null): array
     {
         $merchants = Merchant::select('id', 'name')->orderBy('name')->get();
-        $offersRaw = Offer::with('merchant:id,name')->select('id', 'merchant_id', 'title', 'description', 'points_required')->orderBy('title')->get();
-        $offers = $offersRaw->map(fn ($o) => (object) [
+
+        if ($merchantId === null) {
+            $offers = collect();
+        } else {
+            $offersRaw = Offer::with('merchant:id,name')
+                ->where('merchant_id', $merchantId)
+                ->select('id', 'merchant_id', 'title', 'description', 'points_required')
+                ->orderBy('title')
+                ->get();
+            $offers = $offersRaw->map(fn ($o) => (object) [
             'id' => $o->id,
             'name' => ($o->merchant?->name ?? 'Merchant') . ' — ' . $o->title . ' (' . (int) $o->points_required . ' pts)',
             'merchant_id' => $o->merchant_id,
         ]);
+        }
+
         return compact('merchants', 'offers');
+    }
+
+    /**
+     * Get offers for a given merchant (for dropdown / AJAX).
+     * Only offers for the selected merchant are returned.
+     */
+    public function offersByMerchant(string $merchantId): array
+    {
+        return Offer::where('merchant_id', $merchantId)
+            ->select('id', 'merchant_id', 'title', 'points_required')
+            ->orderBy('title')
+            ->get()
+            ->map(fn ($o) => [
+                'id' => $o->id,
+                'text' => $o->title . ' (' . (int) $o->points_required . ' pts)',
+            ])
+            ->values()
+            ->all();
     }
 }

@@ -29,11 +29,11 @@
                         id="offer_ids"
                         :data="$offers"
                         :existing-id="old('offer_ids', [])"
-                        placeholder="Select one or more offers"
+                        placeholder="Select a merchant first to see their offers"
                         selectclass="select2-offers"
                         multiple
                     />
-                    <small class="text-muted">Select offers to link this voucher to. You can leave blank for a standalone voucher.</small>
+                    <small class="text-muted">Select a merchant first; only that merchant's offers will appear here. You can leave blank for a standalone voucher.</small>
                 </div>
                 <div class="col-md-8 mb-3">
                     <x-auth.input-field type="text" name="title" id="title" required="true" place="Voucher title"
@@ -70,3 +70,80 @@
         </x-auth.form>
     </x-auth.card>
 </x-layouts.auth>
+
+<script>
+$(document).ready(function() {
+    var $merchant = $('#merchant_id');
+    var $offerSelect = $('#offer_ids');
+    var offersByMerchantUrl = @json(route('vouchers.offers-by-merchant', ['merchantId' => '__MERCHANT__']));
+
+    function reinitOfferSelect2() {
+        if ($offerSelect.length && $offerSelect.hasClass('select2-hidden-accessible')) {
+            $offerSelect.select2('destroy');
+        }
+    }
+
+    function initOfferSelect2(noResultsText) {
+        if (!$offerSelect.length) return;
+        var placeholder = $offerSelect.data('placeholder') || 'Select one or more offers';
+        var opts = {
+            dropdownParent: $offerSelect.parent(),
+            placeholder: placeholder,
+            allowClear: true,
+            theme: 'classic',
+            width: '100%'
+        };
+        if (noResultsText) {
+            opts.language = { noResults: function() { return noResultsText; } };
+        }
+        $offerSelect.select2(opts);
+    }
+
+    function loadOffersForMerchant(merchantId) {
+        reinitOfferSelect2();
+        $offerSelect.find('option').not(':first').remove();
+        $offerSelect.val(null).trigger('change');
+
+        if (!merchantId) {
+            $offerSelect.prop('disabled', true);
+            initOfferSelect2('Select a merchant first to see their offers');
+            return;
+        }
+
+        $offerSelect.prop('disabled', false);
+        var url = offersByMerchantUrl.replace('__MERCHANT__', merchantId);
+        $.get(url).done(function(offers) {
+            if (Array.isArray(offers) && offers.length > 0) {
+                offers.forEach(function(o) {
+                    $offerSelect.append(new Option(o.text, o.id, false, false));
+                });
+                initOfferSelect2();
+            } else {
+                var $noOffers = new Option('No offers for this merchant', '', false, false);
+                $noOffers.disabled = true;
+                $offerSelect.append($noOffers);
+                initOfferSelect2('No offers for this merchant');
+            }
+        }).fail(function(xhr) {
+            var $err = new Option('Unable to load offers', '', false, false);
+            $err.disabled = true;
+            $offerSelect.append($err);
+            initOfferSelect2('Unable to load offers. Please try again.');
+            console.error('Offers load failed:', xhr.status, xhr.responseText);
+        });
+    }
+
+    $merchant.on('change', function() {
+        var merchantId = $(this).val();
+        loadOffersForMerchant(merchantId || null);
+    });
+
+    var initialMerchant = $merchant.val();
+    if (initialMerchant) {
+        loadOffersForMerchant(initialMerchant);
+    } else {
+        $offerSelect.prop('disabled', true);
+        initOfferSelect2('Select a merchant first to see their offers');
+    }
+});
+</script>
