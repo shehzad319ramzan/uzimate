@@ -96,13 +96,49 @@ class ScanOfferService
     }
 
     /**
-     * Get user's current points balance.
+     * Get user's current points balance (all merchants).
      */
     public function getUserPointsBalance(string $userId): int
     {
         return max(0, (int) CustomerLog::where('user_id', $userId)
             ->whereNotNull('points_affected')
             ->sum('points_affected'));
+    }
+
+    /**
+     * Get user's points balance for a specific merchant (all action types).
+     */
+    public function getUserPointsBalanceByMerchant(string $userId, string $merchantId): int
+    {
+        return max(0, (int) CustomerLog::where('user_id', $userId)
+            ->where('merchant_id', $merchantId)
+            ->whereNotNull('points_affected')
+            ->sum('points_affected'));
+    }
+
+    /**
+     * Get user's points from offer scans (QR Code Scanned) for a specific merchant only.
+     */
+    public function getUserPointsFromOfferScansByMerchant(string $userId, string $merchantId): int
+    {
+        return max(0, (int) CustomerLog::where('user_id', $userId)
+            ->where('merchant_id', $merchantId)
+            ->where('action_type', 'qr_code_scanned')
+            ->whereNotNull('points_affected')
+            ->sum('points_affected'));
+    }
+
+    /**
+     * Get user's points balance excluding given action types (e.g. qr_code_scanned, survey_completed).
+     * When "Use Other Merchant Points = No": only this balance is allowed for that merchant's voucher.
+     */
+    public function getUserPointsBalanceExcludingActionTypes(string $userId, array $excludeActionTypes): int
+    {
+        $query = CustomerLog::where('user_id', $userId)->whereNotNull('points_affected');
+        if (!empty($excludeActionTypes)) {
+            $query->whereNotIn('action_type', $excludeActionTypes);
+        }
+        return max(0, (int) $query->sum('points_affected'));
     }
 
 

@@ -25,7 +25,12 @@ class VoucherResource extends JsonResource
                 ];
             }),
             'offers' => $this->whenLoaded('offers', function () {
-                return $this->offers->map(fn ($o) => ['id' => $o->id, 'title' => $o->title]);
+                return $this->offers->map(fn ($o) => [
+                    'id' => $o->id,
+                    'title' => $o->title,
+                    'points' => (int) ($o->points_required ?? 0),
+                    'image_url' => $o->image() ?: null,
+                ]);
             }),
             'image_url' => $this->image() ?: null,
         ];

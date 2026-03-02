@@ -65,6 +65,9 @@ class VoucherRepository extends BaseRepository
     {
         $dataArray = $data->toArray();
         $offerIds = $data->offer_ids ?? [];
+        if (!empty($offerIds)) {
+            $dataArray['points_required'] = (int) Offer::whereIn('id', $offerIds)->sum('points_required');
+        }
         $file = $data->file;
         $result = $this->add($this->_model, $dataArray);
         if (!empty($offerIds)) {
@@ -84,8 +87,13 @@ class VoucherRepository extends BaseRepository
         if (!$result) {
             return false;
         }
-        $result->update($data->toArray());
-        $result->offers()->sync($data->offer_ids ?? []);
+        $updateData = $data->toArray();
+        $offerIds = $data->offer_ids ?? [];
+        if (!empty($offerIds)) {
+            $updateData['points_required'] = (int) Offer::whereIn('id', $offerIds)->sum('points_required');
+        }
+        $result->update($updateData);
+        $result->offers()->sync($offerIds);
         if ($data->file) {
             $result->files()->where('type', $this->_imageType)->delete();
             $uploaded = $this->uploadFile($data->file, $this->_imgPath);
@@ -111,6 +119,7 @@ class VoucherRepository extends BaseRepository
             'id' => $o->id,
             'name' => ($o->merchant?->name ?? 'Merchant') . ' — ' . $o->title . ' (' . (int) $o->points_required . ' pts)',
             'merchant_id' => $o->merchant_id,
+            'points_required' => (int) $o->points_required,
         ]);
         }
 
@@ -130,6 +139,7 @@ class VoucherRepository extends BaseRepository
             ->map(fn ($o) => [
                 'id' => $o->id,
                 'text' => $o->title . ' (' . (int) $o->points_required . ' pts)',
+                'points' => (int) $o->points_required,
             ])
             ->values()
             ->all();

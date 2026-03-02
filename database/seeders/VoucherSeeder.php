@@ -78,6 +78,11 @@ class VoucherSeeder extends Seeder
         ];
 
         foreach ($merchants as $index => $merchant) {
+            $merchantOfferIds = Offer::where('merchant_id', $merchant->id)->pluck('id')->toArray();
+            if (empty($merchantOfferIds)) {
+                continue;
+            }
+
             $voucherData = $vouchers[$index % count($vouchers)];
             $voucher = Voucher::create([
                 'merchant_id' => $merchant->id,
@@ -95,13 +100,13 @@ class VoucherSeeder extends Seeder
                 'type' => Constants::IMAGETYPE,
             ]);
 
-            $merchantOfferIds = Offer::where('merchant_id', $merchant->id)->pluck('id')->toArray();
-            if (!empty($merchantOfferIds)) {
-                shuffle($merchantOfferIds);
-                $count = min(rand(1, 3), count($merchantOfferIds));
-                $offerIds = array_slice($merchantOfferIds, 0, $count);
-                $voucher->offers()->sync($offerIds);
-            }
+            shuffle($merchantOfferIds);
+            $count = min(rand(1, 3), count($merchantOfferIds));
+            $offerIds = array_slice($merchantOfferIds, 0, $count);
+            $voucher->offers()->sync($offerIds);
+            $voucher->update([
+                'points_required' => (int) Offer::whereIn('id', $offerIds)->sum('points_required'),
+            ]);
         }
     }
 }

@@ -20,9 +20,12 @@
                         place="Voucher title" val="{{ old('title', $data->title) }}" label="Title" />
                 </div>
                 <div class="col-md-4 mb-3">
-                    <x-auth.input-field type="number" name="points_required" id="points_required" required="true"
-                        place="e.g. 200" val="{{ old('points_required', $data->points_required) }}"
-                        label="Points required" />
+                    <label for="points_required" class="form-label">Points required <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control @error('points_required') is-invalid @enderror"
+                        name="points_required" id="points_required" min="0" required
+                        placeholder="Auto when offers selected" value="{{ old('points_required', $data->points_required) }}" />
+                    <small class="text-muted" id="points_required_hint">Auto-calculated when offers are selected (sum of each offer's points). Change offers to update.</small>
+                    @error('points_required')<span class="text-danger">{{ $message }}</span>@enderror
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="merchant_id" class="form-label">Merchant <span class="text-danger">*</span></label>
@@ -85,8 +88,27 @@
         $(document).ready(function() {
             var $merchant = $('#merchant_id');
             var $offerSelect = $('#offer_ids');
+            var $pointsRequired = $('#points_required');
+            var $pointsHint = $('#points_required_hint');
             var offersByMerchantUrl = @json(route('vouchers.offers-by-merchant', ['merchantId' => '__MERCHANT__']));
             var currentSelectedIds = @json(old('offer_ids', $data->offers->pluck('id')->toArray()));
+            var offerPointsMap = {};
+
+            function updatePointsFromOffers() {
+                var selected = $offerSelect.val();
+                if (selected && selected.length > 0) {
+                    var total = 0;
+                    selected.forEach(function(id) {
+                        total += offerPointsMap[id] || 0;
+                    });
+                    $pointsRequired.val(total);
+                    $pointsRequired.prop('readonly', true);
+                    $pointsHint.text('Auto-calculated: sum of selected offers (' + selected.length + ' offer(s)).');
+                } else {
+                    $pointsRequired.prop('readonly', false);
+                    $pointsHint.text('Enter points for a standalone voucher, or select offers above to auto-fill (sum of each offer\'s points).');
+                }
+            }
 
             function reinitOfferSelect2() {
                 if ($offerSelect.length && $offerSelect.hasClass('select2-hidden-accessible')) {
@@ -104,17 +126,21 @@
                     theme: 'classic',
                     width: '100%'
                 });
+                $offerSelect.off('change.points').on('change.points', updatePointsFromOffers);
                 if (selectedIds && selectedIds.length) {
                     $offerSelect.val(selectedIds).trigger('change');
                 }
+                updatePointsFromOffers();
             }
 
             function loadOffersForMerchant(merchantId, keepSelection) {
                 reinitOfferSelect2();
                 $offerSelect.find('option').not(':first').remove();
                 $offerSelect.val(null);
+                offerPointsMap = {};
 
                 if (!merchantId) {
+                    $pointsRequired.prop('readonly', false);
                     initOfferSelect2();
                     return;
                 }
@@ -123,6 +149,7 @@
                 $.get(url).done(function(offers) {
                     if (Array.isArray(offers)) {
                         offers.forEach(function(o) {
+                            offerPointsMap[o.id] = o.points != null ? o.points : 0;
                             $offerSelect.append(new Option(o.text, o.id, false, false));
                         });
                     }

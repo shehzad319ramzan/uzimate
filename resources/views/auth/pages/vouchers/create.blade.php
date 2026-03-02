@@ -40,8 +40,12 @@
                         val="{{ old('title') }}" label="Title" />
                 </div>
                 <div class="col-md-4 mb-3">
-                    <x-auth.input-field type="number" name="points_required" id="points_required" required="true"
-                        place="e.g. 200" val="{{ old('points_required', '200') }}" label="Points required" />
+                    <label for="points_required" class="form-label">Points required <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control @error('points_required') is-invalid @enderror"
+                        name="points_required" id="points_required" min="0" required
+                        placeholder="Auto when offers selected" value="{{ old('points_required', '0') }}" />
+                    <small class="text-muted" id="points_required_hint">Enter points for a standalone voucher, or select offers above to auto-fill (sum of each offer's points).</small>
+                    @error('points_required')<span class="text-danger">{{ $message }}</span>@enderror
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="valid_until" class="form-label">Valid until</label>
@@ -75,7 +79,27 @@
 $(document).ready(function() {
     var $merchant = $('#merchant_id');
     var $offerSelect = $('#offer_ids');
+    var $pointsRequired = $('#points_required');
+    var $pointsHint = $('#points_required_hint');
     var offersByMerchantUrl = @json(route('vouchers.offers-by-merchant', ['merchantId' => '__MERCHANT__']));
+    var offerPointsMap = {};
+
+    function updatePointsFromOffers() {
+        var selected = $offerSelect.val();
+        if (selected && selected.length > 0) {
+            var total = 0;
+            selected.forEach(function(id) {
+                total += offerPointsMap[id] || 0;
+            });
+            $pointsRequired.val(total);
+            $pointsRequired.prop('readonly', true);
+            $pointsHint.text('Auto-calculated: sum of selected offers (' + selected.length + ' offer(s)).');
+        } else {
+            $pointsRequired.prop('readonly', false);
+            if ($pointsRequired.val() === '') $pointsRequired.val('0');
+            $pointsHint.text('Enter points for a standalone voucher, or select offers above to auto-fill (sum of each offer\'s points).');
+        }
+    }
 
     function reinitOfferSelect2() {
         if ($offerSelect.length && $offerSelect.hasClass('select2-hidden-accessible')) {
@@ -97,12 +121,17 @@ $(document).ready(function() {
             opts.language = { noResults: function() { return noResultsText; } };
         }
         $offerSelect.select2(opts);
+        $offerSelect.off('change.points').on('change.points', updatePointsFromOffers);
     }
 
     function loadOffersForMerchant(merchantId) {
         reinitOfferSelect2();
         $offerSelect.find('option').not(':first').remove();
         $offerSelect.val(null).trigger('change');
+        offerPointsMap = {};
+        $pointsRequired.prop('readonly', false);
+        $pointsRequired.val('0');
+        $pointsHint.text('Enter points for a standalone voucher, or select offers above to auto-fill (sum of each offer\'s points).');
 
         if (!merchantId) {
             $offerSelect.prop('disabled', true);
@@ -115,9 +144,11 @@ $(document).ready(function() {
         $.get(url).done(function(offers) {
             if (Array.isArray(offers) && offers.length > 0) {
                 offers.forEach(function(o) {
+                    offerPointsMap[o.id] = o.points != null ? o.points : 0;
                     $offerSelect.append(new Option(o.text, o.id, false, false));
                 });
                 initOfferSelect2();
+                updatePointsFromOffers();
             } else {
                 var $noOffers = new Option('No offers for this merchant', '', false, false);
                 $noOffers.disabled = true;
