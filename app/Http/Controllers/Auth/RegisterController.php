@@ -70,7 +70,8 @@ class RegisterController extends Controller
             'max_sites' => ['required', 'integer', 'min:1'],
             'spin_after_days' => ['required', 'integer', 'min:1'],
             'scan_after_hours' => ['required', 'integer', 'min:1'],
-            'use_other_merchant_points' => ['nullable', 'boolean']
+            'use_other_merchant_points' => ['nullable', 'boolean'],
+            'fcm_token' => ['nullable', 'string', 'max:500'],
         ]);
     }
 
@@ -88,6 +89,9 @@ class RegisterController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ];
+        if (!empty($data['fcm_token'])) {
+            $userArr['fcm_token'] = $data['fcm_token'];
+        }
 
         $user = User::create($userArr);
 
@@ -143,6 +147,7 @@ class RegisterController extends Controller
             'password_confirmation' => ['required', 'string', 'min:8'],
             'date_of_birth' => ['required', 'date'],
             'referral_code' => ['nullable', 'string', 'max:20'],
+            'fcm_token' => ['nullable', 'string', 'max:500'],
         ]);
 
         if ($validator->fails()) {
@@ -162,6 +167,9 @@ class RegisterController extends Controller
                 'date_of_birth' => $request->date_of_birth ?? null,
                 'email_verified_at' => now(),
             ];
+            if ($request->filled('fcm_token')) {
+                $userArr['fcm_token'] = $request->input('fcm_token');
+            }
 
             $user = User::create($userArr);
 
@@ -214,6 +222,7 @@ class RegisterController extends Controller
                         'date_of_birth' => $user->date_of_birth ? $user->date_of_birth->format('Y-m-d') : null,
                         'full_name' => $user->full_name ?? ($user->first_name . ' ' . $user->last_name),
                         'roles' => $user->roles->pluck('name'),
+                        'fcm_token' => $user->fcm_token,
                     ],
                     'token' => $token,
                 ]

@@ -28,6 +28,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'provider',
         'email_verified_at',
         'referral_code',
+        'fcm_token',
     ];
 
     protected $hidden = [

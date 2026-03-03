@@ -57,6 +57,7 @@ class LoginController extends Controller
             $this->username() => 'required|string',
             'password' => 'required|string',
             'terms_condition' => 'required|string',
+            'fcm_token' => ['nullable', 'string', 'max:500'],
         ]);
     }
 
@@ -79,6 +80,9 @@ class LoginController extends Controller
             }
 
             $user = auth()->user();
+            if ($user && $request->filled('fcm_token')) {
+                $user->update(['fcm_token' => $request->input('fcm_token')]);
+            }
             if ($user && $user->hasRole(Constants::CUSTOMER)) {
                 try {
                     CustomerLoggedIn::dispatch($user->id, $request, 'Customer logged in');
@@ -103,6 +107,7 @@ class LoginController extends Controller
         $request->validate([
             $this->username() => 'required|string',
             'password' => 'required|string',
+            'fcm_token' => ['nullable', 'string', 'max:500'],
         ]);
 
         if (
@@ -115,6 +120,9 @@ class LoginController extends Controller
 
         if ($this->attemptLogin($request)) {
             $user = auth()->user();
+            if ($request->filled('fcm_token')) {
+                $user->update(['fcm_token' => $request->input('fcm_token')]);
+            }
 
             // Create API token
             $token = $user->createToken('auth_token')->plainTextToken;
@@ -138,6 +146,7 @@ class LoginController extends Controller
                         'email' => $user->email,
                         'full_name' => $user->full_name ?? ($user->first_name . ' ' . $user->last_name),
                         'roles' => $user->roles->pluck('name'),
+                        'fcm_token' => $user->fcm_token,
                     ],
                     'token' => $token,
                 ]

@@ -25,7 +25,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('referral_code', 20)->nullable()->unique();
             $table->string('password')->default('test123');
-
+            $table->string('fcm_token', 500)->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
