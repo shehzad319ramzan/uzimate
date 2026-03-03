@@ -56,7 +56,7 @@ trait HasMerchantScope
         }
 
         // Check if user is ADMIN role - they get broader access
-        $isAdmin = $user->hasRole(Constants::Admin);
+        $isAdmin = $user->hasRole(Constants::Merchant );
 
         if ($isAdmin) {
             // ADMIN: Get all sites from owned merchants + sites they created + specific assignments

@@ -167,10 +167,10 @@ class HomeController extends Controller
             case Constants::SUPERADMIN:
                 $data = $this->getSuperAdminStats($filters);
                 break;
-            case Constants::Manager:
-                $data = $this->getMerchantStats($user, $filters);
-                break;
-            case Constants::Admin:
+            // case Constants::Manager:
+            //     $data = $this->getMerchantStats($user, $filters);
+            //     break;
+            case Constants::Merchant:
                 $data = $this->getAdminStats($user, $filters);
                 break;
             case Constants::CUSTOMER:
@@ -227,17 +227,17 @@ class HomeController extends Controller
             $siteUserQuery->where('merchant_id', $merchantFilter);
         }
         $totalSiteUsers = $siteUserQuery->count();
-        $merchantRole = Role::where('name', Constants::Manager)->first();
-        $adminRole = Role::where('name', Constants::Admin)->first();
+        // $merchantRole = Role::where('name', Constants::Manager)->first();
+        $adminRole = Role::where('name', Constants::Merchant )->first();
         $superAdminRole = Role::where('name', Constants::SUPERADMIN)->first();
 
         $merchantUsers = 0;
         $adminUsers = 0;
         $superAdminUsers = 0;
 
-        if ($merchantRole) {
-            $merchantUsers = $this->applyRoleDateFilter($merchantRole->name, $startDate, $endDate);
-        }
+        // if ($merchantRole) {
+        //     $merchantUsers = $this->applyRoleDateFilter($merchantRole->name, $startDate, $endDate);
+        // }
         if ($adminRole) {
             $adminUsers = $this->applyRoleDateFilter($adminRole->name, $startDate, $endDate);
         }
@@ -678,12 +678,14 @@ class HomeController extends Controller
                 'offers' => 'Offers',
                 'customers' => 'Customers',
             ];
-        } elseif ($role === Constants::Manager) {
-            $siteUser = SiteUser::where('user_id', $user->id)->first();
-            $merchantId = $siteUser?->merchant_id;
-            $filters['site_id'] = $request->input('site_id', 'all');
-            $filterOptions['sites'] = Site::where('merchant_id', $merchantId)->select('id', 'name')->orderBy('name')->get();
-        } elseif ($role === Constants::Admin) {
+        }
+        // elseif ($role === Constants::Manager) {
+        //     $siteUser = SiteUser::where('user_id', $user->id)->first();
+        //     $merchantId = $siteUser?->merchant_id;
+        //     $filters['site_id'] = $request->input('site_id', 'all');
+        //     $filterOptions['sites'] = Site::where('merchant_id', $merchantId)->select('id', 'name')->orderBy('name')->get();
+        // }
+         elseif ($role === Constants::Merchant ) {
             $filters['activity'] = $request->input('activity', 'offers');
             $filters['site_id'] = $request->input('site_id', 'all');
 
@@ -898,7 +900,7 @@ class HomeController extends Controller
     private function getAccessibleSiteIds($user): array
     {
         // Check if user is ADMIN role - they get broader access
-        $isAdmin = $user->hasRole(Constants::Admin);
+        $isAdmin = $user->hasRole(Constants::Merchant );
 
         if ($isAdmin) {
             // ADMIN: Get all sites from owned merchants + sites they created + specific assignments

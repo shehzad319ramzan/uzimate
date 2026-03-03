@@ -225,7 +225,7 @@ class SiteUserRepository extends BaseRepository
             $role = Role::findOrFail($roleId);
             $user->syncRoles([$role->name]);
 
-            if ($role->name === Constants::Admin) {
+            if ($role->name === Constants::Merchant ) {
                 $this->assignDefaultAdminPermissions($user);
             }
         }

@@ -56,10 +56,10 @@
                                             $role?->title ?? ucwords(str_replace('_', ' ', $role?->name ?? '-'));
                                         $roleColors = [
                                             'super_admin' => '#7B1FA2',
-                                            'business_admin' => '#F57C00',
-                                            'manager' => '#1976D2',
+                                            // 'business_admin' => '#F57C00',
+                                            // 'manager' => '#1976D2',
                                             'merchant' => '#00897B',
-                                            'manager_staff' => '#EC407A',
+                                            // 'manager_staff' => '#EC407A',
                                         ];
                                         $roleColor = $roleColors[$role?->name ?? ''] ?? ($role?->color ?? '#4A148D');
                                     @endphp
@@ -89,14 +89,14 @@
                                                 <i class="fas fa-eye me-2 text-primary"></i> View
                                             </a>
                                             @endcan
-                                            
+
                                             @can('edit_site_user')
                                             <a class="dropdown-item"
                                                 href="{{ route('siteusers.edit', $siteUser->id) }}">
                                                 <i class="fas fa-edit me-2 text-warning"></i> Edit
                                             </a>
                                             @endcan
-                                            
+
                                             @can('delete_site_user')
                                             <form action="{{ route('siteusers.destroy', $siteUser->id) }}"
                                                 method="POST"

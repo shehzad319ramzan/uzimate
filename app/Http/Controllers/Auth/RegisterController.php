@@ -92,7 +92,7 @@ class RegisterController extends Controller
         $user = User::create($userArr);
 
         // Assign admin role
-        $user->assignRole(Constants::Admin);
+        $user->assignRole(Constants::Merchant );
 
         // Assign merchant permissions
         $merchantModules = [

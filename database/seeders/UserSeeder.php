@@ -77,7 +77,7 @@ class UserSeeder extends Seeder
         $user2->email_verified_at = now();
         $user2->created_at = now();
         $user2->save();
-        $user2->assignRole(Constants::Manager);
+        $user2->assignRole(Constants::Merchant);
         $user2->file()->create([
             'name' => 'profile_logo.png',
             'path' => $profileLogoPath,
@@ -85,21 +85,21 @@ class UserSeeder extends Seeder
         ]);
 
         // Manager/Staff User
-        $user3 = new User();
-        $user3->first_name = 'admin';
-        $user3->last_name = 'admin';
-        $user3->about = "This is a admin member who handles day-to-day operations.";
-        $user3->email = 'admin@gmail.com';
-        $user3->password = Hash::make('test123');
-        $user3->email_verified_at = now();
-        $user3->created_at = now();
-        $user3->save();
-        $user3->assignRole(Constants::Admin);
-        $user3->file()->create([
-            'name' => 'profile_logo.png',
-            'path' => $profileLogoPath,
-            'type' => Constants::PROFILETYPE,
-        ]);
+        // $user3 = new User();
+        // $user3->first_name = 'admin';
+        // $user3->last_name = 'admin';
+        // $user3->about = "This is a admin member who handles day-to-day operations.";
+        // $user3->email = 'admin@gmail.com';
+        // $user3->password = Hash::make('test123');
+        // $user3->email_verified_at = now();
+        // $user3->created_at = now();
+        // $user3->save();
+        // $user3->assignRole(Constants::Manager);
+        // $user3->file()->create([
+        //     'name' => 'profile_logo.png',
+        //     'path' => $profileLogoPath,
+        //     'type' => Constants::PROFILETYPE,
+        // ]);
 
         // Customer User
         $user4 = new User();

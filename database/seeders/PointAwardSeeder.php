@@ -22,7 +22,7 @@ class PointAwardSeeder extends Seeder
         $merchants = Merchant::all();
         $sites = Site::all();
         $customers = User::role(Constants::CUSTOMER)->get();
-        $admins = User::role([Constants::SUPERADMIN, Constants::Admin, Constants::Manager])->get();
+        // $admins = User::role([Constants::SUPERADMIN, Constants::Merchant , Constants::Manager])->get();
 
         if ($merchants->isEmpty() || $sites->isEmpty()) {
             $this->command->warn('No merchants or sites found. Please run MerchantSeeder and SiteSeeder first.');
@@ -34,15 +34,15 @@ class PointAwardSeeder extends Seeder
             return;
         }
 
-        if ($admins->isEmpty()) {
-            $this->command->warn('No admin users found. Please create admin users first.');
-            return;
-        }
+        // if ($admins->isEmpty()) {
+        //     $this->command->warn('No admin users found. Please create admin users first.');
+        //     return;
+        // }
 
         $merchantIds = $merchants->pluck('id')->toArray();
         $siteIds = $sites->pluck('id')->toArray();
         $customerIds = $customers->pluck('id')->toArray();
-        $adminIds = $admins->pluck('id')->toArray();
+        // $adminIds = $admins->pluck('id')->toArray();
 
         // Helper function to get a random site for a merchant
         $getRandomSiteForMerchant = function ($merchantId) use ($sites) {
@@ -87,7 +87,7 @@ class PointAwardSeeder extends Seeder
         for ($i = 0; $i < 10; $i++) {
             $merchant = $merchants->random();
             $site = $getRandomSiteForMerchant($merchant->id);
-            
+
             if (!$site) {
                 continue; // Skip if no site found for merchant
             }
@@ -133,7 +133,7 @@ class PointAwardSeeder extends Seeder
         for ($i = 0; $i < 5; $i++) {
             $merchant = $merchants->random();
             $site = $getRandomSiteForMerchant($merchant->id);
-            
+
             if (!$site) {
                 continue;
             }
@@ -158,7 +158,7 @@ class PointAwardSeeder extends Seeder
         for ($i = 0; $i < 3; $i++) {
             $merchant = $merchants->random();
             $site = $getRandomSiteForMerchant($merchant->id);
-            
+
             if (!$site) {
                 continue;
             }
@@ -183,7 +183,7 @@ class PointAwardSeeder extends Seeder
         for ($i = 0; $i < 3; $i++) {
             $merchant = $merchants->random();
             $site = $getRandomSiteForMerchant($merchant->id);
-            
+
             if (!$site) {
                 continue;
             }

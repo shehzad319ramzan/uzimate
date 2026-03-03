@@ -35,16 +35,15 @@ class RoleSeeder extends Seeder
             })->get();
         };
 
-        // Business Admin / Owner — can set up loyalty program, define rewards,
+        //  Merchant / Owner — can set up loyalty program, define rewards,
         // manage customers and view reports
         $businessAdmin = Role::create([
-            'name' => Constants::Manager,
-            'title' => 'manager',
+            'name' => Constants::Merchant,
+            'title' => 'Merchant',
             'color' => '#4ECDC4'
         ]);
-        // Modules used inside PermissionSeeder; keep same prefixes so sidebar @can checks stay in sync.
+
         $crudModules = [
-            'app_user',
             'site',
             'site_user',
             'offer',
@@ -69,34 +68,6 @@ class RoleSeeder extends Seeder
         $businessAdmin->availablePermissions()->sync($merchantPermissions);
         $businessAdmin->syncPermissions($merchantPermissions);
 
-        // Manager / Staff — manages day-to-day tasks like checking customers in,
-        // scanning codes, or issuing rewards at point of sale
-        $manager = Role::create([
-            'name' => Constants::Admin,
-            'title' => 'Admin',
-            'color' => '#95E1D3'
-        ]);
-        // Manager gets limited permissions for day-to-day operations
-        $managerModulePrefixes = [
-            'app_user',
-            'site_user',
-            'offer',
-            'customer_scan',
-            'offer_scan',
-            'reward_rule',
-            'point_award',
-            'spin_history',
-            'survey',
-            'customer_log',
-            'invite_friend',
-            'voucher',
-            'inbox',
-            'feedback',
-        ];
-
-        $managerPermissions = $crudPermissions($managerModulePrefixes);
-        $manager->availablePermissions()->sync($managerPermissions);
-        $manager->syncPermissions($managerPermissions);
 
         // Customer (Member) — end-user who signs up for loyalty program,
         // collects points, and redeems rewards
