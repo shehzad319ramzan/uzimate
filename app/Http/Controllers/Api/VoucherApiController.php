@@ -157,24 +157,16 @@ class VoucherApiController extends ApiBaseController
             ], 422);
         }
 
-        // Usable balance: total (all actions) OR total minus qr_code_scanned & survey_completed, based on "Use Other Merchant Points"
-        $usableBalance = $merchant->use_other_merchant_points
-            ? $this->scanOfferService->getUserPointsBalance($user->id)
-            : $this->scanOfferService->getUserPointsBalanceExcludingActionTypes($user->id, ['qr_code_scanned', 'survey_completed']);
+        // Voucher redemption uses user's total points balance (all point types).
+        $totalBalance = $this->scanOfferService->getUserPointsBalance($user->id);
 
-        if ($usableBalance < $pointsRequired) {
-            $shortfall = $pointsRequired - $usableBalance;
-            $totalBalance = $this->scanOfferService->getUserPointsBalance($user->id);
-            if ($merchant->use_other_merchant_points) {
-                $message = "Need {$pointsRequired} points. You have {$usableBalance}. Earn {$shortfall} more.";
-            } else {
-                $message = "Scan/survey points not accepted for this voucher. Usable: {$usableBalance}, required: {$pointsRequired}. Earn {$shortfall} from login, spin, or other actions.";
-            }
+        if ($totalBalance < $pointsRequired) {
+            $shortfall = $pointsRequired - $totalBalance;
             return response()->json([
                 'success' => false,
-                'message' => $message,
+                'message' => "Need {$pointsRequired} points. You have {$totalBalance}. Earn {$shortfall} more.",
                 'points_required' => $pointsRequired,
-                'points_available' => $usableBalance,
+                'points_available' => $totalBalance,
                 'points_balance_total' => $totalBalance,
             ], 403);
         }
@@ -191,7 +183,7 @@ class VoucherApiController extends ApiBaseController
             ], 400);
         }
 
-        $balanceAfter = $usableBalance - $pointsRequired;
+        $balanceAfter = $totalBalance - $pointsRequired;
         $metadata = ['voucher_id' => $voucher->id];
         if (!empty($selectedOfferIds)) {
             $metadata['redeemed_offer_ids'] = $selectedOfferIds;
@@ -206,7 +198,7 @@ class VoucherApiController extends ApiBaseController
                 ? "Redeemed voucher: {$voucher->title} ({$voucher->merchant->name})"
                 : "Redeemed voucher: {$voucher->title} ({$voucher->merchant->name}) – selected offers",
             'points_affected' => -$pointsRequired,
-            'points_balance_before' => $usableBalance,
+            'points_balance_before' => $totalBalance,
             'points_balance_after' => $balanceAfter,
             'related_model_type' => Voucher::class,
             'related_model_id' => $voucher->id,
