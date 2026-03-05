@@ -27,7 +27,13 @@ class SurveyResource extends JsonResource
             'points' => (int) $this->points,
             'estimated_minutes' => (int) $this->estimated_minutes,
             'image_url' => $this->image() ?: null,
-            'merchant_name' => $this->merchant?->name,
+            'merchant' => $this->whenLoaded('merchant', function () {
+                return [
+                    'id' => $this->merchant->id,
+                    'name' => $this->merchant->name,
+                    'image_url' => $this->merchant->logo() ?: null,
+                ];
+            }),
         ];
     }
 }

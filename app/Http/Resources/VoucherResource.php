@@ -11,6 +11,7 @@ class VoucherResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'status' => $this->resolveStatus(),
             'title' => $this->title,
             'description' => $this->description,
             'terms_and_conditions' => $this->terms_and_conditions,
@@ -34,5 +35,19 @@ class VoucherResource extends JsonResource
             }),
             'image_url' => $this->image() ?: null,
         ];
+    }
+
+    /**
+     * Resolve voucher status: active, inactive, or expired.
+     */
+    protected function resolveStatus(): string
+    {
+        if ((string) $this->status === '0') {
+            return 'inactive';
+        }
+        if ($this->valid_until && $this->valid_until->isPast()) {
+            return 'expired';
+        }
+        return 'active';
     }
 }
