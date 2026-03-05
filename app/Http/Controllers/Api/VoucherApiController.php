@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Resources\VoucherResource;
 use App\Models\CustomerLog;
-use App\Models\OfferScan;
 use App\Models\Voucher;
 use App\Services\ScanOfferService;
 use Illuminate\Http\JsonResponse;
@@ -156,19 +155,6 @@ class VoucherApiController extends ApiBaseController
                 'success' => false,
                 'message' => 'Selected offers have no points. Please select at least one offer with points.',
             ], 422);
-        }
-
-        // Eligibility: user must have scanned at least one of this voucher's linked offers (if voucher has offers)
-        if (count($voucherOfferIds) > 0) {
-            $hasScannedLinkedOffer = OfferScan::where('user_id', $user->id)
-                ->whereIn('offer_id', $voucherOfferIds)
-                ->exists();
-            if (!$hasScannedLinkedOffer) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'You need to scan at least one of the offers linked to this voucher before you can redeem it. Visit a participating store to earn points.',
-                ], 403);
-            }
         }
 
         // Usable balance: total (all actions) OR total minus qr_code_scanned & survey_completed, based on "Use Other Merchant Points"
