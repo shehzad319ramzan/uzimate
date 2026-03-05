@@ -19,10 +19,11 @@ class Select2 extends Component
     public $tags = null;
     public $selectclass = null;
 
-    /**
-     * Create a new component instance.
-     */
-    public function __construct($label, $name, $id, $placeholder = "Select option", $data = null, $existingId = null, $isAjax = false, $ajaxRoute = null, $tags = false, $selectclass = "select_2")
+    /** @var array<string, string> Param name => element id for extra ajax data (e.g. ["days" => "send_inactive_days"]) */
+    public $ajaxDataKeys = [];
+
+  
+    public function __construct($label, $name, $id, $placeholder = "Select option", $data = null, $existingId = null, $isAjax = false, $ajaxRoute = null, $tags = false, $selectclass = "select_2", $ajaxDataKeys = [])
     {
         $this->label = $label;
         $this->name = $name;
@@ -34,11 +35,9 @@ class Select2 extends Component
         $this->ajaxRoute = $ajaxRoute;
         $this->tags = $tags;
         $this->selectclass = $selectclass;
+        $this->ajaxDataKeys = is_array($ajaxDataKeys) ? $ajaxDataKeys : [];
     }
 
-    /**
-     * Get the view / contents that represent the component.
-     */
     public function render(): View|Closure|string
     {
         return view('components.auth.select2');

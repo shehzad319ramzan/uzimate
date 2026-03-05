@@ -45,7 +45,13 @@ class SettingSeeder extends Seeder
         $setting->smtp_sender_name = env('APP_NAME', 'Laravel');
         $setting->smtp_encryption = 'tls';
 
-        // Spin wheel: points only (no offer or discount)
+        $setting->firebase_project_id = env('FIREBASE_PROJECT_ID', 'uzimate-c4729');
+        $credentialsPath = env('FIREBASE_CREDENTIALS_FILE', 'storage/firebase-credentials.json');
+        $fullPath = str_starts_with($credentialsPath, '/') || (strlen($credentialsPath) >= 2 && $credentialsPath[1] === ':')
+            ? $credentialsPath
+            : base_path($credentialsPath);
+        $setting->firebase_credentials = File::isFile($fullPath) ? File::get($fullPath) : null;
+
         $setting->spin_spins_per_day = 1;
         $setting->spin_outcome_nothing = 50;
         $setting->spin_outcome_points = 50;

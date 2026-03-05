@@ -191,6 +191,40 @@
                 </li>
             @endcan
 
+            @can('view_notification')
+                {{-- Notifications --}}
+                <li class="sidebar-item">
+                    <a data-bs-target="#notificationsCollapse" data-bs-toggle="collapse" class="sidebar-link collapsed">
+                        <i class="align-middle me-2 fas fa-bell"></i>
+                        <span class="align-middle">Notifications</span>
+                    </a>
+                    <ul id="notificationsCollapse"
+                        class="sidebar-dropdown list-unstyled collapse {{ Str::startsWith(request()->route()->getName(), 'notifications.') ? 'show' : '' }}"
+                        data-bs-parent="#sidebar">
+                        <li class="sidebar-item {{ request()->route('blade') == 'miss-you' ? 'active' : '' }}">
+                            <a class="sidebar-link" href="{{ route('notifications.index', 'miss-you') }}">
+                                <i class="fas fa-angle-double-right me-2"></i> Miss You
+                            </a>
+                        </li>
+                        <li class="sidebar-item {{ request()->route('blade') == 'special-day' ? 'active' : '' }}">
+                            <a class="sidebar-link" href="{{ route('notifications.index', 'special-day') }}">
+                                <i class="fas fa-angle-double-right me-2"></i> Special Day
+                            </a>
+                        </li>
+                        <li class="sidebar-item {{ request()->route('blade') == 'special-offer' ? 'active' : '' }}">
+                            <a class="sidebar-link" href="{{ route('notifications.index', 'special-offer') }}">
+                                <i class="fas fa-angle-double-right me-2"></i> Special Offer
+                            </a>
+                        </li>
+                        <li class="sidebar-item {{ request()->route('blade') == 'birthday' ? 'active' : '' }}">
+                            <a class="sidebar-link" href="{{ route('notifications.index', 'birthday') }}">
+                                <i class="fas fa-angle-double-right me-2"></i> Birthday
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endcan
+
             @can('view_customer_log')
                 {{-- Customer Logs --}}
                 <li

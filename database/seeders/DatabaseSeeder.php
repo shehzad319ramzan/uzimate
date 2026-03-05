@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
         $this->call(SurveySeeder::class);
         $this->call(VoucherSeeder::class);
         $this->call(RewardRuleSeeder::class);
+        $this->call(NotificationSettingSeeder::class);
         // $this->call(PointAwardSeeder::class);
         // $this->call(SpinHistorySeeder::class);
         $this->call(InboxSeeder::class);

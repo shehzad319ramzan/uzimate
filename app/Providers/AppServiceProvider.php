@@ -22,7 +22,9 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use App\Events\CustomerLoggedIn;
 use App\Events\CustomerLoggedOut;
+use App\Events\OfferCreated;
 use App\Listeners\CreateCustomerLogForLogin;
+use App\Listeners\SendOfferNotificationListener;
 use App\Listeners\CreateCustomerLogForLogout;
 use App\Models\OfferScan;
 use App\Observers\OfferScanObserver;
@@ -37,9 +39,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(UserInterface::class, UserRepository::class);
     }
 
-    /**
-     * Bootstrap any application services.
-     */
+
     public function boot(SettingService $settingsService): void
     {
         try {
@@ -60,7 +60,6 @@ class AppServiceProvider extends ServiceProvider
                 ->prefix(LaravelLocalization::setLocale() . '/my-account')
                 ->group(base_path('routes/panel.php'));
 
-            // ✅ Ensure cache and settings tables exist before calling settings logic
             if (Schema::hasTable('cache') && Schema::hasTable('settings')) {
                 $setting = $settingsService->getSettings();
                 $settingsService->applySettings();
@@ -85,10 +84,6 @@ class AppServiceProvider extends ServiceProvider
         app()->setLocale($lang);
     }
 
-    /**
-     * Register model observers and event listeners for automatic customer log creation.
-     * Observers: PointAward, SpinHistory, OfferScan. Events: login, logout.
-     */
     private function registerObservers(): void
     {
         if (!Schema::hasTable('customer_logs')) {
@@ -101,11 +96,13 @@ class AppServiceProvider extends ServiceProvider
         }
         Event::listen(CustomerLoggedIn::class, CreateCustomerLogForLogin::class);
         Event::listen(CustomerLoggedOut::class, CreateCustomerLogForLogout::class);
+        Event::listen(OfferCreated::class, SendOfferNotificationListener::class);
     }
 
     private function registerBladeComponents(): void
     {
         Blade::component('auth.pages.users.profile.layout', 'my-profile');
         Blade::component('auth.pages.settings.layout', 'settings');
+        Blade::component('auth.pages.notifications.layout', 'notification-management');
     }
 }

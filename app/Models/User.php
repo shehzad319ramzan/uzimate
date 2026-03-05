@@ -95,4 +95,10 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(Merchant::class);
     }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<CustomerLog> */
+    public function customerLogs()
+    {
+        return $this->hasMany(CustomerLog::class);
+    }
 }

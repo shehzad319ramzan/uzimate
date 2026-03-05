@@ -85,18 +85,26 @@
                             url: "{{ $ajaxRoute }}",
                             dataType: 'json',
                             data: function(params) {
-                                return {
+                                var data = {
                                     search: params.term,
                                     page: params.page || 1
                                 };
+                                @if(!empty($ajaxDataKeys))
+                                @foreach($ajaxDataKeys as $param => $elId)
+                                (function() {
+                                    var el = document.getElementById("{{ $elId }}");
+                                    if (el) data["{{ $param }}"] = el.value;
+                                })();
+                                @endforeach
+                                @endif
+                                return data;
                             },
                             processResults: function(data, params) {
                                 params.page = params.page || 1;
-
                                 return {
-                                    results: data.results,
+                                    results: data.results || [],
                                     pagination: {
-                                        more: data.more
+                                        more: !!data.more
                                     }
                                 };
                             }

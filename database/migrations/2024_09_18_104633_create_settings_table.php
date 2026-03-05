@@ -38,7 +38,9 @@ return new class extends Migration
             $table->string('bank_transfer_active')->default(0);
             $table->string('bank_transfer_instructions')->nullable();
             $table->string('bank_transfer_informations')->nullable();
-
+            // FCM
+            $table->string('firebase_project_id')->nullable();
+            $table->longText('firebase_credentials')->nullable();
             //SMTP
             $table->string('smtp_host')->nullable();
             $table->string('smtp_port')->nullable();

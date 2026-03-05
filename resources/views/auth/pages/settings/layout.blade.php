@@ -15,6 +15,10 @@
                         href="{{ route('settings.index', 'smtp') }}">
                         <i class="align-middle me-1 fas fa-fw fa-envelope"></i> SMTP
                     </a>
+                    <a class="list-group-item list-group-item-action {{ (request()->route('blade') ?? request()->blade) == 'firebase' ? 'active' : '' }}"
+                        href="{{ route('settings.index', 'firebase') }}">
+                        <i class="align-middle me-1 fas fa-fw fa-mobile-alt"></i> Firebase / Push
+                    </a>
                     <a class="list-group-item list-group-item-action {{ (request()->route('blade') ?? request()->blade) == 'spin' ? 'active' : '' }}"
                         href="{{ route('settings.index', 'spin') }}">
                         <i class="align-middle me-1 fas fa-fw fa-sync-alt"></i> Spin Wheel

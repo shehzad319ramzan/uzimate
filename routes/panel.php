@@ -8,6 +8,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InboxController;
 use App\Http\Controllers\InviteFriendController;
 use App\Http\Controllers\MerchantCategoryController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\RoleController;
@@ -185,6 +186,18 @@ Route::group(
             Route::get('edit/{id}', 'edit')->name('edit');
         });
 
+        Route::prefix('notifications')->as('notifications.')->middleware('can:view_notification')->controller(NotificationController::class)->group(function () {
+            Route::get('api/inactive-customers-preview', 'getInactiveCustomersPreview')->name('api.inactive-customers-preview');
+            Route::get('api/inactive-customers', 'getInactiveCustomers')->name('api.inactive-customers');
+            Route::get('api/customers', 'getCustomers')->name('api.customers');
+            Route::post('update-settings/{type}', 'updateSettings')->name('update-settings')->middleware('can:edit_notification');
+            Route::post('send-miss-you', 'sendMissYou')->name('send-miss-you')->middleware('can:add_notification');
+            Route::post('send-special-day', 'sendSpecialDay')->name('send-special-day')->middleware('can:add_notification');
+            Route::post('send-special-offer', 'sendSpecialOffer')->name('send-special-offer')->middleware('can:add_notification');
+            Route::post('send-birthday', 'sendBirthday')->name('send-birthday')->middleware('can:add_notification');
+            Route::get('{blade}', 'index')->name('index');
+        });
+
         Route::prefix('customer-logs')->as('customerlogs.')->controller(CustomerLogController::class)->group(function () {
             Route::get('', 'index')->name('index');
             Route::get('detail/{id}', 'show')->name('show');
@@ -220,6 +233,7 @@ Route::group(
 
             Route::put('basic_info/update', 'basic_info')->name('basic_info');
             Route::put('smtp/update', 'smtp_update')->name('smtp_update');
+            Route::put('firebase/update', 'firebase_update')->name('firebase_update');
             Route::put('spin/update', 'spin_update')->name('spin_update');
             Route::put('social-logins/update', 'social_logins_update')->name('social_logins_update');
             Route::put('registration/update', 'registeration_update')->name('registeration_update');

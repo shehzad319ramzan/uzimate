@@ -2,13 +2,13 @@
 <nav class="navbar navbar-expand-lg navbar-uzimate fixed-top">
     <div class="container-fluid">
         <a class="navbar-brand" href="{{ route('welcome') }}">
-            <x-logo />
+            <x-logo :setting="$setting ?? null" />
         </a>
-        
+
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        
+
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto">
                 <li class="nav-item">
@@ -86,7 +86,7 @@
                     <a class="nav-link" href="{{ route('contact') }}">Contact</a>
                 </li>
             </ul>
-            
+
             <div class="d-flex align-items-center gap-3 ms-auto">
                 <div class="dropdown">
                     <a class="nav-link dropdown-toggle d-inline-flex align-items-center" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">

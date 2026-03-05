@@ -153,9 +153,34 @@
                         @enderror
                     </div>
                 </div>
+
+                @can('add_notification')
+                <div class="col-md-12 mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input @error('send_notification') is-invalid @enderror" type="checkbox"
+                            name="send_notification" id="send_notification" value="1" {{ old('send_notification') ? 'checked' : '' }}>
+                        <label class="form-check-label" for="send_notification">Send notification to customers</label>
+                        @error('send_notification')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <small class="text-muted d-block mt-1">Email and/or mobile push will be sent to targeted customers when this offer is created.</small>
+                </div>
+                <div class="col-md-12 mb-3" id="notification_message_wrap" style="{{ old('send_notification') ? '' : 'display:none;' }}">
+                    <div class="form-group">
+                        <label for="notification_message" class="form-label">Notification message (optional)</label>
+                        <input type="text" class="form-control @error('notification_message') is-invalid @enderror"
+                            name="notification_message" id="notification_message" maxlength="500"
+                            placeholder="e.g. Get 20% off on your favorite items!"
+                            value="{{ old('notification_message') }}">
+                        @error('notification_message')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+                @endcan
             </div>
 
-            <!-- Action Buttons -->
             <div class="row">
                 <div class="col-md-12 d-flex justify-content-between">
                     <a href="{{ route('offers.index') }}" class="btn btn-secondary">Delete</a>
@@ -166,21 +191,17 @@
     </x-auth.card>
 </x-layouts.auth>
 
-{{-- @push('auth_scripts') --}}
 <script>
-    // Character counter for description
     document.getElementById('description').addEventListener('input', function() {
         const charCount = this.value.length;
         document.getElementById('charCount').textContent = charCount;
     });
 
-    // Initialize character count
     document.addEventListener('DOMContentLoaded', function() {
         const desc = document.getElementById('description');
         document.getElementById('charCount').textContent = desc.value.length;
     });
 
-    // Weekdays toggle - Multiple selection allowed
     let selectedWeekdays = {!! json_encode($oldWeekdays) !!};
     if (!Array.isArray(selectedWeekdays)) {
         selectedWeekdays = [];
@@ -188,23 +209,24 @@
 
     function toggleWeekday(button, day) {
         if (button.classList.contains('btn-primary')) {
-            // Deselect
             button.classList.remove('btn-primary');
             button.classList.add('btn-outline-primary');
             selectedWeekdays = selectedWeekdays.filter(d => d !== day);
         } else {
-            // Select
             button.classList.remove('btn-outline-primary');
             button.classList.add('btn-primary');
             if (!selectedWeekdays.includes(day)) {
                 selectedWeekdays.push(day);
             }
         }
-        // Update hidden input with selected weekdays
         document.getElementById('weekdaysInput').value = JSON.stringify(selectedWeekdays);
     }
 
-    // Filter sites based on merchant selection
+    document.getElementById('send_notification')?.addEventListener('change', function() {
+        var wrap = document.getElementById('notification_message_wrap');
+        if (wrap) wrap.style.display = this.checked ? 'block' : 'none';
+    });
+
     document.getElementById('merchant_id').addEventListener('change', function() {
         const merchantId = this.value;
         const siteSelect = document.getElementById('site_id');
@@ -223,7 +245,6 @@
             }
         });
 
-        // Reset site selection if current selection doesn't match
         const selectedOption = siteSelect.options[siteSelect.selectedIndex];
         if (selectedOption.value !== '' && merchantId !== '' && selectedOption.getAttribute('data-merchant') !== merchantId) {
             siteSelect.value = '';

@@ -47,6 +47,9 @@ class SettingService
             'mail.mailers.smtp.encryption' => $setting->smtp_encryption ?? env('MAIL_ENCRYPTION'),
             'mail.from.address' => $setting->smtp_email ?? env('MAIL_FROM_ADDRESS'),
             'mail.from.name' => $setting->smtp_sender_name ?? env('MAIL_FROM_NAME'),
+
+            'services.fcm.project_id' => $setting->firebase_project_id ?? config('services.fcm.project_id'),
+            'services.fcm.credentials_json' => $setting->firebase_credentials ?? config('services.fcm.credentials_json'),
         ]);
 
         config([

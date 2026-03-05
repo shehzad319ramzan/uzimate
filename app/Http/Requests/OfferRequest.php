@@ -6,44 +6,35 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class OfferRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
+    
     public function authorize(): bool
     {
         return auth()->check();
     }
 
-    /**
-     * Prepare the data for validation.
-     */
+
     protected function prepareForValidation(): void
     {
-        // Convert weekdays JSON string to array if it's a string
         if ($this->has('weekdays')) {
             $weekdays = $this->input('weekdays');
-            
+
             if (is_string($weekdays)) {
-                // Handle empty string
                 if (trim($weekdays) === '' || $weekdays === 'null') {
                     $this->merge(['weekdays' => null]);
                 } elseif ($weekdays === '[]') {
-                    // Empty array JSON string should be converted to empty array
                     $this->merge(['weekdays' => []]);
                 } else {
                     $decoded = json_decode($weekdays, true);
                     if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
                         $this->merge(['weekdays' => $decoded]);
                     } else {
-                        // If JSON decode fails, set to null
                         $this->merge(['weekdays' => null]);
                     }
                 }
             } elseif (!is_array($weekdays) && $weekdays !== null) {
-                // If weekdays exists but is not array, string, or null, set to null
                 $this->merge(['weekdays' => null]);
             }
-            // If it's already an array or null, leave it as is
+
         }
     }
 
@@ -65,6 +56,8 @@ class OfferRequest extends FormRequest
             'description' => ['nullable', 'string', 'max:255'],
             'file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
             'status' => ['nullable', 'string', 'in:0,1'],
+            'send_notification' => ['nullable', 'boolean'],
+            'notification_message' => ['nullable', 'string', 'max:500'],
         ];
     }
 

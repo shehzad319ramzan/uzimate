@@ -42,6 +42,8 @@ class Setting extends Model
         'smtp_email',
         'smtp_sender_name',
         'smtp_encryption',
+        'firebase_project_id',
+        'firebase_credentials',
         'spin_spins_per_day',
         'spin_default_site_id',
         'spin_outcome_nothing',

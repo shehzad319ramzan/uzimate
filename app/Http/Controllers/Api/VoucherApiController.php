@@ -20,15 +20,17 @@ class VoucherApiController extends ApiBaseController
     public function index(Request $request): JsonResponse
     {
         $merchantId = $request->query('merchant_id');
-        $status = $request->query('status', 'active');
+        $status = $request->query('status', 'all');
         $search = $request->query('search');
 
-        $query = Voucher::with(['merchant', 'offers'])->active();
+        $query = Voucher::with(['merchant', 'offers']);
 
         if ($status === 'active') {
-            $query->notExpired();
+            $query->where('status', '1')->notExpired();
         } elseif ($status === 'expired') {
-            $query->whereNotNull('valid_until')->where('valid_until', '<', now()->toDateString());
+            $query->where('status', '1')
+                ->whereNotNull('valid_until')
+                ->where('valid_until', '<', now()->toDateString());
         } elseif ($status === 'inactive') {
             $query->where('status', '0');
         }
@@ -44,7 +46,6 @@ class VoucherApiController extends ApiBaseController
             $query->where('merchant_id', $merchantId);
         }
 
-        // List all vouchers; "Use Other Merchant Points" and balance checks apply only on redeem
         $vouchers = $query->orderBy('valid_until')->paginate(min((int) $request->get('per_page', 20), 50));
 
         return response()->json([

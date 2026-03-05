@@ -5,18 +5,21 @@ namespace App\Http\Controllers;
 use App\Dto\SiteSettings\ActiveLanguageDto;
 use App\Dto\SiteSettings\BasicInfoDto;
 use App\Dto\SiteSettings\RegisterDto;
+use App\Dto\SiteSettings\FirebaseDto;
 use App\Dto\SiteSettings\SmtpDto;
 use App\Dto\SiteSettings\SocialDto;
 use App\Dto\SiteSettings\SpinDto;
 use App\Dto\SiteSettings\UpdateDefaultLanguageDto;
 use App\Dto\SiteSettings\InstallLanguageDto;
 use App\Helper\Exception;
+use App\Services\FcmService;
 use App\Repositories\SettingRepository;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SiteSettings\ActiveLanguageRequest;
 use App\Http\Requests\SiteSettings\BasicInfoRequest;
 use App\Http\Requests\SiteSettings\InstallLanguageRequest;
 use App\Http\Requests\SiteSettings\RegisterRequest;
+use App\Http\Requests\SiteSettings\FirebaseRequest;
 use App\Http\Requests\SiteSettings\SmtpRequest;
 use App\Http\Requests\SiteSettings\SpinRequest;
 use App\Http\Requests\SiteSettings\SocialLoginRequest;
@@ -91,6 +94,17 @@ class SettingController extends Controller
         try {
             $this->_repo->smtp_update(SmtpDto::fromRequest($request->validated()));
             return redirect()->back()->with('success', 'Updated succesfully');
+        } catch (\Throwable $th) {
+            return Exception::handle($th);
+        }
+    }
+
+    public function firebase_update(FirebaseRequest $request)
+    {
+        try {
+            $this->_repo->firebase_update(FirebaseDto::fromRequest($request->validated()));
+            FcmService::clearTokenCache();
+            return redirect()->back()->with('success', 'Updated successfully');
         } catch (\Throwable $th) {
             return Exception::handle($th);
         }

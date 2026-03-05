@@ -52,5 +52,12 @@ return [
         'name' => env('APP_NAME'),
         'url' => env('APP_URL'),
         'email' => env('ADMIN_MAIL')
-    ]
+    ],
+
+    'fcm' => [
+        'server_key' => env('FCM_SERVER_KEY'),
+        'project_id' => env('FIREBASE_PROJECT_ID'),
+        'credentials' => env('FIREBASE_CREDENTIALS_FILE'),
+        'credentials_json' => null,
+    ],
 ];

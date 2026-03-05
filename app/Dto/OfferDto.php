@@ -12,6 +12,8 @@ class OfferDto
     public readonly ?array $weekdays;
     public readonly ?string $description;
     public readonly ?string $status;
+    public readonly bool $send_notification;
+    public readonly ?string $notification_message;
     public $file;
 
     /**
@@ -26,7 +28,6 @@ class OfferDto
         $this->title = $request['title'];
         $this->points_required = (int) $request['points_required'];
         $this->expires_on = $request['expires_on'] ?? null;
-        // Handle weekdays - can be array or JSON string
         if (isset($request['weekdays'])) {
             if (is_array($request['weekdays'])) {
                 $this->weekdays = $request['weekdays'];
@@ -41,6 +42,8 @@ class OfferDto
         }
         $this->description = $request['description'] ?? null;
         $this->status = $request['status'] ?? '1';
+        $this->send_notification = ! empty($request['send_notification']);
+        $this->notification_message = $request['notification_message'] ?? null;
         $this->file = request()->hasFile('file') ? request()->file('file') : null;
     }
 

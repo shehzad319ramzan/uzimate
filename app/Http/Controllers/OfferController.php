@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Dto\OfferDto;
+use App\Events\OfferCreated;
 use App\Repositories\OfferRepository;
 use App\Http\Requests\OfferRequest;
 use App\Http\Controllers\Controller;
@@ -42,7 +43,10 @@ class OfferController extends BaseController
     public function store(OfferRequest $request)
     {
         try {
-            $this->_repo->store(OfferDto::fromRequest($request));
+            $offer = $this->_repo->store(OfferDto::fromRequest($request));
+            if ($request->boolean('send_notification')) {
+                OfferCreated::dispatch($offer, $request->input('notification_message'));
+            }
             return redirect()->route($this->_route . '.index')->with('success', 'Successfully created.');
         } catch (\Throwable $th) {
             return redirect()->back()->withInput()->with('error', $th->getMessage());
@@ -88,7 +92,7 @@ class OfferController extends BaseController
             return redirect()->route($this->_route . '.index')->with('success', 'Updated succesfully');
         } catch (\Throwable $th) {
             if ($th instanceof NotFoundHttpException) {
-                $message = $th->getMessage(); // Get the exception message
+                $message = $th->getMessage();
                 return redirect()->route($this->_route . '.index')->with('error', $message);
             } else {
                 return redirect()->route($this->_route . '.index')->with('error', 'Something went wrong..');

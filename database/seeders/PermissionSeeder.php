@@ -62,6 +62,7 @@ class PermissionSeeder extends Seeder
             'Inbox' => 'inbox',
             'Feedbacks' => 'feedback',
             'Permissions' => 'permission',
+            'Notifications' => 'notification',
         ];
 
         foreach ($crudModules as $category => $prefix) {

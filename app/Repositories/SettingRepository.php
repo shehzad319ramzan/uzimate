@@ -7,6 +7,7 @@ use App\Dto\SiteSettings\ActiveLanguageDto;
 use App\Dto\SiteSettings\BasicInfoDto;
 use App\Dto\SiteSettings\InstallLanguageDto;
 use App\Dto\SiteSettings\RegisterDto;
+use App\Dto\SiteSettings\FirebaseDto;
 use App\Dto\SiteSettings\SmtpDto;
 use App\Dto\SiteSettings\SocialDto;
 use App\Dto\SiteSettings\SpinDto;
@@ -78,6 +79,11 @@ class SettingRepository extends BaseRepository
     }
 
     public function smtp_update(SmtpDto $data)
+    {
+        return $this->updateData($data);
+    }
+
+    public function firebase_update(FirebaseDto $data)
     {
         return $this->updateData($data);
     }

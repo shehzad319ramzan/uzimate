@@ -14,8 +14,7 @@ class RoleSeeder extends Seeder
     {
         app()['cache']->forget('spatie.permission.cache');
 
-        // Super Admin — oversees all accounts, sets global settings, monitors activity
-        // Full access to everything
+
         $superAdmin = Role::create([
             'name' => Constants::SUPERADMIN,
             'title' => 'Super Admin',
@@ -35,8 +34,7 @@ class RoleSeeder extends Seeder
             })->get();
         };
 
-        //  Merchant / Owner — can set up loyalty program, define rewards,
-        // manage customers and view reports
+
         $businessAdmin = Role::create([
             'name' => Constants::Merchant,
             'title' => 'Merchant',
@@ -59,6 +57,7 @@ class RoleSeeder extends Seeder
             'inbox',
             'feedback',
             'permission',
+            'notification',
         ];
 
         $merchantModulePrefixes = $crudModules;
@@ -69,14 +68,11 @@ class RoleSeeder extends Seeder
         $businessAdmin->syncPermissions($merchantPermissions);
 
 
-        // Customer (Member) — end-user who signs up for loyalty program,
-        // collects points, and redeems rewards
         $customer = Role::create([
             'name' => Constants::CUSTOMER,
             'title' => 'Customer',
             'color' => '#F38181'
         ]);
-        // Customers only get site settings permission for now
         $customerPermissions = Permission::where('name', 'site_setting')->get();
         $customer->availablePermissions()->sync($customerPermissions);
         $customer->syncPermissions($customerPermissions);
