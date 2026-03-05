@@ -77,6 +77,8 @@ class VoucherSeeder extends Seeder
             ],
         ];
 
+        $createdVouchers = [];
+
         foreach ($merchants as $index => $merchant) {
             $merchantOfferIds = Offer::where('merchant_id', $merchant->id)->pluck('id')->toArray();
             if (empty($merchantOfferIds)) {
@@ -107,6 +109,15 @@ class VoucherSeeder extends Seeder
             $voucher->update([
                 'points_required' => (int) Offer::whereIn('id', $offerIds)->sum('points_required'),
             ]);
+
+            $createdVouchers[] = $voucher;
+        }
+
+        if (count($createdVouchers) >= 1) {
+            $createdVouchers[0]->update(['valid_until' => now()->subDays(5)]);
+        }
+        if (count($createdVouchers) >= 2) {
+            $createdVouchers[1]->update(['status' => '0']);
         }
     }
 }
