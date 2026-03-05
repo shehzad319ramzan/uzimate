@@ -56,7 +56,7 @@ class UserSeeder extends Seeder
         $user1->last_name = 'Admin';
         $user1->about = "This is the super admin of the Uzimate loyalty platform.";
         $user1->email = 'superadmin@gmail.com';
-        $user1->password = Hash::make('admin123');
+        $user1->password = Hash::make('admin1234');
         $user1->email_verified_at = now();
         $user1->created_at = now();
         $user1->save();
@@ -73,7 +73,7 @@ class UserSeeder extends Seeder
         $user2->last_name = 'Merchant';
         $user2->about = "This is a Merchant  who can set up loyalty programs and manage customers.";
         $user2->email = 'merchant@gmail.com';
-        $user2->password = Hash::make('test123');
+        $user2->password = Hash::make('test1234');
         $user2->email_verified_at = now();
         $user2->created_at = now();
         $user2->save();
@@ -107,6 +107,21 @@ class UserSeeder extends Seeder
         $user4->last_name = 'Member';
         $user4->about = "This is a customer member who collects points and redeems rewards.";
         $user4->email = 'user@gmail.com';
+        $user4->password = Hash::make('test1234');
+        $user4->email_verified_at = now();
+        $user4->created_at = now();
+        $user4->save();
+        $user4->assignRole(Constants::CUSTOMER);
+        $user4->file()->create([
+            'name' => 'user_logo.png',
+            'path' => $userLogoPath,
+            'type' => Constants::PROFILETYPE,
+        ]);
+        $user4 = new User();
+        $user4->first_name = 'Muhammad';
+        $user4->last_name = 'Shehzad';
+        $user4->about = "This is a customer member who collects points and redeems rewards.";
+        $user4->email = 'shehzad319ramzan@gmail.com';
         $user4->password = Hash::make('test123');
         $user4->email_verified_at = now();
         $user4->created_at = now();
