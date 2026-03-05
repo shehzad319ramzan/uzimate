@@ -35,10 +35,7 @@ class VoucherApiController extends ApiBaseController
         ], 200);
     }
 
-    /**
-     * Search vouchers by title, merchant name, with optional filters.
-     * GET /vouchers/search?q=pizza&merchant_id=...&status=active|expired|inactive|all&per_page=20&page=1
-     */
+
     public function search(Request $request): JsonResponse
     {
         $vouchers = $this->getVouchersQuery($request)
