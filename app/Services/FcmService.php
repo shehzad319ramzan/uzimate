@@ -15,9 +15,16 @@ class FcmService
     protected ?string $credentialsJson;
     public const FCM_V1_TOKEN_CACHE_KEY = 'fcm_v1_access_token';
 
+    protected ?string $lastError = null;
+
     public static function clearTokenCache(): void
     {
         Cache::forget(self::FCM_V1_TOKEN_CACHE_KEY);
+    }
+
+    public function getLastError(): ?string
+    {
+        return $this->lastError;
     }
 
     public function __construct()
@@ -31,6 +38,7 @@ class FcmService
 
     public function sendToToken(string $token, string $title, string $body, array $data = []): bool
     {
+        $this->lastError = null;
         $data = array_map(fn ($v) => (string) $v, $data);
 
         if ($this->useV1Api()) {
@@ -38,6 +46,7 @@ class FcmService
         }
 
         if (empty($this->serverKey)) {
+            $this->lastError = 'FCM_NOT_CONFIGURED: Set FCM_SERVER_KEY (legacy) or FIREBASE_PROJECT_ID + FIREBASE_CREDENTIALS_FILE (v1) in .env';
             Log::warning('FCM not configured: set FCM_SERVER_KEY (legacy) or FIREBASE_PROJECT_ID + FIREBASE_CREDENTIALS_FILE (v1). Skipping push.');
             return false;
         }
@@ -92,14 +101,17 @@ class FcmService
             ])->post('https://fcm.googleapis.com/fcm/send', $payload);
 
             if (!$response->successful()) {
+                $msg = 'FCM_LEGACY_HTTP_' . $response->status() . ': ' . $response->body();
+                $this->lastError = $msg;
                 Log::warning('FCM legacy send failed', [
-                    'reason' => 'HTTP ' . $response->status() . ': ' . $response->body(),
+                    'reason' => $msg,
                     'token_preview' => substr($token, 0, 20) . '...',
                 ]);
                 return false;
             }
             return true;
         } catch (\Throwable $e) {
+            $this->lastError = 'FCM_LEGACY_EXCEPTION: ' . get_class($e) . ' - ' . $e->getMessage();
             Log::error('FCM legacy exception', ['reason' => $e->getMessage(), 'exception' => get_class($e)]);
             return false;
         }
@@ -109,6 +121,9 @@ class FcmService
     {
         $accessToken = $this->getV1AccessToken();
         if (empty($accessToken)) {
+            if (empty($this->lastError)) {
+                $this->lastError = 'FCM_V1: Failed to obtain access token (check logs for details).';
+            }
             return false;
         }
 
@@ -131,14 +146,19 @@ class FcmService
             ])->post($url, $payload);
 
             if (!$response->successful()) {
+                $bodyStr = $response->body();
+                $decoded = json_decode($bodyStr, true);
+                $detail = isset($decoded['error']['message']) ? $decoded['error']['message'] : $bodyStr;
+                $this->lastError = 'FCM_V1_HTTP_' . $response->status() . ': ' . $detail;
                 Log::warning('FCM v1 send failed', [
-                    'reason' => 'HTTP ' . $response->status() . ': ' . $response->body(),
+                    'reason' => $this->lastError,
                     'token_preview' => substr($token, 0, 20) . '...',
                 ]);
                 return false;
             }
             return true;
         } catch (\Throwable $e) {
+            $this->lastError = 'FCM_V1_EXCEPTION: ' . get_class($e) . ' - ' . $e->getMessage();
             Log::error('FCM v1 exception', ['reason' => $e->getMessage(), 'exception' => get_class($e)]);
             return false;
         }
@@ -152,16 +172,19 @@ class FcmService
             if (empty($json)) {
                 $path = $this->resolveCredentialsPath();
                 if ($path === null) {
+                    $this->lastError = 'FCM_V1: Credentials path not set (FIREBASE_CREDENTIALS_FILE in .env).';
                     return null;
                 }
                 $json = @file_get_contents($path);
                 if ($json === false) {
+                    $this->lastError = 'FCM_V1: Could not read credentials file at: ' . $path . ' (check path and file permissions).';
                     Log::warning('FCM v1: could not read credentials file: ' . $this->credentialsPath);
                     return null;
                 }
             }
             $creds = json_decode($json, true);
             if (empty($creds['client_email']) || empty($creds['private_key'])) {
+                $this->lastError = 'FCM_V1: Invalid credentials JSON - client_email and private_key are required.';
                 Log::warning('FCM v1: invalid credentials JSON (client_email, private_key required).');
                 return null;
             }
@@ -172,6 +195,7 @@ class FcmService
                 'assertion' => $jwt,
             ]);
             if (!$response->successful()) {
+                $this->lastError = 'FCM_V1: Failed to get OAuth access token - ' . $response->body();
                 Log::warning('FCM v1: failed to get access token', ['body' => $response->body()]);
                 return null;
             }

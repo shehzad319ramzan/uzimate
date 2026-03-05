@@ -245,9 +245,10 @@ class NotificationService
                             'sent_at' => now(),
                         ]);
                     } else {
+                        $fcmError = $this->fcmService->getLastError();
                         Log::error('Notification push failed', array_merge($context, [
                             'channel' => 'push',
-                            'reason' => 'FCM returned false (check FCM config, token validity, or FCM logs)',
+                            'reason' => $fcmError ?? 'FCM returned false (no error message captured).',
                         ]));
                     }
                 }
