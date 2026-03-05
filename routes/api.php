@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\SpinApiController;
 use App\Http\Controllers\Api\InviteFriendApiController;
 use App\Http\Controllers\Api\SurveyApiController;
 use App\Http\Controllers\Api\VoucherApiController;
+use App\Http\Controllers\Api\NotificationApiController;
 use Illuminate\Support\Facades\Route;
 
 // Merchant routes
@@ -54,4 +55,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('surveys/{id}', [SurveyApiController::class, 'show']);
     Route::get('surveys/{id}/form', [SurveyApiController::class, 'form']);
     Route::post('surveys/{id}/submit', [SurveyApiController::class, 'submit']);
+
+    Route::get('notifications', [NotificationApiController::class, 'index']);
+    Route::post('notifications/read-all', [NotificationApiController::class, 'markAllAsRead']);
+    Route::get('notifications/{id}', [NotificationApiController::class, 'show']);
+    Route::post('notifications/{id}/read', [NotificationApiController::class, 'markAsRead']);
 });
