@@ -25,7 +25,22 @@ class VoucherController extends BaseController
 
     public function create()
     {
-        $options = $this->_repo->formOptions(Auth::user(), null);
+        $user = Auth::user();
+        $options = $this->_repo->formOptions($user, null);
+
+        if ($options['isSuperAdmin']) {
+            $selectedMerchantId = old('merchant_id');
+        } else {
+            $selectedMerchantId = $options['merchants']->isNotEmpty()
+                ? (old('merchant_id', $options['merchants']->first()->id))
+                : null;
+        }
+
+        if ($selectedMerchantId) {
+            $options = $this->_repo->formOptions($user, $selectedMerchantId);
+        }
+        $options['selectedMerchantId'] = $selectedMerchantId;
+
         return view($this->_directory . '.create', $options);
     }
 
@@ -65,7 +80,18 @@ class VoucherController extends BaseController
         if ($data === null) {
             abort(404);
         }
-        $options = $this->_repo->formOptions(Auth::user(), $data->merchant_id);
+        $user = Auth::user();
+        $options = $this->_repo->formOptions($user, $data->merchant_id);
+
+        if ($options['isSuperAdmin']) {
+            $selectedMerchantId = old('merchant_id', $data->merchant_id);
+        } else {
+            $selectedMerchantId = $options['merchants']->isNotEmpty()
+                ? ($options['merchants']->firstWhere('id', $data->merchant_id)?->id ?? $options['merchants']->first()->id)
+                : $data->merchant_id;
+        }
+        $options['selectedMerchantId'] = $selectedMerchantId;
+
         return view($this->_directory . '.edit', array_merge(['data' => $data], $options));
     }
 

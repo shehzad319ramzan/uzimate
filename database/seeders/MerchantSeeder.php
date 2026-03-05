@@ -12,7 +12,7 @@ class MerchantSeeder extends Seeder
 {
     public function run(): void
     {
-        $defaultUserId = User::first()?->id;
+        $defaultUserId = 2;
         $categoryIds = MerchantCategory::pluck('id')->toArray();
 
         $assignCategory = function () use ($categoryIds) {

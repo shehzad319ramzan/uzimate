@@ -7,18 +7,27 @@
         </x-slot>
         <x-auth.form form-action="{{ route('offers.store') }}" enctype="true">
             <div class="row">
-                <!-- Merchant Selection -->
+                <!-- Merchant Selection: for non–super-admin, auto-select their merchant (same as Sites) -->
                 <div class="col-md-12 mb-3">
                     <div class="form-group">
                         <label for="merchant_id" class="form-label">Merchant</label>
-                        <select class="form-select @error('merchant_id') is-invalid @enderror" name="merchant_id" id="merchant_id">
-                            <option value="">Select Merchant</option>
-                            @foreach($merchants as $merchant)
-                                <option value="{{ $merchant->id }}" {{ old('merchant_id') == $merchant->id ? 'selected' : '' }}>
-                                    {{ $merchant->name }}
+                        @if(!$isSuperAdmin && $selectedMerchantId)
+                            <input type="hidden" name="merchant_id" value="{{ $selectedMerchantId }}">
+                            <select class="form-select @error('merchant_id') is-invalid @enderror" id="merchant_id" disabled>
+                                <option value="{{ $selectedMerchantId }}" selected>
+                                    {{ $merchants->firstWhere('id', $selectedMerchantId)?->name ?? $merchants->first()->name ?? 'N/A' }}
                                 </option>
-                            @endforeach
-                        </select>
+                            </select>
+                        @else
+                            <select class="form-select @error('merchant_id') is-invalid @enderror" name="merchant_id" id="merchant_id">
+                                <option value="">Select Merchant</option>
+                                @foreach($merchants as $merchant)
+                                    <option value="{{ $merchant->id }}" {{ ($selectedMerchantId == $merchant->id || old('merchant_id') == $merchant->id) ? 'selected' : '' }}>
+                                        {{ $merchant->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        @endif
                         @error('merchant_id')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
@@ -227,29 +236,32 @@
         if (wrap) wrap.style.display = this.checked ? 'block' : 'none';
     });
 
-    document.getElementById('merchant_id').addEventListener('change', function() {
-        const merchantId = this.value;
-        const siteSelect = document.getElementById('site_id');
-        const options = siteSelect.querySelectorAll('option');
+    var merchantSelect = document.getElementById('merchant_id');
+    if (merchantSelect && merchantSelect.tagName === 'SELECT') {
+        merchantSelect.addEventListener('change', function() {
+            const merchantId = this.value;
+            const siteSelect = document.getElementById('site_id');
+            const options = siteSelect.querySelectorAll('option');
 
-        options.forEach(option => {
-            if (option.value === '') {
-                option.style.display = 'block';
-            } else {
-                const dataMerchant = option.getAttribute('data-merchant');
-                if (merchantId === '' || dataMerchant === merchantId) {
+            options.forEach(option => {
+                if (option.value === '') {
                     option.style.display = 'block';
                 } else {
-                    option.style.display = 'none';
+                    const dataMerchant = option.getAttribute('data-merchant');
+                    if (merchantId === '' || dataMerchant === merchantId) {
+                        option.style.display = 'block';
+                    } else {
+                        option.style.display = 'none';
+                    }
                 }
+            });
+
+            const selectedOption = siteSelect.options[siteSelect.selectedIndex];
+            if (selectedOption.value !== '' && merchantId !== '' && selectedOption.getAttribute('data-merchant') !== merchantId) {
+                siteSelect.value = '';
             }
         });
-
-        const selectedOption = siteSelect.options[siteSelect.selectedIndex];
-        if (selectedOption.value !== '' && merchantId !== '' && selectedOption.getAttribute('data-merchant') !== merchantId) {
-            siteSelect.value = '';
-        }
-    });
+    }
 </script>
 {{-- @endpush --}}
 

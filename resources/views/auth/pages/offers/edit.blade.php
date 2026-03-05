@@ -8,18 +8,27 @@
         <x-auth.form form-action="{{ route('offers.update', $data->id) }}" enctype="true">
             @method('PUT')
             <div class="row">
-                <!-- Merchant Selection -->
+                <!-- Merchant Selection: for non–super-admin, auto-select their merchant (same as Sites) -->
                 <div class="col-md-12 mb-3">
                     <div class="form-group">
                         <label for="merchant_id" class="form-label">Merchant</label>
-                        <select class="form-select @error('merchant_id') is-invalid @enderror" name="merchant_id" id="merchant_id">
-                            <option value="">Select Merchant</option>
-                            @foreach($merchants as $merchant)
-                                <option value="{{ $merchant->id }}" {{ old('merchant_id', $data->merchant_id ?? ($data->site->merchant_id ?? '')) == $merchant->id ? 'selected' : '' }}>
-                                    {{ $merchant->name }}
+                        @if(!$isSuperAdmin && $selectedMerchantId)
+                            <input type="hidden" name="merchant_id" value="{{ $selectedMerchantId }}">
+                            <select class="form-select @error('merchant_id') is-invalid @enderror" id="merchant_id" disabled>
+                                <option value="{{ $selectedMerchantId }}" selected>
+                                    {{ $merchants->firstWhere('id', $selectedMerchantId)?->name ?? $merchants->first()->name ?? 'N/A' }}
                                 </option>
-                            @endforeach
-                        </select>
+                            </select>
+                        @else
+                            <select class="form-select @error('merchant_id') is-invalid @enderror" name="merchant_id" id="merchant_id">
+                                <option value="">Select Merchant</option>
+                                @foreach($merchants as $merchant)
+                                    <option value="{{ $merchant->id }}" {{ old('merchant_id', $data->merchant_id ?? ($data->site->merchant_id ?? '')) == $merchant->id ? 'selected' : '' }}>
+                                        {{ $merchant->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        @endif
                         @error('merchant_id')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
@@ -200,51 +209,50 @@
         document.getElementById('weekdaysInput').value = JSON.stringify(selectedWeekdays);
     }
 
-    // Filter sites based on merchant selection
-    document.getElementById('merchant_id').addEventListener('change', function() {
-        const merchantId = this.value;
-        const siteSelect = document.getElementById('site_id');
-        const currentSelectedValue = siteSelect.value; // Preserve current selection
-        const options = siteSelect.querySelectorAll('option');
-        
-        options.forEach(option => {
-            if (option.value === '') {
-                option.style.display = 'block';
-            } else {
-                const dataMerchant = option.getAttribute('data-merchant');
-                if (merchantId === '' || dataMerchant === merchantId) {
+    // Filter sites based on merchant selection (only when merchant dropdown is present)
+    var merchantSelectEl = document.getElementById('merchant_id');
+    if (merchantSelectEl && merchantSelectEl.tagName === 'SELECT') {
+        merchantSelectEl.addEventListener('change', function() {
+            const merchantId = this.value;
+            const siteSelect = document.getElementById('site_id');
+            const currentSelectedValue = siteSelect.value; // Preserve current selection
+            const options = siteSelect.querySelectorAll('option');
+            
+            options.forEach(option => {
+                if (option.value === '') {
                     option.style.display = 'block';
                 } else {
-                    option.style.display = 'none';
+                    const dataMerchant = option.getAttribute('data-merchant');
+                    if (merchantId === '' || dataMerchant === merchantId) {
+                        option.style.display = 'block';
+                    } else {
+                        option.style.display = 'none';
+                    }
+                }
+            });
+            
+            if (currentSelectedValue) {
+                const selectedOption = siteSelect.querySelector(`option[value="${currentSelectedValue}"]`);
+                if (selectedOption) {
+                    const selectedMerchant = selectedOption.getAttribute('data-merchant');
+                    if (merchantId !== '' && selectedMerchant !== merchantId) {
+                        siteSelect.value = '';
+                    } else if (selectedOption.style.display !== 'none') {
+                        siteSelect.value = currentSelectedValue;
+                    }
                 }
             }
         });
-        
-        // Only reset site selection if current selection doesn't match the new merchant
-        // But preserve it if it matches
-        if (currentSelectedValue) {
-            const selectedOption = siteSelect.querySelector(`option[value="${currentSelectedValue}"]`);
-            if (selectedOption) {
-                const selectedMerchant = selectedOption.getAttribute('data-merchant');
-                // If merchant is selected and site's merchant doesn't match, clear selection
-                if (merchantId !== '' && selectedMerchant !== merchantId) {
-                    siteSelect.value = '';
-                } else if (selectedOption.style.display !== 'none') {
-                    // Restore selection if it's still visible
-                    siteSelect.value = currentSelectedValue;
-                }
-            }
-        }
-    });
+    }
 
     // Initialize site filtering on page load - but preserve selected site
     document.addEventListener('DOMContentLoaded', function() {
         const merchantSelect = document.getElementById('merchant_id');
         const siteSelect = document.getElementById('site_id');
-        const selectedSiteId = siteSelect.value;
+        const selectedSiteId = siteSelect && siteSelect.value;
         
-        // Only filter if merchant is selected AND we have a selected site to preserve
-        if (merchantSelect.value && selectedSiteId) {
+        // Only filter if merchant select exists, has value, and we have a selected site to preserve
+        if (merchantSelect && merchantSelect.tagName === 'SELECT' && merchantSelect.value && selectedSiteId) {
             // Filter sites based on merchant, but keep selected site visible
             const options = siteSelect.querySelectorAll('option');
             options.forEach(option => {

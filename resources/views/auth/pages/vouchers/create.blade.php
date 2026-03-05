@@ -14,12 +14,21 @@
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="merchant_id" class="form-label">Merchant <span class="text-danger">*</span></label>
-                    <select class="form-select @error('merchant_id') is-invalid @enderror" name="merchant_id" id="merchant_id" required>
-                        <option value="">— Select Merchant —</option>
-                        @foreach ($merchants as $m)
-                            <option value="{{ $m->id }}" {{ old('merchant_id') == $m->id ? 'selected' : '' }}>{{ $m->name }}</option>
-                        @endforeach
-                    </select>
+                    @if(!$isSuperAdmin && $selectedMerchantId)
+                        <input type="hidden" name="merchant_id" value="{{ $selectedMerchantId }}">
+                        <select class="form-select @error('merchant_id') is-invalid @enderror" id="merchant_id" disabled>
+                            <option value="{{ $selectedMerchantId }}" selected>
+                                {{ $merchants->firstWhere('id', $selectedMerchantId)?->name ?? $merchants->first()->name ?? 'N/A' }}
+                            </option>
+                        </select>
+                    @else
+                        <select class="form-select @error('merchant_id') is-invalid @enderror" name="merchant_id" id="merchant_id" required>
+                            <option value="">— Select Merchant —</option>
+                            @foreach ($merchants as $m)
+                                <option value="{{ $m->id }}" {{ ($selectedMerchantId == $m->id || old('merchant_id') == $m->id) ? 'selected' : '' }}>{{ $m->name }}</option>
+                            @endforeach
+                        </select>
+                    @endif
                     @error('merchant_id')<span class="text-danger">{{ $message }}</span>@enderror
                 </div>
                 <div class="col-md-6 mb-3">

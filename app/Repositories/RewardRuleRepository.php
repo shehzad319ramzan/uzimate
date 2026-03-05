@@ -101,6 +101,7 @@ class RewardRuleRepository extends BaseRepository
 
         return [
             'merchants' => $merchants,
+            'isSuperAdmin' => $isSuperAdmin,
             'actionTypes' => RewardRule::defaultActionTypes(),
             'triggerConditions' => RewardRule::triggerConditions(),
         ];

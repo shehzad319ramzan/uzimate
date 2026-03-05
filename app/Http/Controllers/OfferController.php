@@ -30,8 +30,18 @@ class OfferController extends BaseController
      */
     public function create()
     {
-        $options = $this->_repo->formOptions(Auth::user());
-        return view($this->_directory . '.create', $options);
+        $user = Auth::user();
+        $options = $this->_repo->formOptions($user);
+
+        if ($options['isSuperAdmin']) {
+            $selectedMerchantId = old('merchant_id');
+        } else {
+            $selectedMerchantId = $options['merchants']->isNotEmpty()
+                ? (old('merchant_id', $options['merchants']->first()->id))
+                : null;
+        }
+
+        return view($this->_directory . '.create', array_merge($options, ['selectedMerchantId' => $selectedMerchantId]));
     }
 
     /**
@@ -67,16 +77,24 @@ class OfferController extends BaseController
             abort(404);
         }
 
-        // Load relationships to ensure site and merchant are available
         $data->load(['merchant', 'site']);
 
+        $user = Auth::user();
         $options = $this->_repo->formOptions(
-            Auth::user(),
+            $user,
             $data->site_id,
             $data->merchant_id ?? ($data->site->merchant_id ?? null)
         );
 
-        return view($this->_directory . '.edit', array_merge(['data' => $data], $options));
+        if ($options['isSuperAdmin']) {
+            $selectedMerchantId = old('merchant_id', $data->merchant_id ?? $data->site->merchant_id ?? null);
+        } else {
+            $selectedMerchantId = $options['merchants']->isNotEmpty()
+                ? ($options['merchants']->firstWhere('id', $data->merchant_id ?? $data->site->merchant_id)?->id ?? $options['merchants']->first()->id)
+                : null;
+        }
+
+        return view($this->_directory . '.edit', array_merge(['data' => $data], $options, ['selectedMerchantId' => $selectedMerchantId]));
     }
 
     /**

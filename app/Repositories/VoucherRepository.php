@@ -6,9 +6,11 @@ use App\Constants\Constants;
 use App\Dto\VoucherDto;
 use App\Models\Merchant;
 use App\Models\Offer;
+use App\Models\SiteUser;
 use App\Models\User;
 use App\Models\Voucher;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class VoucherRepository extends BaseRepository
 {
@@ -105,7 +107,13 @@ class VoucherRepository extends BaseRepository
 
     public function formOptions(?User $user = null, string|int|null $merchantId = null): array
     {
-        $merchants = Merchant::select('id', 'name')->orderBy('name')->get();
+        $isSuperAdmin = $user && $user->hasRole(Constants::SUPERADMIN);
+
+        if ($isSuperAdmin || ! $user) {
+            $merchants = Merchant::select('id', 'name')->orderBy('name')->get();
+        } else {
+            $merchants = $this->getAccessibleMerchants($user);
+        }
 
         if ($merchantId === null) {
             $offers = collect();
@@ -116,14 +124,32 @@ class VoucherRepository extends BaseRepository
                 ->orderBy('title')
                 ->get();
             $offers = $offersRaw->map(fn ($o) => (object) [
-            'id' => $o->id,
-            'name' => ($o->merchant?->name ?? 'Merchant') . ' — ' . $o->title . ' (' . (int) $o->points_required . ' pts)',
-            'merchant_id' => $o->merchant_id,
-            'points_required' => (int) $o->points_required,
-        ]);
+                'id' => $o->id,
+                'name' => ($o->merchant?->name ?? 'Merchant') . ' — ' . $o->title . ' (' . (int) $o->points_required . ' pts)',
+                'merchant_id' => $o->merchant_id,
+                'points_required' => (int) $o->points_required,
+            ]);
         }
 
-        return compact('merchants', 'offers');
+        return [
+            'merchants' => $merchants,
+            'offers' => $offers,
+            'isSuperAdmin' => $isSuperAdmin ?? false,
+        ];
+    }
+
+    protected function getAccessibleMerchants(User $user): Collection
+    {
+        $merchantIds = Merchant::where('user_id', $user->id)->pluck('id')->all();
+        $siteUserMerchantIds = SiteUser::where('user_id', $user->id)
+            ->whereNotNull('merchant_id')
+            ->pluck('merchant_id')
+            ->all();
+        $ids = array_unique(array_filter(array_merge($merchantIds, $siteUserMerchantIds)));
+        if (empty($ids)) {
+            return collect();
+        }
+        return Merchant::whereIn('id', $ids)->select('id', 'name')->orderBy('name')->get();
     }
 
     /**

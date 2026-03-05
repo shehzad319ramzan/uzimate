@@ -29,7 +29,18 @@ class RewardRuleController extends BaseController
 
     public function create()
     {
-        $options = $this->_repo->formOptions(Auth::user());
+        $user = Auth::user();
+        $options = $this->_repo->formOptions($user);
+
+        if ($options['isSuperAdmin']) {
+            $selectedMerchantId = old('merchant_id');
+        } else {
+            $selectedMerchantId = $options['merchants']->isNotEmpty()
+                ? (old('merchant_id', $options['merchants']->first()->id))
+                : old('merchant_id');
+        }
+        $options['selectedMerchantId'] = $selectedMerchantId;
+
         return view($this->_directory . '.create', $options);
     }
 
@@ -58,7 +69,18 @@ class RewardRuleController extends BaseController
         if ($data === null) {
             abort(404);
         }
-        $options = $this->_repo->formOptions(Auth::user());
+        $user = Auth::user();
+        $options = $this->_repo->formOptions($user);
+
+        if ($options['isSuperAdmin']) {
+            $selectedMerchantId = old('merchant_id', $data->merchant_id);
+        } else {
+            $selectedMerchantId = $options['merchants']->isNotEmpty()
+                ? ($options['merchants']->firstWhere('id', $data->merchant_id)?->id ?? $options['merchants']->first()->id)
+                : $data->merchant_id;
+        }
+        $options['selectedMerchantId'] = $selectedMerchantId;
+
         return view($this->_directory . '.edit', array_merge(compact('data'), $options));
     }
 

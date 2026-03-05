@@ -6,8 +6,10 @@ use App\Constants\Constants;
 use App\Dto\SurveyDto;
 use App\Models\Merchant;
 use App\Models\Survey;
+use App\Models\SiteUser;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class SurveyRepository extends BaseRepository
 {
@@ -99,7 +101,31 @@ class SurveyRepository extends BaseRepository
 
     public function formOptions(?User $user = null): array
     {
-        $merchants = Merchant::select('id', 'name')->orderBy('name')->get();
-        return compact('merchants');
+        $isSuperAdmin = $user && $user->hasRole(Constants::SUPERADMIN);
+
+        if ($isSuperAdmin || ! $user) {
+            $merchants = Merchant::select('id', 'name')->orderBy('name')->get();
+        } else {
+            $merchants = $this->getAccessibleMerchants($user);
+        }
+
+        return [
+            'merchants' => $merchants,
+            'isSuperAdmin' => $isSuperAdmin ?? false,
+        ];
+    }
+
+    protected function getAccessibleMerchants(User $user): Collection
+    {
+        $merchantIds = Merchant::where('user_id', $user->id)->pluck('id')->all();
+        $siteUserMerchantIds = SiteUser::where('user_id', $user->id)
+            ->whereNotNull('merchant_id')
+            ->pluck('merchant_id')
+            ->all();
+        $ids = array_unique(array_filter(array_merge($merchantIds, $siteUserMerchantIds)));
+        if (empty($ids)) {
+            return collect();
+        }
+        return Merchant::whereIn('id', $ids)->select('id', 'name')->orderBy('name')->get();
     }
 }

@@ -42,14 +42,23 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="merchant_id" class="form-label">Merchant</label>
-                            <select class="form-select" name="merchant_id" id="merchant_id">
-                                <option value="">— None —</option>
-                                @foreach ($merchants as $m)
-                                    <option value="{{ $m->id }}"
-                                        {{ old('merchant_id') == $m->id ? 'selected' : '' }}>{{ $m->name }}
+                            @if(!$isSuperAdmin && $selectedMerchantId)
+                                <input type="hidden" name="merchant_id" value="{{ $selectedMerchantId }}">
+                                <select class="form-select" id="merchant_id" disabled>
+                                    <option value="{{ $selectedMerchantId }}" selected>
+                                        {{ $merchants->firstWhere('id', $selectedMerchantId)?->name ?? $merchants->first()->name ?? 'N/A' }}
                                     </option>
-                                @endforeach
-                            </select>
+                                </select>
+                            @else
+                                <select class="form-select" name="merchant_id" id="merchant_id">
+                                    <option value="">— None —</option>
+                                    @foreach ($merchants as $m)
+                                        <option value="{{ $m->id }}"
+                                            {{ ($selectedMerchantId == $m->id || old('merchant_id') == $m->id) ? 'selected' : '' }}>{{ $m->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            @endif
                         </div>
                         <div class="col-md-12 mb-3">
                             <label for="description" class="form-label">Description</label>

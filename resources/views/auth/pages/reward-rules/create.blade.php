@@ -11,15 +11,25 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="merchant_id" class="form-label">Merchant</label>
-                    <select class="form-select @error('merchant_id') is-invalid @enderror" id="merchant_id" name="merchant_id">
-                        <option value="">Global (all merchants)</option>
-                        @foreach($merchants as $merchant)
-                            <option value="{{ $merchant->id }}" {{ old('merchant_id') == $merchant->id ? 'selected' : '' }}>
-                                {{ $merchant->name }}
+                    @if(!$isSuperAdmin && $selectedMerchantId)
+                        <input type="hidden" name="merchant_id" value="{{ $selectedMerchantId }}">
+                        <select class="form-select @error('merchant_id') is-invalid @enderror" id="merchant_id" disabled>
+                            <option value="{{ $selectedMerchantId }}" selected>
+                                {{ $merchants->firstWhere('id', $selectedMerchantId)?->name ?? $merchants->first()->name ?? 'N/A' }}
                             </option>
-                        @endforeach
-                    </select>
-                    <small class="text-muted">Leave empty for a rule that applies to all merchants.</small>
+                        </select>
+                        <small class="text-muted">Rule applies to your merchant only.</small>
+                    @else
+                        <select class="form-select @error('merchant_id') is-invalid @enderror" id="merchant_id" name="merchant_id">
+                            <option value="">Global (all merchants)</option>
+                            @foreach($merchants as $merchant)
+                                <option value="{{ $merchant->id }}" {{ ($selectedMerchantId == $merchant->id || old('merchant_id') == $merchant->id) ? 'selected' : '' }}>
+                                    {{ $merchant->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">Leave empty for a rule that applies to all merchants.</small>
+                    @endif
                     @error('merchant_id')
                         <span class="text-danger">{{ $message }}</span>
                     @enderror
