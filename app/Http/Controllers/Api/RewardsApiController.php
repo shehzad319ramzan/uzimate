@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\CustomerLog;
 use App\Models\Offer;
 use App\Services\RewardRuleService;
 use App\Services\ScanOfferService;
@@ -51,6 +52,51 @@ class RewardsApiController extends ApiBaseController
                     'per_page' => $history->perPage(),
                     'total' => $history->total(),
                 ],
+            ],
+        ], 200);
+    }
+
+
+    public function receiptHistory(Request $request): JsonResponse
+    {
+        $user = Auth::user();
+        $perPage = min((int) $request->get('per_page', 20), 50);
+
+        $receipts = CustomerLog::where('user_id', $user->id)
+            ->where('action_type', 'voucher_redeemed')
+            ->with('merchant')
+            ->latest('created_at')
+            ->paginate($perPage);
+
+        $items = $receipts->getCollection()->map(function (CustomerLog $log) {
+            $merchantName = $log->merchant?->name ?? 'Merchant';
+            $points = (int) $log->points_affected;
+            if ($points > 0) {
+                $points = -$points;
+            }
+            return [
+                'id' => $log->id,
+                'title' => 'Redemption',
+                'description' => 'You redeem points - ' . $merchantName,
+                'merchant_name' => $merchantName,
+                'merchant_id' => $log->merchant_id,
+                'points' => $points,
+                'points_affected' => (int) $log->points_affected,
+                'date' => $log->created_at->format('M d, Y'),
+                'time' => $log->created_at->format('H:i'),
+                'datetime' => $log->created_at->toIso8601String(),
+                'voucher_id' => $log->related_model_id,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'receipts' => $items,
+                'current_page' => $receipts->currentPage(),
+                'last_page' => $receipts->lastPage(),
+                'per_page' => $receipts->perPage(),
+                'total' => $receipts->total(),
             ],
         ], 200);
     }

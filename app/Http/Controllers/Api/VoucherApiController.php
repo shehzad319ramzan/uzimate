@@ -157,7 +157,6 @@ class VoucherApiController extends ApiBaseController
             ], 422);
         }
 
-        // Voucher redemption uses user's total points balance (all point types).
         $totalBalance = $this->scanOfferService->getUserPointsBalance($user->id);
 
         if ($totalBalance < $pointsRequired) {

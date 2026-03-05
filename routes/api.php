@@ -33,6 +33,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('logout', [HomeController::class, 'logoutApi']);
     Route::get('profile', [UserController::class, 'profileApi']);
     Route::get('my-rewards', [RewardsApiController::class, 'index']);
+    Route::get('receipt-history', [RewardsApiController::class, 'receiptHistory']);
     Route::get('my-scans', [ScanOfferApiController::class, 'index']);
     Route::post('edit-profile', [UserController::class, 'edit_profile']);
     Route::post('password-change', [PasswordApiController::class, 'change_password']);
