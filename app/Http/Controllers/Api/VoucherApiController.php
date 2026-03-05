@@ -166,9 +166,9 @@ class VoucherApiController extends ApiBaseController
             $shortfall = $pointsRequired - $usableBalance;
             $totalBalance = $this->scanOfferService->getUserPointsBalance($user->id);
             if ($merchant->use_other_merchant_points) {
-                $message = "You need {$pointsRequired} points to redeem this voucher. You have {$usableBalance} points. Earn {$shortfall} more points to redeem.";
+                $message = "Need {$pointsRequired} points. You have {$usableBalance}. Earn {$shortfall} more.";
             } else {
-                $message = "This voucher cannot be paid with points from offer scans or surveys. You have {$totalBalance} total points; {$usableBalance} can be used (excluding scan/survey). This voucher requires {$pointsRequired}. Earn {$shortfall} more points from login, spin, or other actions.";
+                $message = "Scan/survey points not accepted for this voucher. Usable: {$usableBalance}, required: {$pointsRequired}. Earn {$shortfall} from login, spin, or other actions.";
             }
             return response()->json([
                 'success' => false,
