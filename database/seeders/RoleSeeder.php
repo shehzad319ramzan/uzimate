@@ -51,7 +51,7 @@ class RoleSeeder extends Seeder
             'point_award',
             'spin_history',
             'survey',
-            'customer_log',
+            // 'customer_log',
             'invite_friend',
             'voucher',
             'inbox',

@@ -35,9 +35,10 @@ class VoucherApiController extends ApiBaseController
     }
 
 
+
     public function search(Request $request): JsonResponse
     {
-        $vouchers = $this->getVouchersQuery($request)
+        $vouchers = $this->getSearchOnlyQuery($request)
             ->orderBy('valid_until')
             ->paginate(min((int) $request->get('per_page', 20), 50));
 
@@ -51,6 +52,37 @@ class VoucherApiController extends ApiBaseController
                 'total' => $vouchers->total(),
             ],
         ], 200);
+    }
+
+ 
+    protected function getSearchOnlyQuery(Request $request): \Illuminate\Database\Eloquent\Builder
+    {
+        $search = $request->query('search') ?? $request->query('q');
+        $status = $request->query('status', 'all');
+
+        $query = Voucher::with(['merchant', 'offers']);
+
+        if ($status === 'active') {
+            $query->where('status', '1')->notExpired();
+        } elseif ($status === 'expired') {
+            $query->where('status', '1')
+                ->whereNotNull('valid_until')
+                ->where('valid_until', '<', now()->toDateString());
+        } elseif ($status === 'inactive') {
+            $query->where('status', '0');
+        }
+
+        if ($search && strlen(trim($search)) > 0) {
+            $term = '%' . trim($search) . '%';
+            $query->where(function ($q) use ($term) {
+                $q->where('title', 'like', $term)
+                    ->orWhere('description', 'like', $term)
+                    ->orWhereHas('merchant', fn ($qb) => $qb->where('name', 'like', $term))
+                    ->orWhereHas('offers', fn ($qb) => $qb->where('title', 'like', $term));
+            });
+        }
+
+        return $query;
     }
 
     /**
