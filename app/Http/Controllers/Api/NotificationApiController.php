@@ -10,14 +10,15 @@ use Illuminate\Support\Facades\Auth;
 class NotificationApiController extends ApiBaseController
 {
 
+    
     public function index(Request $request): JsonResponse
     {
         $user = Auth::user();
         $perPage = min((int) $request->get('per_page', 20), 50);
-        $channel = $request->query('channel');
+        $channel = $request->query('channel', 'push');
 
         $query = NotificationLog::where('user_id', $user->id)
-            ->orderByDesc('sent_at')
+            ->orderByRaw('COALESCE(sent_at, created_at) DESC')
             ->orderByDesc('created_at');
 
         if (in_array($channel, ['push', 'email'], true)) {

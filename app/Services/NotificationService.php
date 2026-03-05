@@ -226,30 +226,35 @@ class NotificationService
                 }
             }
             if ($channel === 'push') {
+                $pushLog = function ($sent) use ($user, $type, $title, $body, $relatedModelType, $relatedModelId) {
+                    NotificationLog::create([
+                        'user_id' => $user->id,
+                        'type' => $type,
+                        'channel' => 'push',
+                        'title' => $title,
+                        'body' => $body,
+                        'related_model_type' => $relatedModelType,
+                        'related_model_id' => $relatedModelId,
+                        'sent_at' => $sent ? now() : null,
+                    ]);
+                };
                 if (empty($user->fcm_token)) {
                     $results['push'] = false;
                     Log::warning('Notification push skipped: no FCM token', array_merge($context, ['channel' => 'push', 'reason' => 'User has no FCM token']));
+                    $pushLog(false);
                 } else {
                     $sent = $this->fcmService->sendToToken($user->fcm_token, $title, $body, $pushData);
                     $results['push'] = $sent;
                     if ($sent) {
                         Log::info('Notification push sent', array_merge($context, ['channel' => 'push']));
-                        NotificationLog::create([
-                            'user_id' => $user->id,
-                            'type' => $type,
-                            'channel' => 'push',
-                            'title' => $title,
-                            'body' => $body,
-                            'related_model_type' => $relatedModelType,
-                            'related_model_id' => $relatedModelId,
-                            'sent_at' => now(),
-                        ]);
+                        $pushLog(true);
                     } else {
                         $fcmError = $this->fcmService->getLastError();
                         Log::error('Notification push failed', array_merge($context, [
                             'channel' => 'push',
                             'reason' => $fcmError ?? 'FCM returned false (no error message captured).',
                         ]));
+                        $pushLog(false);
                     }
                 }
             }
