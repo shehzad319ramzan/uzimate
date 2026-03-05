@@ -122,7 +122,7 @@ class UserSeeder extends Seeder
         $user4->last_name = 'Shehzad';
         $user4->about = "This is a customer member who collects points and redeems rewards.";
         $user4->email = 'shehzad319ramzan@gmail.com';
-        $user4->password = Hash::make('test123');
+        $user4->password = Hash::make('test1234');
         $user4->email_verified_at = now();
         $user4->created_at = now();
         $user4->save();
