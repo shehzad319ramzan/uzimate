@@ -127,16 +127,17 @@ class FcmService
             return false;
         }
 
-        $payload = [
-            'message' => [
-                'token' => $token,
-                'notification' => [
-                    'title' => $title,
-                    'body' => $body,
-                ],
-                'data' => $data,
+        $message = [
+            'token' => $token,
+            'notification' => [
+                'title' => $title,
+                'body' => $body,
             ],
         ];
+        if (!empty($data)) {
+            $message['data'] = $data;
+        }
+        $payload = ['message' => $message];
 
         try {
             $url = 'https://fcm.googleapis.com/v1/projects/' . $this->projectId . '/messages:send';
