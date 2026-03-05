@@ -42,6 +42,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('invited-friends', [InviteFriendApiController::class, 'invitedFriends']);
 
     Route::get('vouchers', [VoucherApiController::class, 'index']);
+    Route::get('vouchers/search', [VoucherApiController::class, 'search']);
     Route::get('vouchers/{id}', [VoucherApiController::class, 'show']);
     Route::post('vouchers/{id}/redeem', [VoucherApiController::class, 'redeem']);
 

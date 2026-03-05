@@ -19,9 +19,52 @@ class VoucherApiController extends ApiBaseController
 
     public function index(Request $request): JsonResponse
     {
+        $vouchers = $this->getVouchersQuery($request)
+            ->orderBy('valid_until')
+            ->paginate(min((int) $request->get('per_page', 20), 50));
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'vouchers' => VoucherResource::collection($vouchers->getCollection())->resolve(),
+                'current_page' => $vouchers->currentPage(),
+                'last_page' => $vouchers->lastPage(),
+                'per_page' => $vouchers->perPage(),
+                'total' => $vouchers->total(),
+            ],
+        ], 200);
+    }
+
+    /**
+     * Search vouchers by title, merchant name, with optional filters.
+     * GET /vouchers/search?q=pizza&merchant_id=...&status=active|expired|inactive|all&per_page=20&page=1
+     */
+    public function search(Request $request): JsonResponse
+    {
+        $vouchers = $this->getVouchersQuery($request)
+            ->orderBy('valid_until')
+            ->paginate(min((int) $request->get('per_page', 20), 50));
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'vouchers' => VoucherResource::collection($vouchers->getCollection())->resolve(),
+                'current_page' => $vouchers->currentPage(),
+                'last_page' => $vouchers->lastPage(),
+                'per_page' => $vouchers->perPage(),
+                'total' => $vouchers->total(),
+            ],
+        ], 200);
+    }
+
+    /**
+     * Build vouchers query with optional search, status, and merchant filters.
+     */
+    protected function getVouchersQuery(Request $request): \Illuminate\Database\Eloquent\Builder
+    {
         $merchantId = $request->query('merchant_id');
         $status = $request->query('status', 'all');
-        $search = $request->query('search');
+        $search = $request->query('search') ?? $request->query('q');
 
         $query = Voucher::with(['merchant', 'offers']);
 
@@ -35,10 +78,12 @@ class VoucherApiController extends ApiBaseController
             $query->where('status', '0');
         }
 
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhereHas('merchant', fn ($qb) => $qb->where('name', 'like', "%{$search}%"));
+        if ($search && strlen(trim($search)) > 0) {
+            $term = '%' . trim($search) . '%';
+            $query->where(function ($q) use ($term) {
+                $q->where('title', 'like', $term)
+                    ->orWhere('description', 'like', $term)
+                    ->orWhereHas('merchant', fn ($qb) => $qb->where('name', 'like', $term));
             });
         }
 
@@ -46,18 +91,7 @@ class VoucherApiController extends ApiBaseController
             $query->where('merchant_id', $merchantId);
         }
 
-        $vouchers = $query->orderBy('valid_until')->paginate(min((int) $request->get('per_page', 20), 50));
-
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'vouchers' => VoucherResource::collection($vouchers->getCollection())->resolve(),
-                'current_page' => $vouchers->currentPage(),
-                'last_page' => $vouchers->lastPage(),
-                'per_page' => $vouchers->perPage(),
-                'total' => $vouchers->total(),
-            ],
-        ], 200);
+        return $query;
     }
 
 
