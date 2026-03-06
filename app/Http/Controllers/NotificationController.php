@@ -103,15 +103,34 @@ class NotificationController extends Controller
         return redirect()->route('notifications.index', $blade)->with('success', 'Settings saved.');
     }
 
-    public function sendMissYou(SendNotificationRequest $request): RedirectResponse
+    public function sendMissYou(SendNotificationRequest $request): RedirectResponse|JsonResponse
     {
         $inactiveDays = $request->input('inactive_days');
-        $userIds = $request->input('user_ids', []);
-        $userIds = is_array($userIds) ? array_filter($userIds) : [];
+        $userIds = (array) $request->input('user_ids', []);
+        $userIds = array_filter(array_map('intval', $userIds));
+        $channels = array_values(array_intersect((array) $request->input('channels', []), ['email', 'push']));
+        $channelsOverride = $channels !== [] ? $channels : null;
+
         if ($request->boolean('send_to_all_inactive') || empty($userIds)) {
-            $count = $this->notificationService->sendMissYouNotifications($inactiveDays ? (int) $inactiveDays : null, null, Auth::id());
+            $daysParam = $inactiveDays;
+            if ($daysParam === 'all') {
+                $userIds = $this->notificationService->getAllCustomerIds();
+                $count = $this->notificationService->sendMissYouNotifications(null, $userIds, Auth::id(), $channelsOverride);
+            } elseif ($daysParam !== null && $daysParam !== '') {
+                $days = (int) $daysParam;
+                $count = $this->notificationService->sendMissYouNotifications($days, null, Auth::id(), $channelsOverride);
+            } else {
+                if ($request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Please specify inactive days or select customers.'], 422);
+                }
+                return redirect()->back()->with('error', 'Please specify inactive days or select at least one customer.');
+            }
         } else {
-            $count = $this->notificationService->sendMissYouNotifications(null, $userIds, Auth::id());
+            $count = $this->notificationService->sendMissYouNotifications(null, $userIds, Auth::id(), $channelsOverride);
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => "Miss You notification sent to {$count} customer(s).", 'count' => $count]);
         }
         return redirect()->back()->with('success', "Miss You notification sent to {$count} customer(s).");
     }
@@ -213,11 +232,30 @@ class NotificationController extends Controller
     /**
      * Get inactive customers count and preview for "send to all" display.
      * Returns: { count: int, preview: [{ id, text }] }
+     * Query param days: 7, 14, 21, 30, 60, or "all" for all customers.
      */
     public function getInactiveCustomersPreview(Request $request)
     {
-        $days = (int) $request->input('days', 7);
-        $data = $this->notificationService->getInactiveCustomersPreview($days, 50);
+        $daysParam = $request->input('days', 7);
+        if ($daysParam === 'all') {
+            $users = $this->notificationService->getAllCustomers();
+            $preview = $users->take(100)->map(fn ($u) => [
+                'id' => $u->id,
+                'text' => (trim($u->first_name . ' ' . $u->last_name) ?: $u->email) . ' (' . $u->email . ')',
+            ])->values()->all();
+            return response()->json(['count' => $users->count(), 'preview' => $preview]);
+        }
+        $days = (int) $daysParam;
+        $data = $this->notificationService->getInactiveCustomersPreview($days, 100);
+        return response()->json($data);
+    }
+
+    /**
+     * Get counts per inactive segment for the segment table (7, 14, 21, 30, 60 days, all).
+     */
+    public function getInactiveCounts(Request $request)
+    {
+        $data = $this->notificationService->getInactiveCounts();
         return response()->json($data);
     }
 

@@ -79,6 +79,22 @@ class NotificationService
             ->get();
     }
 
+    /**
+     * Get inactive user counts per segment (7, 14, 21, 30, 60 days, and all customers) for the segment table.
+     *
+     * @return array<string, int>
+     */
+    public function getInactiveCounts(): array
+    {
+        $segments = [7, 14, 21, 30, 60];
+        $counts = [];
+        foreach ($segments as $days) {
+            $counts[(string) $days] = $this->getInactiveCustomers($days)->count();
+        }
+        $counts['all'] = User::role(Constants::CUSTOMER)->count();
+        return $counts;
+    }
+
 
     public function getBirthdayCustomers(): \Illuminate\Database\Eloquent\Collection
     {
@@ -315,7 +331,10 @@ class NotificationService
     }
 
 
-    public function sendMissYouNotifications(?int $inactiveDays = null, ?array $userIds = null, ?int $createdBy = null): int
+    /**
+     * @param  array<string>|null  $channelsOverride  When provided, use these channels instead of setting (e.g. from segment table).
+     */
+    public function sendMissYouNotifications(?int $inactiveDays = null, ?array $userIds = null, ?int $createdBy = null, ?array $channelsOverride = null): int
     {
         $type = NotificationSetting::TYPE_MISS_YOU;
         $setting = $this->getSetting($type);
@@ -325,7 +344,12 @@ class NotificationService
         }
         $days = $inactiveDays ?? (int) $setting->getConfigValue('inactive_days', 7);
         $template = $setting->getConfigValue('message_template', 'We miss you, {{name}}!');
-        $channels = $setting->getConfigValue('channels', ['email', 'push']);
+        $channels = $channelsOverride !== null && $channelsOverride !== []
+            ? array_values(array_intersect($channelsOverride, ['email', 'push']))
+            : $setting->getConfigValue('channels', ['email', 'push']);
+        if ($channels === []) {
+            $channels = ['email', 'push'];
+        }
         $title = 'We miss you!';
 
         $users = $userIds

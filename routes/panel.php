@@ -188,6 +188,7 @@ Route::group(
 
         Route::prefix('notifications')->as('notifications.')->middleware('can:view_notification')->controller(NotificationController::class)->group(function () {
             Route::get('api/inactive-customers-preview', 'getInactiveCustomersPreview')->name('api.inactive-customers-preview');
+            Route::get('api/inactive-counts', 'getInactiveCounts')->name('api.inactive-counts');
             Route::get('api/inactive-customers', 'getInactiveCustomers')->name('api.inactive-customers');
             Route::get('api/birthday-preview', 'getBirthdayPreview')->name('api.birthday-preview');
             Route::get('api/birthday-counts', 'getBirthdayCounts')->name('api.birthday-counts');
