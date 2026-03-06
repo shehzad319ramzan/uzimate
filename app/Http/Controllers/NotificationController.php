@@ -66,6 +66,17 @@ class NotificationController extends Controller
         };
     }
 
+    protected function typeToBlade(string $type): string
+    {
+        return match ($type) {
+            NotificationSetting::TYPE_MISS_YOU => 'miss-you',
+            NotificationSetting::TYPE_SPECIAL_DAY => 'special-day',
+            NotificationSetting::TYPE_SPECIAL_OFFER => 'special-offer',
+            NotificationSetting::TYPE_BIRTHDAY => 'birthday',
+            default => $type,
+        };
+    }
+
 
     public function updateSettings(Request $request, string $type): RedirectResponse
     {
@@ -88,7 +99,8 @@ class NotificationController extends Controller
             $setting = $this->notificationService->getSetting($type);
             $setting->update(['is_active' => $request->boolean('is_active')]);
         }
-        return redirect()->back()->with('success', 'Settings saved.');
+        $blade = $this->typeToBlade($type);
+        return redirect()->route('notifications.index', $blade)->with('success', 'Settings saved.');
     }
 
     public function sendMissYou(SendNotificationRequest $request): RedirectResponse
