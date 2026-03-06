@@ -1,6 +1,7 @@
 @php
     $messageTail = $body ?? '';
-    if (!empty($recipientName) && (stripos($messageTail, 'We miss you,') !== false || stripos($messageTail, 'we miss you,') !== false)) {
+    $isMissYou = ($type ?? '') === 'miss_you';
+    if ($isMissYou && !empty($recipientName) && (stripos($messageTail, 'We miss you,') !== false || stripos($messageTail, 'we miss you,') !== false)) {
         $pos = strpos($messageTail, '!');
         $messageTail = $pos !== false ? trim(substr($messageTail, $pos + 1)) : $messageTail;
     }
@@ -18,7 +19,11 @@
         <div style="background-color: #fff; padding: 20px; border-radius: 5px; margin-top: 0;">
             @if(!empty($recipientName))
                 <p style="margin: 0 0 8px 0; font-size: 15px; color: #666;">Hello</p>
-                <h2 style="margin: 0 0 16px 0; font-size: 22px; color: #174b79;">We miss you, <strong>{{ $recipientName }}</strong>!</h2>
+                @if($isMissYou)
+                    <h2 style="margin: 0 0 16px 0; font-size: 22px; color: #174b79;">We miss you, <strong>{{ $recipientName }}</strong>!</h2>
+                @else
+                    <h2 style="margin: 0 0 16px 0; font-size: 22px; color: #174b79;">{{ $subject ?? 'Notification' }}</h2>
+                @endif
             @endif
             {!! nl2br(e($messageTail ?: $body ?? '')) !!}
             @if(!empty($recipientName) && ($appUrl ?? config('app.url')))
