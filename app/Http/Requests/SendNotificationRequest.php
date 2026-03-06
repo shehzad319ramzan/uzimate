@@ -20,7 +20,20 @@ class SendNotificationRequest extends FormRequest
             'channels.*' => ['in:email,push'],
             'user_ids' => ['nullable', 'array'],
             'user_ids.*' => ['integer', 'exists:users,id'],
-            'inactive_days' => ['nullable', 'integer', 'min:1', 'max:365'],
+            'inactive_days' => [
+                'nullable',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if ($value === null || $value === '') {
+                        return;
+                    }
+                    if ($value === 'all') {
+                        return;
+                    }
+                    if (! is_numeric($value) || (int) $value < 1 || (int) $value > 365) {
+                        $fail('The inactive days must be an integer between 1 and 365, or "all".');
+                    }
+                },
+            ],
             'send_to_all_inactive' => ['nullable', 'boolean'],
             'send_to_all' => ['nullable', 'boolean'],
             'send_to_all_today' => ['nullable', 'boolean'],
