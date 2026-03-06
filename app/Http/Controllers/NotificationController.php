@@ -8,6 +8,7 @@ use App\Http\Requests\SendNotificationRequest;
 use App\Models\NotificationSetting;
 use App\Models\Offer;
 use App\Services\NotificationService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -164,22 +165,36 @@ class NotificationController extends Controller
     }
 
     /**
-     * Send Birthday notification manually: to all with birthday today or to selected users.
+     * Send Birthday notification manually: by dynamic filter (today, 1–7 days before, or all customers) or to selected users.
+     * Returns JSON when request expects JSON (e.g. AJAX from segment table).
      */
-    public function sendBirthday(SendNotificationRequest $request): RedirectResponse
+    public function sendBirthday(SendNotificationRequest $request): RedirectResponse|JsonResponse
     {
-        $sendToAllToday = $request->boolean('send_to_all_today');
         $userIds = (array) $request->input('user_ids', []);
-        $userIds = is_array($userIds) ? array_filter($userIds) : [];
+        $userIds = is_array($userIds) ? array_filter(array_map('intval', $userIds)) : [];
+        $birthdayFilter = $request->input('birthday_filter', 'today');
+        $allCustomers = $birthdayFilter === 'all';
+        $channels = array_values(array_intersect((array) $request->input('channels', []), ['email', 'push']));
+        $channelsOverride = $channels !== [] ? $channels : null;
 
-        if ($sendToAllToday) {
-            $count = $this->notificationService->sendBirthdayNotifications(null, Auth::id());
-        } elseif (!empty($userIds)) {
-            $count = $this->notificationService->sendBirthdayNotifications($userIds, Auth::id());
+        if (!empty($userIds)) {
+            $count = $this->notificationService->sendBirthdayNotifications($userIds, Auth::id(), null, false, $channelsOverride);
+        } elseif ($allCustomers) {
+            $count = $this->notificationService->sendBirthdayNotifications(null, Auth::id(), null, true, $channelsOverride);
+        } elseif ($birthdayFilter === 'today' || $birthdayFilter === '0') {
+            $count = $this->notificationService->sendBirthdayNotifications(null, Auth::id(), 0, false, $channelsOverride);
+        } elseif (is_numeric($birthdayFilter) && (int) $birthdayFilter >= 1 && (int) $birthdayFilter <= 365) {
+            $count = $this->notificationService->sendBirthdayNotifications(null, Auth::id(), (int) $birthdayFilter, false, $channelsOverride);
         } else {
-            return redirect()->back()->with('error', 'Please check "Send to all with birthday today" or select at least one customer.');
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Please choose a valid filter or select at least one customer.'], 422);
+            }
+            return redirect()->back()->with('error', 'Please choose "Send to" (e.g. today, 1 day before, or all customers) or select at least one customer.');
         }
 
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => "Birthday notification sent to {$count} customer(s).", 'count' => $count]);
+        }
         return redirect()->back()->with('success', "Birthday notification sent to {$count} customer(s).");
     }
 
@@ -191,6 +206,30 @@ class NotificationController extends Controller
     {
         $days = (int) $request->input('days', 7);
         $data = $this->notificationService->getInactiveCustomersPreview($days, 50);
+        return response()->json($data);
+    }
+
+    /**
+     * Get counts per segment for the birthday segment table.
+     * Returns: { today: int, 1: int, ..., 7: int, all: int }
+     */
+    public function getBirthdayCounts(Request $request)
+    {
+        $data = $this->notificationService->getBirthdayCounts();
+        return response()->json($data);
+    }
+
+    /**
+     * Get birthday filter preview: list of users matching the selected filter (today, 1–7 days before, or all).
+     * Returns: { count: int, preview: [{ id, text, email, date_of_birth }] }
+     */
+    public function getBirthdayPreview(Request $request)
+    {
+        $filter = $request->input('filter', 'today');
+        if (! in_array($filter, ['today', '0', 'all'], true) && (! is_numeric($filter) || (int) $filter < 1 || (int) $filter > 365)) {
+            $filter = 'today';
+        }
+        $data = $this->notificationService->getBirthdayPreview($filter, 100);
         return response()->json($data);
     }
 

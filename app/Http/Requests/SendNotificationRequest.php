@@ -24,6 +24,7 @@ class SendNotificationRequest extends FormRequest
             'send_to_all_inactive' => ['nullable', 'boolean'],
             'send_to_all' => ['nullable', 'boolean'],
             'send_to_all_today' => ['nullable', 'boolean'],
+            'birthday_filter' => ['nullable', 'string', 'max:10'],
             'offer_id' => ['nullable', 'exists:offers,id'],
         ];
         return $rules;

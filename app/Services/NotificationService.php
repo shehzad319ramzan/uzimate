@@ -82,10 +82,20 @@ class NotificationService
 
     public function getBirthdayCustomers(): \Illuminate\Database\Eloquent\Collection
     {
+        return $this->getBirthdayCustomersForDaysFromNow(0);
+    }
+
+    /**
+     * Get customers whose birthday falls on (today + $daysFromNow).
+     * 0 = today, 1 = tomorrow, 2 = in 2 days, etc.
+     */
+    public function getBirthdayCustomersForDaysFromNow(int $daysFromNow = 0): \Illuminate\Database\Eloquent\Collection
+    {
+        $targetDate = Carbon::now()->addDays($daysFromNow);
         return User::role(Constants::CUSTOMER)
             ->whereNotNull('date_of_birth')
-            ->whereRaw('MONTH(date_of_birth) = ?', [Carbon::now()->month])
-            ->whereRaw('DAY(date_of_birth) = ?', [Carbon::now()->day])
+            ->whereRaw('MONTH(date_of_birth) = ?', [$targetDate->month])
+            ->whereRaw('DAY(date_of_birth) = ?', [$targetDate->day])
             ->get();
     }
 
@@ -102,6 +112,47 @@ class NotificationService
     public function getAllCustomerIds(): array
     {
         return User::role(Constants::CUSTOMER)->pluck('id')->toArray();
+    }
+
+    /**
+     * Get user counts per birthday segment (today, 1–7 days before, all) for the segment table.
+     *
+     * @return array<string, int>
+     */
+    public function getBirthdayCounts(): array
+    {
+        $counts = ['today' => $this->getBirthdayCustomersForDaysFromNow(0)->count()];
+        for ($days = 1; $days <= 7; $days++) {
+            $counts[(string) $days] = $this->getBirthdayCustomersForDaysFromNow($days)->count();
+        }
+        $counts['all'] = User::role(Constants::CUSTOMER)->count();
+        return $counts;
+    }
+
+    /**
+     * Preview list of users for birthday manual send (by filter: today, 1–7 days before, or all).
+     * Returns count and preview items for display in admin.
+     */
+    public function getBirthdayPreview(string $filter = 'today', int $previewLimit = 100): array
+    {
+        if ($filter === 'all') {
+            $users = $this->getAllCustomers();
+            $total = $users->count();
+        } else {
+            $days = $filter === 'today' || $filter === '0' ? 0 : (int) $filter;
+            $users = $this->getBirthdayCustomersForDaysFromNow($days);
+            $total = $users->count();
+        }
+        $preview = $users->take($previewLimit)->map(fn ($u) => [
+            'id' => $u->id,
+            'text' => (trim($u->first_name . ' ' . $u->last_name) ?: $u->email) . ' (' . $u->email . ')',
+            'email' => $u->email,
+            'date_of_birth' => $u->date_of_birth?->format('Y-m-d'),
+        ])->values()->all();
+        return [
+            'count' => $total,
+            'preview' => $preview,
+        ];
     }
 
 
@@ -425,7 +476,14 @@ class NotificationService
     }
 
 
-    public function sendBirthdayNotifications(?array $userIds = null, ?int $createdBy = null): int
+    /**
+     * @param  array<int>|null  $userIds  Specific user IDs to send to (takes precedence).
+     * @param  int|null  $createdBy  Admin user ID.
+     * @param  int|null  $daysFromNow  0 = today, 1 = tomorrow, etc. Used when $userIds is null and $allCustomers is false.
+     * @param  bool  $allCustomers  When true and $userIds is null, send to all customers.
+     * @param  array<string>|null  $channelsOverride  When provided, use these channels (e.g. ['email'], ['push'], or ['email','push']) instead of setting.
+     */
+    public function sendBirthdayNotifications(?array $userIds = null, ?int $createdBy = null, ?int $daysFromNow = null, bool $allCustomers = false, ?array $channelsOverride = null): int
     {
         $type = NotificationSetting::TYPE_BIRTHDAY;
         $setting = $this->getSetting($type);
@@ -435,12 +493,22 @@ class NotificationService
         }
         $template = $setting->getConfigValue('message_template', 'Happy Birthday, {{name}}! You\'ve earned {{points}} points.');
         $points = (int) $setting->getConfigValue('reward_points', 5);
-        $channels = $setting->getConfigValue('channels', ['email', 'push']);
+        $channels = $channelsOverride !== null && $channelsOverride !== []
+            ? array_values(array_intersect($channelsOverride, ['email', 'push']))
+            : $setting->getConfigValue('channels', ['email', 'push']);
+        if ($channels === []) {
+            $channels = ['email', 'push'];
+        }
         $title = 'Happy Birthday!';
 
-        $users = $userIds
-            ? User::whereIn('id', $userIds)->get()
-            : $this->getBirthdayCustomers();
+        if ($userIds !== null && $userIds !== []) {
+            $users = User::whereIn('id', $userIds)->get();
+        } elseif ($allCustomers) {
+            $users = $this->getAllCustomers();
+        } else {
+            $days = $daysFromNow !== null ? $daysFromNow : 0;
+            $users = $this->getBirthdayCustomersForDaysFromNow($days);
+        }
         $users = $users->filter(fn ($u) => $u->hasRole(Constants::CUSTOMER));
         $total = $users->count();
         if ($total === 0) {
@@ -480,13 +548,15 @@ class NotificationService
             }
         }
 
+        $targetType = $userIds ? 'selected' : ($allCustomers ? 'all_customers' : 'birthday_filter');
+        $targetConfig = $userIds ? ['user_ids' => $userIds] : ($allCustomers ? [] : ['days_from_now' => $daysFromNow ?? 0]);
         $this->createCampaignRecord([
             'type' => $type,
             'name' => 'Birthday – ' . now()->format('M j, Y H:i'),
             'message' => $template,
             'channels' => $channels,
-            'target_type' => $userIds ? 'selected' : 'all_today',
-            'target_config' => $userIds ? ['user_ids' => $userIds] : [],
+            'target_type' => $targetType,
+            'target_config' => $targetConfig,
             'created_by' => $createdBy,
         ]);
 

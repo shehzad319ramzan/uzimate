@@ -189,6 +189,8 @@ Route::group(
         Route::prefix('notifications')->as('notifications.')->middleware('can:view_notification')->controller(NotificationController::class)->group(function () {
             Route::get('api/inactive-customers-preview', 'getInactiveCustomersPreview')->name('api.inactive-customers-preview');
             Route::get('api/inactive-customers', 'getInactiveCustomers')->name('api.inactive-customers');
+            Route::get('api/birthday-preview', 'getBirthdayPreview')->name('api.birthday-preview');
+            Route::get('api/birthday-counts', 'getBirthdayCounts')->name('api.birthday-counts');
             Route::get('api/customers', 'getCustomers')->name('api.customers');
             Route::post('update-settings/{type}', 'updateSettings')->name('update-settings')->middleware('can:edit_notification');
             Route::post('send-miss-you', 'sendMissYou')->name('send-miss-you')->middleware('can:add_notification');

@@ -14,13 +14,13 @@
     }
 
     @if (session('success'))
-        showToaster('success', '{{ session('success') }}', 'Success');
+        showToaster('success', {!! json_encode(session('success')) !!}, 'Success');
     @elseif (session('error'))
-        showToaster('error', '{{ session('error') }}', 'Error');
+        showToaster('error', {!! json_encode(session('error')) !!}, 'Error');
     @elseif (session('info'))
-        showToaster('info', '{{ session('info') }}', 'Info');
+        showToaster('info', {!! json_encode(session('info')) !!}, 'Info');
     @elseif (session('warning'))
-        showToaster('warning', '{{ session('warning') }}', 'Warning');
+        showToaster('warning', {!! json_encode(session('warning')) !!}, 'Warning');
     @endif
 
     // Advanced Mode Toggle Functionality
