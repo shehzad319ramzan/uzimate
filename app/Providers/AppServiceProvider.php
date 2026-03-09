@@ -26,7 +26,9 @@ use App\Events\OfferCreated;
 use App\Listeners\CreateCustomerLogForLogin;
 use App\Listeners\SendOfferNotificationListener;
 use App\Listeners\CreateCustomerLogForLogout;
+use App\Models\MerchantScan;
 use App\Models\OfferScan;
+use App\Observers\MerchantScanObserver;
 use App\Observers\OfferScanObserver;
 
 class AppServiceProvider extends ServiceProvider
@@ -93,6 +95,9 @@ class AppServiceProvider extends ServiceProvider
         SpinHistory::observe(SpinHistoryObserver::class);
         if (Schema::hasTable('offer_scans')) {
             OfferScan::observe(OfferScanObserver::class);
+        }
+        if (Schema::hasTable('merchant_scans')) {
+            MerchantScan::observe(MerchantScanObserver::class);
         }
         Event::listen(CustomerLoggedIn::class, CreateCustomerLogForLogin::class);
         Event::listen(CustomerLoggedOut::class, CreateCustomerLogForLogout::class);

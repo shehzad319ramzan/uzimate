@@ -29,6 +29,7 @@ class MerchantRequest extends FormRequest
             'spin_after_days' => ['nullable', 'integer', 'min:0'],
             'scan_after_hours' => ['nullable', 'integer', 'min:0'],
             'use_other_merchant_points' => ['nullable', 'boolean'],
+            'qr_scan_points' => ['nullable', 'integer', 'min:0', 'max:100000'],
             'description' => ['nullable', 'string'],
             'file' => ['nullable', 'image'],
         ];

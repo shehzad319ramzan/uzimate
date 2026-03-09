@@ -56,6 +56,7 @@ class RewardRule extends Model
             'offer_viewed' => 'Offer Viewed',
             'offer_redeemed' => 'Offer Redeemed',
             'qr_code_scanned' => 'QR Code Scanned',
+            'merchant_qr_scanned' => 'Merchant QR Scanned',
             'check_in' => 'Check In',
             'profile_updated' => 'Profile Updated',
             'login' => 'Login',

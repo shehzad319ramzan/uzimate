@@ -58,6 +58,8 @@ return new class extends Migration
                 ->nullOnDelete();
             $table->index('offer_id');
             $table->index(['user_id', 'created_at']);
+            $table->index(['merchant_id', 'created_at']);
+            $table->index(['user_id', 'merchant_id']);
             $table->index(['action_type', 'created_at']);
             $table->index(['action_category', 'created_at']);
         });

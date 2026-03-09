@@ -40,6 +40,12 @@
                         place="Enter scan after hours" val="{{ old('scan_after_hours', $data->scan_after_hours ?? '6') }}" extraclasses="mb-3"
                         label="Scan After (hours)" />
                 </div> --}}
+                <div class="col-md-6">
+                    <x-auth.input-field type="number" name="qr_scan_points" id="qr_scan_points"
+                        place="e.g. 10" val="{{ old('qr_scan_points', $data->qr_scan_points ?? '') }}" extraclasses="mb-3"
+                        label="Get Points (when customers scan your store QR)" />
+                    <small class="text-muted">Points awarded when customers scan your merchant QR code.</small>
+                </div>
                 <div class="col-md-12">
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="checkbox" name="use_other_merchant_points"
@@ -63,4 +69,27 @@
             </div>
         </x-auth.form>
     </x-auth.card>
+
+    @if($data->qr_code ?? null)
+        <x-auth.card card-header="Store QR Code – Customers scan to earn points" class="mt-3">
+            <p class="text-muted small">Share this QR code with customers. When they scan it (via the app), they receive @if(isset($data->qr_scan_points) && $data->qr_scan_points !== null) <strong>{{ $data->qr_scan_points }} points</strong>@else points according to your reward rules (Merchant QR Scanned)@endif.</p>
+            <div class="text-center mb-3">
+                <img src="{{ $data->qrCodeImageUrl() }}" alt="Merchant QR Code" class="img-fluid" style="max-width: 220px;" />
+            </div>
+            <div class="d-flex flex-wrap gap-2 justify-content-center">
+                <a href="{{ $data->qrCodeImageUrl() }}" download="merchant-qr-{{ \Illuminate\Support\Str::slug($data->name) }}.svg" class="btn btn-outline-primary">
+                    <i class="fas fa-download me-1"></i> Download QR
+                </a>
+                <a href="{{ route('merchants.show', $data->id) }}" class="btn btn-outline-secondary"><i class="fas fa-eye me-1"></i> View full detail</a>
+            </div>
+        </x-auth.card>
+    @else
+        <x-auth.card card-header="Store QR Code – Customers scan to earn points" class="mt-3">
+            <p class="text-muted small">Generate a unique QR code for this merchant. Customers scan it in the app to earn points (configure "Merchant QR Scanned" in Reward Rules or set "Get Points" above).</p>
+            <form action="{{ route('merchants.generate-qr', $data->id) }}" method="POST" class="d-inline">
+                @csrf
+                <button type="submit" class="btn btn-primary"><i class="fas fa-qrcode me-1"></i> Generate QR Code</button>
+            </form>
+        </x-auth.card>
+    @endif
 </x-layouts.auth>

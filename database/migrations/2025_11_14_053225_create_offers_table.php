@@ -31,6 +31,10 @@ return new class extends Migration
 
             $table->foreign('merchant_id')->references('id')->on('merchants')->onDelete('cascade');
             $table->foreign('site_id')->references('id')->on('sites')->onDelete('cascade');
+
+            $table->index('merchant_id');
+            $table->index('status');
+            $table->index(['merchant_id', 'status']);
         });
     }
 

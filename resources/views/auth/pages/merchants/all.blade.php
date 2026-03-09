@@ -37,6 +37,8 @@
                             <th>Sr#</th>
                             <th>Logo</th>
                             <th>Name</th>
+                            <th>QR Code</th>
+                            <th>Points (QR scan)</th>
                             <th>Max Sites</th>
                             {{-- <th>Spin After (days)</th>
                             <th>Scan After (hours)</th> --}}
@@ -59,7 +61,7 @@
                                              style="width: 40px; height: 40px; background-color: #4A148D; font-size: 16px;">
                                             {{ strtoupper(substr($merchant->name ?? 'M', 0, 1)) }}
                                         </div>
-                                    @endif
+                                        @endif
                                 </td>
                                 <td>
                                     <span class="fw-semibold">{{ $merchant?->name }}</span>
@@ -70,6 +72,22 @@
                                             <span class="badge bg-secondary">Not Assign</span>
                                         @endif
                                     </div>
+                                </td>
+                                <td>
+                                    @if($merchant?->qr_code && $merchant->qrCodeImageUrl())
+                                        <a href="{{ route('merchants.show', $merchant->id) }}" title="View merchant">
+                                            <img src="{{ $merchant->qrCodeImageUrl() }}" alt="QR" class="img-fluid" style="max-width: 48px; max-height: 48px;" />
+                                        </a>
+                                    @else
+                                        <span class="text-muted small">—</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if(isset($merchant->qr_scan_points) && $merchant->qr_scan_points !== null)
+                                        <span class="badge bg-success">{{ number_format($merchant->qr_scan_points) }} pts</span>
+                                    @else
+                                        <span class="text-muted small">—</span>
+                                    @endif
                                 </td>
                                 <td>{{ $merchant?->max_sites ?? '-' }}</td>
                                 {{-- <td>{{ $merchant?->spin_after_days ?? '-' }}</td>

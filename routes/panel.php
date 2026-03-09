@@ -88,6 +88,7 @@ Route::group(
             Route::delete('delete/{merchant}', 'destroy')->name('destroy');
             Route::get('detail/{merchant}', 'show')->name('show');
             Route::get('edit/{merchant}', 'edit')->name('edit');
+            Route::post('generate-qr/{merchant}', 'generateQr')->name('generate-qr');
         });
 
 

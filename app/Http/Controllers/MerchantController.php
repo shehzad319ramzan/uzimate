@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Dto\MerchantDto;
+use App\Helper\QrCodeHelper;
 use App\Http\Requests\MerchantRequest;
+use App\Models\Merchant;
 use App\Models\MerchantCategory;
 use App\Repositories\MerchantRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -74,5 +76,15 @@ class MerchantController extends BaseController
                 return redirect()->route($this->_route . '.index')->with('error', 'Something went wrong..');
             }
         }
+    }
+
+    public function generateQr(Merchant $merchant)
+    {
+        if ($merchant->qr_code) {
+            return redirect()->route('merchants.show', $merchant->id)->with('info', 'This merchant already has a QR code.');
+        }
+        $qrPath = QrCodeHelper::generateAndSave($merchant->id, 'merchants/qr/');
+        $merchant->update(['qr_code' => $qrPath]);
+        return redirect()->route('merchants.show', $merchant->id)->with('success', 'QR code generated. Customers can scan it to earn points.');
     }
 }

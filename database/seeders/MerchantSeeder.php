@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Constants\Constants;
+use App\Helper\QrCodeHelper;
 use App\Models\Merchant;
 use App\Models\MerchantCategory;
 use App\Models\User;
@@ -32,10 +33,12 @@ class MerchantSeeder extends Seeder
         $merchant1->scan_after_hours = 12;
         $merchant1->use_other_merchant_points = true;
         $merchant1->status = '1';
+        $merchant1->qr_scan_points = 10;
         $merchant1->user_id = $defaultUserId;
         $merchant1->created_at = now();
         $merchant1->updated_at = now();
         $merchant1->save();
+        $merchant1->update(['qr_code' => QrCodeHelper::generateAndSave($merchant1->id, 'merchants/qr/')]);
         $merchant1->file()->create([
             'name' => 'logo1.png',
             'path' => 'merchants/logos/logo1.png',
@@ -52,10 +55,12 @@ class MerchantSeeder extends Seeder
         $merchant2->scan_after_hours = 8;
         $merchant2->use_other_merchant_points = false;
         $merchant2->status = '1';
+        $merchant2->qr_scan_points = 15;
         $merchant2->user_id = $defaultUserId;
         $merchant2->created_at = now();
         $merchant2->updated_at = now();
         $merchant2->save();
+        $merchant2->update(['qr_code' => QrCodeHelper::generateAndSave($merchant2->id, 'merchants/qr/')]);
         $merchant2->file()->create([
             'name' => 'logo2.png',
             'path' => 'merchants/logos/logo2.png',
@@ -72,10 +77,12 @@ class MerchantSeeder extends Seeder
         $merchant3->scan_after_hours = 6;
         $merchant3->use_other_merchant_points = true;
         $merchant3->status = '1';
+        $merchant3->qr_scan_points = 20;
         $merchant3->user_id = $defaultUserId;
         $merchant3->created_at = now();
         $merchant3->updated_at = now();
         $merchant3->save();
+        $merchant3->update(['qr_code' => QrCodeHelper::generateAndSave($merchant3->id, 'merchants/qr/')]);
         $merchant3->file()->create([
             'name' => 'logo3.png',
             'path' => 'merchants/logos/logo3.png',
@@ -92,10 +99,12 @@ class MerchantSeeder extends Seeder
         $merchant4->scan_after_hours = 24;
         $merchant4->use_other_merchant_points = false;
         $merchant4->status = '1';
+        $merchant4->qr_scan_points = 25;
         $merchant4->user_id = $defaultUserId;
         $merchant4->created_at = now();
         $merchant4->updated_at = now();
         $merchant4->save();
+        $merchant4->update(['qr_code' => QrCodeHelper::generateAndSave($merchant4->id, 'merchants/qr/')]);
         $merchant4->file()->create([
             'name' => 'logo4.png',
             'path' => 'merchants/logos/logo4.png',
@@ -112,10 +121,12 @@ class MerchantSeeder extends Seeder
         $merchant5->scan_after_hours = 12;
         $merchant5->use_other_merchant_points = true;
         $merchant5->status = '1';
+        $merchant5->qr_scan_points = 10;
         $merchant5->user_id = $defaultUserId;
         $merchant5->created_at = now();
         $merchant5->updated_at = now();
         $merchant5->save();
+        $merchant5->update(['qr_code' => QrCodeHelper::generateAndSave($merchant5->id, 'merchants/qr/')]);
         $merchant5->file()->create([
             'name' => 'logo5.png',
             'path' => 'merchants/logos/logo5.png',

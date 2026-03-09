@@ -61,6 +61,15 @@
                                                 label="Scan After Hours" />
                                         </div>
                                         <div class="col-md-6 mb-3">
+                                            <x-auth.input-field type="number" name="qr_scan_points" id="qr_scan_points"
+                                                place="e.g. 10" val="{{ old('qr_scan_points', 10) }}" extraclasses="mb-0"
+                                                label="Get Points (when customers scan your QR)" />
+                                            <small class="text-muted">Points awarded to customers when they scan your store QR code.</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
                                             <div class="form-check mt-4">
                                                 <input class="form-check-input @error('use_other_merchant_points') is-invalid @enderror" 
                                                     type="checkbox" value="1" name="use_other_merchant_points" 

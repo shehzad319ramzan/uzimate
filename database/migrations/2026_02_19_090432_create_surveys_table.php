@@ -24,6 +24,9 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('merchant_id')->references('id')->on('merchants')->nullOnDelete();
+
+            $table->index('merchant_id');
+            $table->index('status');
         });
 
         Schema::create('survey_questions', function (Blueprint $table) {

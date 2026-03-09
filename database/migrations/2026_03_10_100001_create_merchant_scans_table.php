@@ -11,20 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('offer_scans', function (Blueprint $table) {
+        Schema::create('merchant_scans', function (Blueprint $table) {
             $table->uuid('id')->primary();
-
-            $table->uuid('merchant_id')->nullable();
-            $table->uuid('site_id');
-            $table->uuid('offer_id');
+            $table->uuid('merchant_id');
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-
             $table->unsignedInteger('points_earned')->default(0);
-
             $table->string('ip_address')->nullable();
             $table->text('user_agent')->nullable();
             $table->json('metadata')->nullable();
-
             $table->timestamps();
 
             $table->foreign('merchant_id')
@@ -32,18 +26,7 @@ return new class extends Migration
                 ->on('merchants')
                 ->cascadeOnDelete();
 
-            $table->foreign('site_id')
-                ->references('id')
-                ->on('sites')
-                ->cascadeOnDelete();
-
-            $table->foreign('offer_id')
-                ->references('id')
-                ->on('offers')
-                ->cascadeOnDelete();
-
-            $table->index(['user_id', 'offer_id']);
-            $table->index(['user_id', 'created_at']);
+            $table->index(['user_id', 'merchant_id']);
             $table->index(['merchant_id', 'created_at']);
         });
     }
@@ -53,6 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('offer_scans');
+        Schema::dropIfExists('merchant_scans');
     }
 };

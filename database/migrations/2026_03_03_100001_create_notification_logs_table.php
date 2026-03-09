@@ -22,6 +22,9 @@ return new class extends Migration
             $table->timestamp('clicked_at')->nullable();
             $table->json('metadata')->nullable();
             $table->timestamps();
+
+            $table->index(['user_id', 'channel']);
+            $table->index(['user_id', 'created_at']);
         });
     }
 

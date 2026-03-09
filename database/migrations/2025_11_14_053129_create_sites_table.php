@@ -38,6 +38,9 @@ return new class extends Migration
             $table->string('status')->default(1);
 
             $table->timestamps();
+
+            $table->index('merchant_id');
+            $table->index('status');
         });
     }
 

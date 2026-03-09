@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helper\QrCodeHelper;
 use App\Relationships\FileRelationship;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -26,6 +27,8 @@ class Merchant extends Model
         'status',
         'user_id',
         'merchant_category_id',
+        'qr_code',
+        'qr_scan_points',
     ];
 
     public function logo()
@@ -46,5 +49,16 @@ class Merchant extends Model
     public function sites()
     {
         return $this->hasMany(Site::class);
+    }
+
+    /**
+     * Full URL for the merchant's QR code image (customers scan this to earn points).
+     */
+    public function qrCodeImageUrl(): ?string
+    {
+        if (empty($this->qr_code)) {
+            return null;
+        }
+        return QrCodeHelper::url($this->qr_code);
     }
 }

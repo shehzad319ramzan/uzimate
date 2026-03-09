@@ -24,6 +24,10 @@ return new class extends Migration
                 ->references('id')
                 ->on('merchants')
                 ->onDelete('cascade');
+
+            $table->index('merchant_id');
+            $table->index('status');
+            $table->index('valid_until');
         });
     }
 

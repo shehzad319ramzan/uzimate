@@ -35,6 +35,9 @@ return new class extends Migration
                 ->references('id')
                 ->on('sites')
                 ->cascadeOnDelete();
+
+            $table->index(['user_id', 'merchant_id']);
+            $table->index(['user_id', 'created_at']);
         });
     }
 

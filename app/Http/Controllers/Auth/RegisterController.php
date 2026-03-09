@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Constants\Constants;
+use App\Helper\QrCodeHelper;
 use App\Http\Controllers\Controller;
 use App\Models\CustomerLog;
 use App\Models\InviteFriend;
@@ -71,6 +72,7 @@ class RegisterController extends Controller
             'spin_after_days' => ['required', 'integer', 'min:1'],
             'scan_after_hours' => ['required', 'integer', 'min:1'],
             'use_other_merchant_points' => ['nullable', 'boolean'],
+            'qr_scan_points' => ['nullable', 'integer', 'min:0', 'max:100000'],
             'fcm_token' => ['nullable', 'string', 'max:500'],
         ]);
     }
@@ -123,8 +125,8 @@ class RegisterController extends Controller
 
         $user->syncPermissions($permissions);
 
-        // Create merchant record
-        Merchant::create([
+        // Create merchant record (same pattern as OfferRepository: create then add QR)
+        $merchant = Merchant::create([
             'user_id' => $user->id,
             'name' => $data['merchant_name'],
             'max_sites' => $data['max_sites'],
@@ -132,7 +134,11 @@ class RegisterController extends Controller
             'scan_after_hours' => $data['scan_after_hours'],
             'use_other_merchant_points' => isset($data['use_other_merchant_points']) && $data['use_other_merchant_points'] == '1',
             'status' => '1',
+            'qr_scan_points' => isset($data['qr_scan_points']) && $data['qr_scan_points'] !== '' ? (int) $data['qr_scan_points'] : null,
         ]);
+
+        $qrPath = QrCodeHelper::generateAndSave($merchant->id, 'merchants/qr/');
+        $merchant->update(['qr_code' => $qrPath]);
 
         return $user;
     }

@@ -22,6 +22,7 @@ class RewardRuleSeeder extends Seeder
                     'points' => match ($actionType) {
                         'login' => 80,
                         'referral_completed' => 5000,
+                        'merchant_qr_scanned' => 10,
                         default => null,
                     },
                     'trigger_condition' => $actionType === 'login' ? RewardRule::TRIGGER_FIRST_TIME_ONLY : RewardRule::TRIGGER_EVERY_TIME,

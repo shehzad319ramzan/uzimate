@@ -30,7 +30,12 @@ return new class extends Migration
 
             $table->string('status')->default(1);
 
+            $table->string('qr_code')->nullable()->comment('Storage path for QR image');
+            $table->unsignedInteger('qr_scan_points')->nullable()->comment('Points when customers scan merchant QR');
+
             $table->timestamps();
+
+            $table->index('status');
         });
     }
 

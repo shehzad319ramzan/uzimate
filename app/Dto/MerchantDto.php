@@ -12,6 +12,7 @@ class MerchantDto
     public ?bool $use_other_merchant_points;
     public ?string $description;
     public ?int $user_id;
+    public ?int $qr_scan_points;
     public $file;
 
     /**
@@ -29,6 +30,7 @@ class MerchantDto
         $this->use_other_merchant_points = isset($request['use_other_merchant_points']) ? (bool)$request['use_other_merchant_points'] : false;
         $this->description = $request['description'] ?? null;
         $this->user_id = isset($request['user_id']) ? (int)$request['user_id'] : auth()->id();
+        $this->qr_scan_points = isset($request['qr_scan_points']) && $request['qr_scan_points'] !== '' ? (int)$request['qr_scan_points'] : null;
         $this->file = request()->hasFile('file') ? request()->file('file') : null;
     }
 
@@ -62,6 +64,7 @@ class MerchantDto
         
         $data['use_other_merchant_points'] = $this->use_other_merchant_points ?? false;
         $data['description'] = $this->description;
+        $data['qr_scan_points'] = $this->qr_scan_points;
 
         if ($this->user_id !== null) {
             $data['user_id'] = $this->user_id;
