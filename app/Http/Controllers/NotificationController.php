@@ -8,6 +8,7 @@ use App\Http\Requests\SendNotificationRequest;
 use App\Models\NotificationSetting;
 use App\Models\Offer;
 use App\Services\NotificationService;
+use App\Support\Concerns\HasMerchantScope;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ use Illuminate\View\View;
 
 class NotificationController extends Controller
 {
+    use HasMerchantScope;
     private $_directory = 'auth.pages.notifications';
 
     private const ALLOWED_BLADES = [
@@ -28,7 +30,7 @@ class NotificationController extends Controller
         protected NotificationService $notificationService
     ) {}
 
-    
+
     public function index(string $blade): View|RedirectResponse
     {
         if (! in_array($blade, self::ALLOWED_BLADES, true)) {
@@ -75,6 +77,16 @@ class NotificationController extends Controller
     }
 
 
+    private function notificationMerchantIds(): ?array
+    {
+        if (! $this->shouldLimitByMerchant()) {
+            return null;
+        }
+        $ids = $this->accessibleMerchantIds();
+
+        return $ids === [] ? null : $ids;
+    }
+
     public function updateSettings(Request $request, string $type): RedirectResponse
     {
         $type = $this->bladeToType(str_replace('_', '-', $type));
@@ -108,14 +120,15 @@ class NotificationController extends Controller
         $channels = array_values(array_intersect((array) $request->input('channels', []), ['email', 'push']));
         $channelsOverride = $channels !== [] ? $channels : null;
 
+        $merchantIds = $this->notificationMerchantIds();
         if ($request->boolean('send_to_all_inactive') || empty($userIds)) {
             $daysParam = $inactiveDays;
             if ($daysParam === 'all') {
-                $userIds = $this->notificationService->getAllCustomerIds();
-                $count = $this->notificationService->sendMissYouNotifications(null, $userIds, Auth::id(), $channelsOverride);
+                $userIds = $this->notificationService->getAllCustomerIds($merchantIds);
+                $count = $this->notificationService->sendMissYouNotifications(null, $userIds, Auth::id(), $channelsOverride, $merchantIds);
             } elseif ($daysParam !== null && $daysParam !== '') {
                 $days = (int) $daysParam;
-                $count = $this->notificationService->sendMissYouNotifications($days, null, Auth::id(), $channelsOverride);
+                $count = $this->notificationService->sendMissYouNotifications($days, null, Auth::id(), $channelsOverride, $merchantIds);
             } else {
                 if ($request->wantsJson()) {
                     return response()->json(['success' => false, 'message' => 'Please specify inactive days or select customers.'], 422);
@@ -123,7 +136,7 @@ class NotificationController extends Controller
                 return redirect()->back()->with('error', 'Please specify inactive days or select at least one customer.');
             }
         } else {
-            $count = $this->notificationService->sendMissYouNotifications(null, $userIds, Auth::id(), $channelsOverride);
+            $count = $this->notificationService->sendMissYouNotifications(null, $userIds, Auth::id(), $channelsOverride, $merchantIds);
         }
 
         if ($request->wantsJson()) {
@@ -144,11 +157,12 @@ class NotificationController extends Controller
             return redirect()->back()->with('error', 'Offer not found.');
         }
 
+        $merchantIds = $this->notificationMerchantIds();
         $sendToAll = $request->boolean('send_to_all');
         $userIds = (array) $request->input('user_ids', []);
         $userIds = is_array($userIds) ? array_filter($userIds) : [];
         if ($sendToAll) {
-            $userIds = $this->notificationService->getAllCustomerIds();
+            $userIds = $this->notificationService->getAllCustomerIds($merchantIds);
         }
         if (empty($userIds)) {
             return redirect()->back()->with('error', 'Please select at least one customer or check "Send to all customers".');
@@ -171,6 +185,7 @@ class NotificationController extends Controller
      */
     public function sendBirthday(SendNotificationRequest $request): RedirectResponse|JsonResponse
     {
+        $merchantIds = $this->notificationMerchantIds();
         $userIds = (array) $request->input('user_ids', []);
         $userIds = is_array($userIds) ? array_filter(array_map('intval', $userIds)) : [];
         $birthdayFilter = $request->input('birthday_filter', 'today');
@@ -179,13 +194,13 @@ class NotificationController extends Controller
         $channelsOverride = $channels !== [] ? $channels : null;
 
         if (!empty($userIds)) {
-            $count = $this->notificationService->sendBirthdayNotifications($userIds, Auth::id(), null, false, $channelsOverride);
+            $count = $this->notificationService->sendBirthdayNotifications($userIds, Auth::id(), null, false, $channelsOverride, $merchantIds);
         } elseif ($allCustomers) {
-            $count = $this->notificationService->sendBirthdayNotifications(null, Auth::id(), null, true, $channelsOverride);
+            $count = $this->notificationService->sendBirthdayNotifications(null, Auth::id(), null, true, $channelsOverride, $merchantIds);
         } elseif ($birthdayFilter === 'today' || $birthdayFilter === '0') {
-            $count = $this->notificationService->sendBirthdayNotifications(null, Auth::id(), 0, false, $channelsOverride);
+            $count = $this->notificationService->sendBirthdayNotifications(null, Auth::id(), 0, false, $channelsOverride, $merchantIds);
         } elseif (is_numeric($birthdayFilter) && (int) $birthdayFilter >= 1 && (int) $birthdayFilter <= 365) {
-            $count = $this->notificationService->sendBirthdayNotifications(null, Auth::id(), (int) $birthdayFilter, false, $channelsOverride);
+            $count = $this->notificationService->sendBirthdayNotifications(null, Auth::id(), (int) $birthdayFilter, false, $channelsOverride, $merchantIds);
         } else {
             if ($request->wantsJson()) {
                 return response()->json(['success' => false, 'message' => 'Please choose a valid filter or select at least one customer.'], 422);
@@ -206,9 +221,10 @@ class NotificationController extends Controller
      */
     public function getInactiveCustomersPreview(Request $request)
     {
+        $merchantIds = $this->notificationMerchantIds();
         $daysParam = $request->input('days', 7);
         if ($daysParam === 'all') {
-            $users = $this->notificationService->getAllCustomers();
+            $users = $this->notificationService->getAllCustomers($merchantIds);
             $preview = $users->take(100)->map(fn ($u) => [
                 'id' => $u->id,
                 'text' => (trim($u->first_name . ' ' . $u->last_name) ?: $u->email) . ' (' . $u->email . ')',
@@ -216,7 +232,7 @@ class NotificationController extends Controller
             return response()->json(['count' => $users->count(), 'preview' => $preview]);
         }
         $days = (int) $daysParam;
-        $data = $this->notificationService->getInactiveCustomersPreview($days, 100);
+        $data = $this->notificationService->getInactiveCustomersPreview($days, 100, $merchantIds);
         return response()->json($data);
     }
 
@@ -225,7 +241,7 @@ class NotificationController extends Controller
      */
     public function getInactiveCounts(Request $request)
     {
-        $data = $this->notificationService->getInactiveCounts();
+        $data = $this->notificationService->getInactiveCounts($this->notificationMerchantIds());
         return response()->json($data);
     }
 
@@ -235,7 +251,7 @@ class NotificationController extends Controller
      */
     public function getBirthdayCounts(Request $request)
     {
-        $data = $this->notificationService->getBirthdayCounts();
+        $data = $this->notificationService->getBirthdayCounts($this->notificationMerchantIds());
         return response()->json($data);
     }
 
@@ -249,7 +265,7 @@ class NotificationController extends Controller
         if (! in_array($filter, ['today', '0', 'all'], true) && (! is_numeric($filter) || (int) $filter < 1 || (int) $filter > 365)) {
             $filter = 'today';
         }
-        $data = $this->notificationService->getBirthdayPreview($filter, 100);
+        $data = $this->notificationService->getBirthdayPreview($filter, 100, $this->notificationMerchantIds());
         return response()->json($data);
     }
 
@@ -262,7 +278,7 @@ class NotificationController extends Controller
         $days = (int) $request->input('days', 7);
         $page = (int) $request->input('page', 1);
         $search = $request->input('search');
-        $paginator = $this->notificationService->getInactiveCustomersPaginated($days, $page, 20, $search);
+        $paginator = $this->notificationService->getInactiveCustomersPaginated($days, $page, 20, $search, $this->notificationMerchantIds());
         $results = $paginator->getCollection()->map(fn ($u) => [
             'id' => $u->id,
             'text' => (trim($u->first_name . ' ' . $u->last_name) ?: $u->email) . ' (' . $u->email . ')',
@@ -281,7 +297,7 @@ class NotificationController extends Controller
     {
         $page = (int) $request->input('page', 1);
         $search = $request->input('search');
-        $paginator = $this->notificationService->getAllCustomersPaginated($page, 20, $search);
+        $paginator = $this->notificationService->getAllCustomersPaginated($page, 20, $search, $this->notificationMerchantIds());
         $results = $paginator->getCollection()->map(fn ($u) => [
             'id' => $u->id,
             'text' => (trim($u->first_name . ' ' . $u->last_name) ?: $u->email) . ' (' . $u->email . ')',

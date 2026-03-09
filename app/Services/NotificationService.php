@@ -16,11 +16,14 @@ use Illuminate\Support\Facades\Log;
 
 class NotificationService
 {
+    /** @var array<string, array<int|string>> Request-scoped cache: merchant_ids key => customer user_ids (CUSTOMER role only) */
+    private array $userIdsForMerchantsCache = [];
+
     public function __construct(
         protected FcmService $fcmService
     ) {}
 
- 
+
     public function getSetting(string $type): NotificationSetting
     {
         $setting = NotificationSetting::firstOrCreate(
@@ -59,7 +62,44 @@ class NotificationService
         };
     }
 
-    public function getInactiveCustomers(int $inactiveDays): \Illuminate\Database\Eloquent\Collection
+
+    public function getUserIdsForMerchants(array $merchantIds): array
+    {
+        if (empty($merchantIds)) {
+            return [];
+        }
+        $sorted = $merchantIds;
+        sort($sorted);
+        $cacheKey = implode('|', $sorted);
+        if (array_key_exists($cacheKey, $this->userIdsForMerchantsCache)) {
+            return $this->userIdsForMerchantsCache[$cacheKey];
+        }
+
+        $rawUserIds = CustomerLog::whereIn('merchant_id', $merchantIds)
+            ->distinct()
+            ->pluck('user_id')
+            ->filter()
+            ->values()
+            ->all();
+
+        if (empty($rawUserIds)) {
+            $this->userIdsForMerchantsCache[$cacheKey] = [];
+
+            return [];
+        }
+
+        $userIds = User::role(Constants::CUSTOMER)
+            ->whereIn('id', $rawUserIds)
+            ->pluck('id')
+            ->values()
+            ->all();
+
+        $this->userIdsForMerchantsCache[$cacheKey] = $userIds;
+
+        return $userIds;
+    }
+
+    public function getInactiveCustomers(int $inactiveDays, ?array $merchantIds = null): \Illuminate\Database\Eloquent\Collection
     {
         $cutoff = Carbon::now()->subDays($inactiveDays);
         $lastLoginUserIds = CustomerLog::where('action_type', 'login')
@@ -74,24 +114,33 @@ class NotificationService
 
         $userIds = $lastLoginUserIds->merge($neverLoggedUserIds)->unique()->filter();
 
+        if ($merchantIds !== null && $merchantIds !== []) {
+            $merchantUserIds = $this->getUserIdsForMerchants($merchantIds);
+            if (empty($merchantUserIds)) {
+                return new \Illuminate\Database\Eloquent\Collection([]);
+            }
+            $userIds = $userIds->intersect($merchantUserIds);
+        }
+
         return User::role(Constants::CUSTOMER)
             ->whereIn('id', $userIds)
             ->get();
     }
 
-    /**
-     * Get inactive user counts per segment (7, 14, 21, 30, 60 days, and all customers) for the segment table.
-     *
-     * @return array<string, int>
-     */
-    public function getInactiveCounts(): array
+
+    public function getInactiveCounts(?array $merchantIds = null): array
     {
         $segments = [7, 14, 21, 30, 60];
         $counts = [];
         foreach ($segments as $days) {
-            $counts[(string) $days] = $this->getInactiveCustomers($days)->count();
+            $counts[(string) $days] = $this->getInactiveCustomers($days, $merchantIds)->count();
         }
-        $counts['all'] = User::role(Constants::CUSTOMER)->count();
+        if ($merchantIds !== null && $merchantIds !== []) {
+            $ids = $this->getUserIdsForMerchants($merchantIds);
+            $counts['all'] = empty($ids) ? 0 : User::role(Constants::CUSTOMER)->whereIn('id', $ids)->count();
+        } else {
+            $counts['all'] = User::role(Constants::CUSTOMER)->count();
+        }
         return $counts;
     }
 
@@ -101,62 +150,76 @@ class NotificationService
         return $this->getBirthdayCustomersForDaysFromNow(0);
     }
 
-    /**
-     * Get customers whose birthday falls on (today + $daysFromNow).
-     * 0 = today, 1 = tomorrow, 2 = in 2 days, etc.
-     */
-    public function getBirthdayCustomersForDaysFromNow(int $daysFromNow = 0): \Illuminate\Database\Eloquent\Collection
+
+    public function getBirthdayCustomersForDaysFromNow(int $daysFromNow = 0, ?array $merchantIds = null): \Illuminate\Database\Eloquent\Collection
     {
         $targetDate = Carbon::now()->addDays($daysFromNow);
-        return User::role(Constants::CUSTOMER)
+        $query = User::role(Constants::CUSTOMER)
             ->whereNotNull('date_of_birth')
             ->whereRaw('MONTH(date_of_birth) = ?', [$targetDate->month])
-            ->whereRaw('DAY(date_of_birth) = ?', [$targetDate->day])
-            ->get();
-    }
-
-
-    public function getAllCustomers(): \Illuminate\Database\Eloquent\Collection
-    {
-        return User::role(Constants::CUSTOMER)
-            ->orderBy('first_name')
-            ->orderBy('last_name')
-            ->get();
-    }
-
-
-    public function getAllCustomerIds(): array
-    {
-        return User::role(Constants::CUSTOMER)->pluck('id')->toArray();
-    }
-
-    /**
-     * Get user counts per birthday segment (today, 1–7 days before, all) for the segment table.
-     *
-     * @return array<string, int>
-     */
-    public function getBirthdayCounts(): array
-    {
-        $counts = ['today' => $this->getBirthdayCustomersForDaysFromNow(0)->count()];
-        for ($days = 1; $days <= 7; $days++) {
-            $counts[(string) $days] = $this->getBirthdayCustomersForDaysFromNow($days)->count();
+            ->whereRaw('DAY(date_of_birth) = ?', [$targetDate->day]);
+        if ($merchantIds !== null && $merchantIds !== []) {
+            $ids = $this->getUserIdsForMerchants($merchantIds);
+            if (empty($ids)) {
+                return new \Illuminate\Database\Eloquent\Collection([]);
+            }
+            $query->whereIn('id', $ids);
         }
-        $counts['all'] = User::role(Constants::CUSTOMER)->count();
+        return $query->get();
+    }
+
+
+    public function getAllCustomers(?array $merchantIds = null): \Illuminate\Database\Eloquent\Collection
+    {
+        $query = User::role(Constants::CUSTOMER)->orderBy('first_name')->orderBy('last_name');
+        if ($merchantIds !== null && $merchantIds !== []) {
+            $ids = $this->getUserIdsForMerchants($merchantIds);
+            if (empty($ids)) {
+                return new \Illuminate\Database\Eloquent\Collection([]);
+            }
+            $query->whereIn('id', $ids);
+        }
+        return $query->get();
+    }
+
+
+    public function getAllCustomerIds(?array $merchantIds = null): array
+    {
+        $query = User::role(Constants::CUSTOMER);
+        if ($merchantIds !== null && $merchantIds !== []) {
+            $ids = $this->getUserIdsForMerchants($merchantIds);
+            if (empty($ids)) {
+                return [];
+            }
+            $query->whereIn('id', $ids);
+        }
+        return $query->pluck('id')->toArray();
+    }
+
+    public function getBirthdayCounts(?array $merchantIds = null): array
+    {
+        $counts = ['today' => $this->getBirthdayCustomersForDaysFromNow(0, $merchantIds)->count()];
+        for ($days = 1; $days <= 7; $days++) {
+            $counts[(string) $days] = $this->getBirthdayCustomersForDaysFromNow($days, $merchantIds)->count();
+        }
+        if ($merchantIds !== null && $merchantIds !== []) {
+            $ids = $this->getUserIdsForMerchants($merchantIds);
+            $counts['all'] = empty($ids) ? 0 : User::role(Constants::CUSTOMER)->whereIn('id', $ids)->count();
+        } else {
+            $counts['all'] = User::role(Constants::CUSTOMER)->count();
+        }
         return $counts;
     }
 
-    /**
-     * Preview list of users for birthday manual send (by filter: today, 1–7 days before, or all).
-     * Returns count and preview items for display in admin.
-     */
-    public function getBirthdayPreview(string $filter = 'today', int $previewLimit = 100): array
+
+    public function getBirthdayPreview(string $filter = 'today', int $previewLimit = 100, ?array $merchantIds = null): array
     {
         if ($filter === 'all') {
-            $users = $this->getAllCustomers();
+            $users = $this->getAllCustomers($merchantIds);
             $total = $users->count();
         } else {
             $days = $filter === 'today' || $filter === '0' ? 0 : (int) $filter;
-            $users = $this->getBirthdayCustomersForDaysFromNow($days);
+            $users = $this->getBirthdayCustomersForDaysFromNow($days, $merchantIds);
             $total = $users->count();
         }
         $preview = $users->take($previewLimit)->map(fn ($u) => [
@@ -172,13 +235,20 @@ class NotificationService
     }
 
 
-    public function getAllCustomersPaginated(int $page = 1, int $perPage = 20, ?string $search = null): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    public function getAllCustomersPaginated(int $page = 1, int $perPage = 20, ?string $search = null, ?array $merchantIds = null): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         $perPage = min(max((int) $perPage, 1), 50);
         $query = User::role(Constants::CUSTOMER)
             ->orderBy('first_name')
             ->orderBy('last_name')
             ->orderBy('email');
+        if ($merchantIds !== null && $merchantIds !== []) {
+            $ids = $this->getUserIdsForMerchants($merchantIds);
+            if (empty($ids)) {
+                return new \Illuminate\Pagination\LengthAwarePaginator([], 0, $perPage, $page);
+            }
+            $query->whereIn('id', $ids);
+        }
         if ($search && strlen(trim($search)) > 0) {
             $term = '%' . trim($search) . '%';
             $query->where(function ($q) use ($term) {
@@ -191,7 +261,7 @@ class NotificationService
     }
 
 
-    public function getInactiveCustomersPaginated(int $inactiveDays, int $page = 1, int $perPage = 20, ?string $search = null): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    public function getInactiveCustomersPaginated(int $inactiveDays, int $page = 1, int $perPage = 20, ?string $search = null, ?array $merchantIds = null): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         $perPage = min(max((int) $perPage, 1), 50);
         $cutoff = Carbon::now()->subDays($inactiveDays);
@@ -209,6 +279,13 @@ class NotificationService
             ->orderBy('first_name')
             ->orderBy('last_name')
             ->orderBy('email');
+        if ($merchantIds !== null && $merchantIds !== []) {
+            $ids = $this->getUserIdsForMerchants($merchantIds);
+            if (empty($ids)) {
+                return new \Illuminate\Pagination\LengthAwarePaginator([], 0, $perPage, $page);
+            }
+            $query->whereIn('id', $ids);
+        }
         if ($search && strlen(trim($search)) > 0) {
             $term = '%' . trim($search) . '%';
             $query->where(function ($q) use ($term) {
@@ -220,9 +297,9 @@ class NotificationService
         return $query->paginate($perPage, ['id', 'first_name', 'last_name', 'email'], 'page', $page);
     }
 
-    public function getInactiveCustomersPreview(int $inactiveDays, int $previewLimit = 50): array
+    public function getInactiveCustomersPreview(int $inactiveDays, int $previewLimit = 50, ?array $merchantIds = null): array
     {
-        $paginator = $this->getInactiveCustomersPaginated($inactiveDays, 1, $previewLimit);
+        $paginator = $this->getInactiveCustomersPaginated($inactiveDays, 1, $previewLimit, null, $merchantIds);
         $preview = $paginator->getCollection()->map(fn ($u) => [
             'id' => $u->id,
             'text' => (trim($u->first_name . ' ' . $u->last_name) ?: $u->email) . ' (' . $u->email . ')',
@@ -331,10 +408,7 @@ class NotificationService
     }
 
 
-    /**
-     * @param  array<string>|null  $channelsOverride  When provided, use these channels instead of setting (e.g. from segment table).
-     */
-    public function sendMissYouNotifications(?int $inactiveDays = null, ?array $userIds = null, ?int $createdBy = null, ?array $channelsOverride = null): int
+    public function sendMissYouNotifications(?int $inactiveDays = null, ?array $userIds = null, ?int $createdBy = null, ?array $channelsOverride = null, ?array $merchantIds = null): int
     {
         $type = NotificationSetting::TYPE_MISS_YOU;
         $setting = $this->getSetting($type);
@@ -354,7 +428,7 @@ class NotificationService
 
         $users = $userIds
             ? User::whereIn('id', $userIds)->get()
-            : $this->getInactiveCustomers($days);
+            : $this->getInactiveCustomers($days, $merchantIds);
         $users = $users->filter(fn ($u) => $u->hasRole(Constants::CUSTOMER));
         $total = $users->count();
         if ($total === 0) {
@@ -500,14 +574,8 @@ class NotificationService
     }
 
 
-    /**
-     * @param  array<int>|null  $userIds  Specific user IDs to send to (takes precedence).
-     * @param  int|null  $createdBy  Admin user ID.
-     * @param  int|null  $daysFromNow  0 = today, 1 = tomorrow, etc. Used when $userIds is null and $allCustomers is false.
-     * @param  bool  $allCustomers  When true and $userIds is null, send to all customers.
-     * @param  array<string>|null  $channelsOverride  When provided, use these channels (e.g. ['email'], ['push'], or ['email','push']) instead of setting.
-     */
-    public function sendBirthdayNotifications(?array $userIds = null, ?int $createdBy = null, ?int $daysFromNow = null, bool $allCustomers = false, ?array $channelsOverride = null): int
+
+    public function sendBirthdayNotifications(?array $userIds = null, ?int $createdBy = null, ?int $daysFromNow = null, bool $allCustomers = false, ?array $channelsOverride = null, ?array $merchantIds = null): int
     {
         $type = NotificationSetting::TYPE_BIRTHDAY;
         $setting = $this->getSetting($type);
@@ -528,10 +596,10 @@ class NotificationService
         if ($userIds !== null && $userIds !== []) {
             $users = User::whereIn('id', $userIds)->get();
         } elseif ($allCustomers) {
-            $users = $this->getAllCustomers();
+            $users = $this->getAllCustomers($merchantIds);
         } else {
             $days = $daysFromNow !== null ? $daysFromNow : 0;
-            $users = $this->getBirthdayCustomersForDaysFromNow($days);
+            $users = $this->getBirthdayCustomersForDaysFromNow($days, $merchantIds);
         }
         $users = $users->filter(fn ($u) => $u->hasRole(Constants::CUSTOMER));
         $total = $users->count();
@@ -588,9 +656,7 @@ class NotificationService
         return $stats['users_processed'];
     }
 
-    /**
-     * Create a notification_campaigns record when a batch send completes.
-     */
+
     protected function createCampaignRecord(array $data): NotificationCampaign
     {
         return NotificationCampaign::create([
