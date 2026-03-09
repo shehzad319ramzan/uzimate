@@ -1,4 +1,4 @@
-<x-notification-management title="Birthday Notification" sub-title="Greetings and reward points" :blade="request()->route('blade')">
+<x-notification-management title="Special Day Notification" sub-title="Greetings and reward points" :blade="request()->route('blade')">
     @php
         $config = $setting->config ?? [];
         $channels = $config['channels'] ?? ['email', 'push'];
@@ -150,7 +150,7 @@
 
     @endcan
 
-    <p class="text-muted small mt-3">Birthday notifications also run automatically via daily cron. Customers whose date of birth is today receive the message and reward points.</p>
+    <p class="text-muted small mt-3">Special Day (birthday) notifications also run automatically via daily cron. Customers whose date of birth is today receive the message and reward points.</p>
 </x-notification-management>
 <script>
 document.addEventListener('DOMContentLoaded', function() {

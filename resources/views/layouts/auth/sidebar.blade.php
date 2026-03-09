@@ -213,7 +213,7 @@
                         </li>
                         <li class="sidebar-item {{ request()->route('blade') == 'birthday' ? 'active' : '' }}">
                             <a class="sidebar-link" href="{{ route('notifications.index', 'birthday') }}">
-                                <i class="fas fa-angle-double-right me-2"></i> Birthday
+                                <i class="fas fa-angle-double-right me-2"></i> Special Day
                             </a>
                         </li>
                     </ul>

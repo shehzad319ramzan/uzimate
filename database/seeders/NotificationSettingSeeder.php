@@ -21,15 +21,6 @@ class NotificationSettingSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'type' => NotificationSetting::TYPE_SPECIAL_DAY,
-                'name' => 'Special Day',
-                'config' => [
-                    'message_template' => '',
-                    'channels' => ['email', 'push'],
-                ],
-                'is_active' => true,
-            ],
-            [
                 'type' => NotificationSetting::TYPE_SPECIAL_OFFER,
                 'name' => 'Special Offer',
                 'config' => [
@@ -40,7 +31,7 @@ class NotificationSettingSeeder extends Seeder
             ],
             [
                 'type' => NotificationSetting::TYPE_BIRTHDAY,
-                'name' => 'Birthday',
+                'name' => 'Special Day',
                 'config' => [
                     'message_template' => 'Happy Birthday, {{name}}! You\'ve earned {{points}} points.',
                     'reward_points' => 5,

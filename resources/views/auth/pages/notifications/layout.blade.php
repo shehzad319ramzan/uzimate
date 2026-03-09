@@ -17,7 +17,7 @@
                     </a>
                     <a class="list-group-item list-group-item-action {{ (request()->route('blade') ?? $blade ?? '') == 'birthday' ? 'active' : '' }}"
                         href="{{ route('notifications.index', 'birthday') }}">
-                        <i class="align-middle me-1 fas fa-fw fa-birthday-cake"></i> Birthday Notification
+                        <i class="align-middle me-1 fas fa-fw fa-birthday-cake"></i> Special Day Notification
                     </a>
                 </div>
             </x-auth.card>
