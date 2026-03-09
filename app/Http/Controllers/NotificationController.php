@@ -20,7 +20,6 @@ class NotificationController extends Controller
 
     private const ALLOWED_BLADES = [
         'miss-you',
-        'special-day',
         'special-offer',
         'birthday',
     ];
@@ -59,7 +58,6 @@ class NotificationController extends Controller
     {
         return match ($blade) {
             'miss-you' => NotificationSetting::TYPE_MISS_YOU,
-            'special-day' => NotificationSetting::TYPE_SPECIAL_DAY,
             'special-offer' => NotificationSetting::TYPE_SPECIAL_OFFER,
             'birthday' => NotificationSetting::TYPE_BIRTHDAY,
             default => $blade,
@@ -70,7 +68,6 @@ class NotificationController extends Controller
     {
         return match ($type) {
             NotificationSetting::TYPE_MISS_YOU => 'miss-you',
-            NotificationSetting::TYPE_SPECIAL_DAY => 'special-day',
             NotificationSetting::TYPE_SPECIAL_OFFER => 'special-offer',
             NotificationSetting::TYPE_BIRTHDAY => 'birthday',
             default => $type,
@@ -134,33 +131,6 @@ class NotificationController extends Controller
         }
         return redirect()->back()->with('success', "Miss You notification sent to {$count} customer(s).");
     }
-
-    public function sendSpecialDay(SendNotificationRequest $request): RedirectResponse
-    {
-        $request->validate(['message' => 'required|string|max:2000']);
-        $sendToAll = $request->boolean('send_to_all');
-        $userIds = (array) $request->input('user_ids', []);
-        $userIds = is_array($userIds) ? array_filter($userIds) : [];
-
-        if ($sendToAll) {
-            $userIds = $this->notificationService->getAllCustomerIds();
-        }
-        if (empty($userIds)) {
-            return redirect()->back()->with('error', 'Please select at least one customer or check "Send to all customers".');
-        }
-
-        $channels = (array) $request->input('channels', ['email', 'push']);
-        $title = $request->input('title', 'Special Day');
-        $count = $this->notificationService->sendSpecialDayNotifications(
-            $request->input('message'),
-            $channels,
-            $userIds,
-            $title,
-            Auth::id()
-        );
-        return redirect()->back()->with('success', "Special Day notification sent to {$count} customer(s).");
-    }
-
 
     public function sendSpecialOffer(SendNotificationRequest $request): RedirectResponse
     {

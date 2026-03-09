@@ -11,10 +11,6 @@
                         href="{{ route('notifications.index', 'miss-you') }}">
                         <i class="align-middle me-1 fas fa-fw fa-heart"></i> Miss You Notification
                     </a>
-                    <a class="list-group-item list-group-item-action {{ (request()->route('blade') ?? $blade ?? '') == 'special-day' ? 'active' : '' }}"
-                        href="{{ route('notifications.index', 'special-day') }}">
-                        <i class="align-middle me-1 fas fa-fw fa-calendar-star"></i> Special Day Notification
-                    </a>
                     <a class="list-group-item list-group-item-action {{ (request()->route('blade') ?? $blade ?? '') == 'special-offer' ? 'active' : '' }}"
                         href="{{ route('notifications.index', 'special-offer') }}">
                         <i class="align-middle me-1 fas fa-fw fa-tag"></i> Special Offer Notification

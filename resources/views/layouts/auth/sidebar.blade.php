@@ -206,11 +206,6 @@
                                 <i class="fas fa-angle-double-right me-2"></i> Miss You
                             </a>
                         </li>
-                        <li class="sidebar-item {{ request()->route('blade') == 'special-day' ? 'active' : '' }}">
-                            <a class="sidebar-link" href="{{ route('notifications.index', 'special-day') }}">
-                                <i class="fas fa-angle-double-right me-2"></i> Special Day
-                            </a>
-                        </li>
                         <li class="sidebar-item {{ request()->route('blade') == 'special-offer' ? 'active' : '' }}">
                             <a class="sidebar-link" href="{{ route('notifications.index', 'special-offer') }}">
                                 <i class="fas fa-angle-double-right me-2"></i> Special Offer

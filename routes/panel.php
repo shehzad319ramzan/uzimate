@@ -195,7 +195,6 @@ Route::group(
             Route::get('api/customers', 'getCustomers')->name('api.customers');
             Route::post('update-settings/{type}', 'updateSettings')->name('update-settings')->middleware('can:edit_notification');
             Route::post('send-miss-you', 'sendMissYou')->name('send-miss-you')->middleware('can:add_notification');
-            Route::post('send-special-day', 'sendSpecialDay')->name('send-special-day')->middleware('can:add_notification');
             Route::post('send-special-offer', 'sendSpecialOffer')->name('send-special-offer')->middleware('can:add_notification');
             Route::post('send-birthday', 'sendBirthday')->name('send-birthday')->middleware('can:add_notification');
             Route::get('{blade}', 'index')->name('index');
