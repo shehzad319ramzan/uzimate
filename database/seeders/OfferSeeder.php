@@ -58,6 +58,7 @@ class OfferSeeder extends Seeder
         $offer1->site_id = $siteIds[array_rand($siteIds)];
         $offer1->title = 'Weekend Special Offer';
         $offer1->points_required = 100;
+        $offer1->points_to_redeem = 80;
         $offer1->expires_on = Carbon::now()->addDays(30)->format('Y-m-d');
         $offer1->weekdays = ['Sat', 'Sun'];
         $offer1->description = 'Get 20% off on all items during weekends. Valid only on Saturdays and Sundays.';
@@ -98,6 +99,7 @@ class OfferSeeder extends Seeder
         $offer3->site_id = $siteIds[array_rand($siteIds)];
         $offer3->title = 'All Week Special';
         $offer3->points_required = 200;
+        $offer3->points_to_redeem = 150;
         $offer3->expires_on = Carbon::now()->addDays(90)->format('Y-m-d');
         $offer3->weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         $offer3->description = 'This amazing offer is valid all week long! Use your points to get exclusive discounts.';
@@ -138,6 +140,7 @@ class OfferSeeder extends Seeder
         $offer5->site_id = $siteIds[array_rand($siteIds)];
         $offer5->title = 'Friday Happy Hour';
         $offer5->points_required = 150;
+        $offer5->points_to_redeem = 100;
         $offer5->expires_on = Carbon::now()->addDays(20)->format('Y-m-d');
         $offer5->weekdays = ['Fri'];
         $offer5->description = 'Celebrate the end of the week with our Friday specials. Happy hour discounts available!';
@@ -158,6 +161,7 @@ class OfferSeeder extends Seeder
         $offer6->site_id = $siteIds[array_rand($siteIds)];
         $offer6->title = 'Midweek Special';
         $offer6->points_required = 80;
+        $offer6->points_to_redeem = 60;
         $offer6->expires_on = Carbon::now()->addDays(35)->format('Y-m-d');
         $offer6->weekdays = ['Tue', 'Wed', 'Thu'];
         $offer6->description = 'Beat the midweek blues with our special Tuesday, Wednesday, and Thursday offers.';

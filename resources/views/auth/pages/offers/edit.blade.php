@@ -68,22 +68,34 @@
                     <label class="form-label mb-2 d-block" style="font-weight: 500;">QR Code</label>
                     @if($data->qrCodeImageUrl())
                         <img src="{{ $data->qrCodeImageUrl() }}" alt="QR Code" class="img-thumbnail" style="max-width: 150px;" />
-                        <small class="d-block text-muted mt-1">Scan to earn {{ $data->points_required }} points</small>
+                        <div class="d-flex flex-wrap gap-2 align-items-center mt-2">
+                            <a href="{{ $data->qrCodeImageUrl() }}" download="offer-qr-{{ \Illuminate\Support\Str::slug($data->title ?? 'offer') }}.svg" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-download me-1"></i> Download QR
+                            </a>
+                        </div>
+                        <small class="d-block text-muted mt-1">Scan: earn {{ $data->points_required }} </small>
                     @else
                         <span class="text-muted">QR code will be generated on save</span>
                     @endif
                 </div>
 
-                <!-- Title and Points Required -->
-                <div class="col-md-8 mb-3">
+                <!-- Title and Points -->
+                <div class="col-md-6 mb-3">
                     <x-auth.input-field type="text" name="title" id="title" required="true"
                         place="Enter title" val="{{ old('title', $data->title ?? '') }}" extraclasses="mb-3 @error('title') is-invalid @enderror"
                         label="Title" />
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <x-auth.input-field type="number" name="points_required" id="points_required" required="true"
                         place="Enter points" val="{{ old('points_required', $data->points_required ?? '') }}" extraclasses="mb-3 @error('points_required') is-invalid @enderror"
-                        label="Points Required" />
+                        label="Points (earn on scan)" />
+                    <small class="text-muted">"Gain points" option</small>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <x-auth.input-field type="number" name="points_to_redeem" id="points_to_redeem"
+                        place="Optional" val="{{ old('points_to_redeem', $data->points_to_redeem ?? '') }}" extraclasses="mb-3 @error('points_to_redeem') is-invalid @enderror"
+                        label="Points to redeem" />
+                    <small class="text-muted">"Use points" option</small>
                 </div>
 
                 <!-- Expires On -->
@@ -217,7 +229,7 @@
             const siteSelect = document.getElementById('site_id');
             const currentSelectedValue = siteSelect.value; // Preserve current selection
             const options = siteSelect.querySelectorAll('option');
-            
+
             options.forEach(option => {
                 if (option.value === '') {
                     option.style.display = 'block';
@@ -230,7 +242,7 @@
                     }
                 }
             });
-            
+
             if (currentSelectedValue) {
                 const selectedOption = siteSelect.querySelector(`option[value="${currentSelectedValue}"]`);
                 if (selectedOption) {
@@ -250,7 +262,7 @@
         const merchantSelect = document.getElementById('merchant_id');
         const siteSelect = document.getElementById('site_id');
         const selectedSiteId = siteSelect && siteSelect.value;
-        
+
         // Only filter if merchant select exists, has value, and we have a selected site to preserve
         if (merchantSelect && merchantSelect.tagName === 'SELECT' && merchantSelect.value && selectedSiteId) {
             // Filter sites based on merchant, but keep selected site visible
@@ -271,7 +283,7 @@
                     }
                 }
             });
-            
+
             // Ensure the selected site remains selected
             siteSelect.value = selectedSiteId;
         } else if (merchantSelect.value && !selectedSiteId) {

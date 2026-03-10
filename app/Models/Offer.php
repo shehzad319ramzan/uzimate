@@ -24,6 +24,7 @@ class Offer extends Model
         'site_id',
         'title',
         'points_required',
+        'points_to_redeem',
         'expires_on',
         'weekdays',
         'description',

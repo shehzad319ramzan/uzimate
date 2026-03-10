@@ -71,16 +71,23 @@
                     </div>
                 </div>
 
-                <!-- Title and Points Required -->
-                <div class="col-md-8 mb-3">
+                <!-- Title and Points -->
+                <div class="col-md-6 mb-3">
                     <x-auth.input-field type="text" name="title" id="title" required="true"
                         place="Enter title" val="{{ old('title') }}" extraclasses="mb-3 @error('title') is-invalid @enderror"
                         label="Title" />
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <x-auth.input-field type="number" name="points_required" id="points_required" required="true"
                         place="Enter points" val="{{ old('points_required') }}" extraclasses="mb-3 @error('points_required') is-invalid @enderror"
-                        label="Points Required" />
+                        label="Points (earn on scan)" />
+                    <small class="text-muted">"Gain points" option</small>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <x-auth.input-field type="number" name="points_to_redeem" id="points_to_redeem"
+                        place="Optional" val="{{ old('points_to_redeem') }}" extraclasses="mb-3 @error('points_to_redeem') is-invalid @enderror"
+                        label="Points to redeem" />
+                    <small class="text-muted">"Use points" option</small>
                 </div>
 
                 <!-- Expires On -->

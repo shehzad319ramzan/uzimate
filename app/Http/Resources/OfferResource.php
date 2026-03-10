@@ -14,6 +14,7 @@ class OfferResource extends JsonResource
             'title' => $this->title,
             'points_required' => $this->points_required,
             'points' => $this->points_required,
+            'points_to_redeem' => isset($this->points_to_redeem) && $this->points_to_redeem !== null ? (int) $this->points_to_redeem : null,
             'description' => $this->description,
             'expires_on' => $this->expires_on?->format('Y-m-d'),
             'image' => $this->image(),

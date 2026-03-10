@@ -8,6 +8,7 @@ class OfferDto
     public readonly string $site_id;
     public readonly string $title;
     public readonly int $points_required;
+    public readonly ?int $points_to_redeem;
     public readonly ?string $expires_on;
     public readonly ?array $weekdays;
     public readonly ?string $description;
@@ -27,6 +28,7 @@ class OfferDto
         $this->site_id = $request['site_id'];
         $this->title = $request['title'];
         $this->points_required = (int) $request['points_required'];
+        $this->points_to_redeem = isset($request['points_to_redeem']) && $request['points_to_redeem'] !== '' ? (int) $request['points_to_redeem'] : null;
         $this->expires_on = $request['expires_on'] ?? null;
         if (isset($request['weekdays'])) {
             if (is_array($request['weekdays'])) {
@@ -62,6 +64,7 @@ class OfferDto
             'site_id' => $this->site_id,
             'title' => $this->title,
             'points_required' => $this->points_required,
+            'points_to_redeem' => $this->points_to_redeem,
             'expires_on' => $this->expires_on,
             'weekdays' => $this->weekdays,
             'description' => $this->description,

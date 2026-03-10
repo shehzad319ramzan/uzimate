@@ -20,7 +20,7 @@
                         @if(!empty($offerImage))
                             <img src="{{ $offerImage }}" alt="Offer Image" class="rounded" width="200" height="200" style="object-fit: cover;" />
                         @else
-                            <div class="rounded d-inline-flex align-items-center justify-content-center text-white fw-bold mx-auto" 
+                            <div class="rounded d-inline-flex align-items-center justify-content-center text-white fw-bold mx-auto"
                                  style="width: 200px; height: 200px; background-color: #4A148D; font-size: 72px;">
                                 {{ strtoupper(substr($data->title ?? 'O', 0, 1)) }}
                             </div>
@@ -43,11 +43,20 @@
                             <td>{{ $data->title ?? '-' }}</td>
                         </tr>
                         <tr>
-                            <th>Points Required</th>
+                            <th>Points (earn on scan)</th>
                             <td>
                                 <span class="badge bg-info">{{ $data->points_required ?? 0 }}</span>
                             </td>
                         </tr>
+                        @if(isset($data->points_to_redeem) && $data->points_to_redeem !== null)
+                        <tr>
+                            <th>Points to redeem</th>
+                            <td>
+                                <span class="badge bg-warning text-dark">{{ $data->points_to_redeem }}</span>
+                                <small class="text-muted d-block mt-1">Customer can use this many points against the offer</small>
+                            </td>
+                        </tr>
+                        @endif
                         <tr>
                             <th>Expires On</th>
                             <td>
@@ -77,7 +86,12 @@
                             <td>
                                 @if($data->qrCodeImageUrl())
                                     <img src="{{ $data->qrCodeImageUrl() }}" alt="QR Code" class="img-thumbnail" style="max-width: 200px;" />
-                                    <small class="d-block text-muted mt-2">Customer scans this to earn {{ $data->points_required }} points</small>
+                                    <div class="mt-2">
+                                        <a href="{{ $data->qrCodeImageUrl() }}" download="offer-qr-{{ \Illuminate\Support\Str::slug($data->title ?? 'offer') }}.svg" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-download me-1"></i> Download QR
+                                        </a>
+                                    </div>
+                                    <small class="d-block text-muted mt-2">Scan: earn {{ $data->points_required }}</small>
                                 @else
                                     <span class="text-muted">-</span>
                                 @endif

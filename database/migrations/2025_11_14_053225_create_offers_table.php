@@ -20,6 +20,7 @@ return new class extends Migration
             $table->UUID('site_id');
             $table->string('title');
             $table->integer('points_required');
+            $table->unsignedInteger('points_to_redeem')->nullable()->comment('Points required to redeem/use this offer');
             $table->date('expires_on')->nullable();
             $table->json('weekdays')->nullable();
             $table->string('description', 255)->nullable();

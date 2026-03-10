@@ -59,13 +59,18 @@ class ScanOfferApiController extends ApiBaseController
     {
         $request->validate([
             'id' => ['required', 'string'],
+            'action' => ['nullable', 'string', 'in:earn,redeem'],
         ]);
 
         $user = Auth::user();
         $id = $request->input('id');
+        $action = $request->input('action', 'earn');
 
         $offer = Offer::find($id);
         if ($offer) {
+            if ($action === 'redeem') {
+                return $this->redeemOffer($offer, $user, $request);
+            }
             return $this->scanOffer($offer, $user, $request);
         }
 
@@ -116,6 +121,49 @@ class ScanOfferApiController extends ApiBaseController
                     'points_earned' => $pointsEarned,
                 ],
                 'points_earned' => $pointsEarned,
+                'points_balance' => $newBalance,
+            ],
+        ], 200);
+    }
+
+    /**
+     * Redeem offer: use points against the offer (action=redeem). Offer must have points_to_redeem set.
+     */
+    private function redeemOffer($offer, $user, Request $request): JsonResponse
+    {
+        $offer = $this->scanOfferService->findValidOffer($offer->id);
+        if (! $offer) {
+            return $this->errorResponse('Invalid or inactive offer', 404);
+        }
+
+        [$valid, $message] = $this->scanOfferService->validateExpiry($offer);
+        if (! $valid) {
+            return $this->errorResponse($message, 400);
+        }
+
+        [$valid, $message] = $this->scanOfferService->validateWeekdays($offer);
+        if (! $valid) {
+            return $this->errorResponse($message, 400);
+        }
+
+        [$success, $message] = $this->scanOfferService->redeemOffer($offer, $user, $request);
+        if (! $success) {
+            return $this->errorResponse($message, 400);
+        }
+
+        $pointsUsed = (int) $offer->points_to_redeem;
+        $newBalance = $this->scanOfferService->getUserPointsBalance($user->id);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Offer redeemed! You used {$pointsUsed} points for: {$offer->title}.",
+            'data' => [
+                'type' => 'offer_redeemed',
+                'offer' => [
+                    'id' => $offer->id,
+                    'title' => $offer->title,
+                    'points_used' => $pointsUsed,
+                ],
                 'points_balance' => $newBalance,
             ],
         ], 200);

@@ -95,6 +95,63 @@ class ScanOfferService
         return $pointsEarned;
     }
 
+
+    public function redeemOffer(Offer $offer, object $user, Request $request): array
+    {
+        $pointsToRedeem = $offer->points_to_redeem ?? null;
+        if ($pointsToRedeem === null || (int) $pointsToRedeem < 1) {
+            return [false, 'This offer cannot be redeemed with points.'];
+        }
+        $pointsToRedeem = (int) $pointsToRedeem;
+
+        if ($this->hasUserScannedOffer($user->id, $offer->id)) {
+            return [false, 'You have already used this offer (scan or redeem).'];
+        }
+
+        $balance = $this->getUserPointsBalance($user->id);
+        if ($balance < $pointsToRedeem) {
+            return [false, "Insufficient points. You need {$pointsToRedeem} points (you have {$balance})."];
+        }
+
+        $scan = OfferScan::create([
+            'merchant_id' => $offer->merchant_id,
+            'site_id' => $offer->site_id,
+            'offer_id' => $offer->id,
+            'user_id' => $user->id,
+            'points_earned' => 0,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'metadata' => [
+                'offer_title' => $offer->title,
+                'redemption' => true,
+                'points_used' => $pointsToRedeem,
+            ],
+        ]);
+
+        $offerTitle = $offer->title ?? 'Offer';
+        CustomerLog::create([
+            'merchant_id' => $offer->merchant_id,
+            'site_id' => $offer->site_id,
+            'offer_id' => $offer->id,
+            'user_id' => $user->id,
+            'action_type' => 'offer_redeemed',
+            'action_category' => 'scans',
+            'description' => "Redeemed offer: {$offerTitle} (used {$pointsToRedeem} points)",
+            'points_affected' => -$pointsToRedeem,
+            'related_model_type' => OfferScan::class,
+            'related_model_id' => $scan->id,
+            'performed_by_id' => $user->id,
+            'metadata' => [
+                'offer_title' => $offerTitle,
+                'points_used' => $pointsToRedeem,
+            ],
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
+        return [true, null];
+    }
+
     /**
      * Get user's current points balance (all merchants).
      */

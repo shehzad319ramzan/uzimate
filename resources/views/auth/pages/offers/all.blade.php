@@ -19,7 +19,8 @@
                             <th>QR Code</th>
                             <th>Title</th>
                             <th>Merchant & Site</th>
-                            <th>Points Required</th>
+                            <th>Points (earn)</th>
+                            <th>Points to redeem</th>
                             <th>Expires On</th>
                             <th>Weekdays</th>
                             <th>Status</th>
@@ -47,7 +48,12 @@
                                 </td>
                                 <td>
                                     @if($offer->qrCodeImageUrl())
-                                        <img src="{{ $offer->qrCodeImageUrl() }}" alt="QR Code" class="rounded" width="40" height="40" style="object-fit: contain;" />
+                                        <div class="d-flex flex-column align-items-start gap-1">
+                                            <img src="{{ $offer->qrCodeImageUrl() }}" alt="QR Code" class="rounded" width="40" height="40" style="object-fit: contain;" />
+                                            <a href="{{ $offer->qrCodeImageUrl() }}" download="offer-qr-{{ \Illuminate\Support\Str::slug($offer->title ?? 'offer') }}.svg" class="btn btn-sm btn-outline-primary py-0 px-1" title="Download QR Code">
+                                                <i class="fas fa-download fa-xs"></i> Download
+                                            </a>
+                                        </div>
                                     @else
                                         <span class="text-muted">-</span>
                                     @endif
@@ -70,6 +76,13 @@
                                 </td>
                                 <td>
                                     <span class="badge bg-info">{{ $offer->points_required ?? 0 }}</span>
+                                </td>
+                                <td>
+                                    @if(isset($offer->points_to_redeem) && $offer->points_to_redeem !== null)
+                                        <span class="badge bg-warning text-dark">{{ $offer->points_to_redeem }} pts</span>
+                                    @else
+                                        <span class="text-muted">—</span>
+                                    @endif
                                 </td>
                                 <td>
                                     @if($offer->expires_on)

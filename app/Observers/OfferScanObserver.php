@@ -15,6 +15,9 @@ class OfferScanObserver
     public function created(OfferScan $offerScan): void
     {
         try {
+            if (! empty($offerScan->metadata['redemption'])) {
+                return;
+            }
             $pointsEarned = (int) ($offerScan->points_earned ?? 0);
             $offerTitle = $offerScan->offer?->title ?? ($offerScan->metadata['offer_title'] ?? 'Offer');
 

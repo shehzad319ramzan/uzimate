@@ -50,6 +50,7 @@ class OfferRequest extends FormRequest
             'site_id' => ['required', 'uuid', 'exists:sites,id'],
             'title' => ['required', 'string', 'max:255'],
             'points_required' => ['required', 'integer', 'min:0'],
+            'points_to_redeem' => ['nullable', 'integer', 'min:0'],
             'expires_on' => ['nullable', 'date', 'after_or_equal:today'],
             'weekdays' => ['nullable', 'array'],
             'weekdays.*' => ['string', 'in:Mon,Tue,Wed,Thu,Fri,Sat,Sun'],
