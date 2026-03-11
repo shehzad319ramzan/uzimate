@@ -10,6 +10,7 @@ use App\Models\SiteUser;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class SurveyRepository extends BaseRepository
 {
@@ -36,6 +37,17 @@ class SurveyRepository extends BaseRepository
     protected function buildFilteredQuery(array $filters = []): Builder
     {
         $query = $this->_model->newQuery()->with($this->with)->latest();
+
+        $user = Auth::user();
+        if ($user && ! $user->hasRole(Constants::SUPERADMIN)) {
+            $merchants = $this->getAccessibleMerchants($user);
+            $merchantIds = $merchants->pluck('id')->all();
+            if (! empty($merchantIds)) {
+                $query->whereIn('merchant_id', $merchantIds);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
+        }
 
         if (! empty($filters['search'])) {
             $search = $filters['search'];
