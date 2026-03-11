@@ -340,6 +340,12 @@ class NotificationService
         array $pushData = []
     ): array {
         $channels = array_intersect($channels, ['email', 'push']);
+        if (! ($user->push_notifications_enabled ?? true)) {
+            $channels = array_values(array_diff($channels, ['push']));
+        }
+        if (! ($user->email_notifications_enabled ?? true)) {
+            $channels = array_values(array_diff($channels, ['email']));
+        }
         $results = [];
         $context = ['notification_type' => $type, 'user_id' => $user->id, 'user_email' => $user->email];
 
