@@ -10,6 +10,7 @@ use App\Models\Offer;
 use App\Models\Site;
 use App\Models\SiteUser;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class OfferRepository extends BaseRepository
 {
@@ -24,6 +25,25 @@ class OfferRepository extends BaseRepository
     public function __construct(Offer $model)
     {
         $this->setModel($model);
+    }
+
+
+    public function index()
+    {
+        $query = Offer::with(['merchant', 'site'])->orderBy('created_at', 'desc');
+
+        $user = Auth::user();
+        if ($user && ! $user->hasRole(Constants::SUPERADMIN)) {
+            $merchants = $this->getAccessibleMerchants($user);
+            $merchantIds = $merchants->pluck('id')->all();
+            if (! empty($merchantIds)) {
+                $query->whereIn('merchant_id', $merchantIds);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
+        }
+
+        return $query->paginate(20);
     }
 
     /**
