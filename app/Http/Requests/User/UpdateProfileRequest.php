@@ -20,6 +20,20 @@ class UpdateProfileRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
+    protected function prepareForValidation(): void
+    {
+        $merge = [];
+        if ($this->hasFile('profile')) {
+            $merge['file'] = $this->file('profile');
+        }
+        if ($this->hasFile('image')) {
+            $merge['file'] = $merge['file'] ?? $this->file('image');
+        }
+        if ($merge !== []) {
+            $this->merge($merge);
+        }
+    }
+
     public function rules(): array
     {
         $userId = auth()->id();
@@ -29,14 +43,15 @@ class UpdateProfileRequest extends FormRequest
             'f_name' => ['required', 'string', 'max:100'],
             'l_name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:200', function ($attribute, $value, $fail) use ($currentEmail) {
-                // dd($value, $currentEmail);
                 if ($value !== $currentEmail) {
                     $fail('You cannot change your email. Please contact the admin!');
                 }
             }],
             'about' => ['nullable','string', 'max:250'],
             'date_of_birth' => ['nullable', 'date'],
-            'file' => ['nullable', 'image'],
+            'file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:5120'],
+            'profile' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:5120'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:5120'],
         ];
     }
 }
