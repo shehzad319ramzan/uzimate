@@ -26,6 +26,9 @@ return new class extends Migration
             $table->string('referral_code', 20)->nullable()->unique();
             $table->string('password')->default('test123');
             $table->string('fcm_token', 500)->nullable();
+            $table->boolean('push_notifications_enabled')->default(true);
+            $table->boolean('email_notifications_enabled')->default(true);
+
             $table->rememberToken();
             $table->timestamps();
         });

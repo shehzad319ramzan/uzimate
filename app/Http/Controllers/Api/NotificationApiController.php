@@ -9,8 +9,53 @@ use Illuminate\Support\Facades\Auth;
 
 class NotificationApiController extends ApiBaseController
 {
+    /**
+     * Get current user's notification preferences (enable/disable push and email).
+     */
+    public function settings(): JsonResponse
+    {
+        $user = Auth::user();
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'application_notifications' => (bool) ($user->push_notifications_enabled ?? true),
+                'email_notifications' => (bool) ($user->email_notifications_enabled ?? true),
+            ],
+        ], 200);
+    }
 
-    
+    /**
+     * Update notification preferences. Send application_notifications and/or email_notifications (boolean).
+     */
+    public function updateSettings(Request $request): JsonResponse
+    {
+        $request->validate([
+            'application_notifications' => ['nullable', 'boolean'],
+            'email_notifications' => ['nullable', 'boolean'],
+        ]);
+
+        $user = Auth::user();
+        $updates = [];
+        if ($request->has('application_notifications')) {
+            $updates['push_notifications_enabled'] = $request->boolean('application_notifications');
+        }
+        if ($request->has('email_notifications')) {
+            $updates['email_notifications_enabled'] = $request->boolean('email_notifications');
+        }
+        if ($updates !== []) {
+            $user->update($updates);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Notification settings updated.',
+            'data' => [
+                'application_notifications' => (bool) ($user->fresh()->push_notifications_enabled ?? true),
+                'email_notifications' => (bool) ($user->fresh()->email_notifications_enabled ?? true),
+            ],
+        ], 200);
+    }
+
     public function index(Request $request): JsonResponse
     {
         $user = Auth::user();

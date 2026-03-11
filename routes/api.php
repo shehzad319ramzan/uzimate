@@ -57,6 +57,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('surveys/{id}/submit', [SurveyApiController::class, 'submit']);
 
     Route::get('notifications', [NotificationApiController::class, 'index']);
+    Route::get('notification-settings', [NotificationApiController::class, 'settings']);
+    Route::put('notification-settings', [NotificationApiController::class, 'updateSettings']);
     Route::post('notifications/read-all', [NotificationApiController::class, 'markAllAsRead']);
     Route::get('notifications/{id}', [NotificationApiController::class, 'show']);
     Route::post('notifications/{id}/read', [NotificationApiController::class, 'markAsRead']);

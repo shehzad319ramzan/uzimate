@@ -29,6 +29,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at',
         'referral_code',
         'fcm_token',
+        'push_notifications_enabled',
+        'email_notifications_enabled',
     ];
 
     protected $hidden = [
@@ -42,6 +44,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'date_of_birth' => 'date',
             'password' => 'hashed',
+            'push_notifications_enabled' => 'boolean',
+            'email_notifications_enabled' => 'boolean',
         ];
     }
 
