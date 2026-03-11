@@ -21,9 +21,13 @@ class SurveyController extends BaseController
 
     public function index()
     {
+        $user = Auth::user();
         $filters = request()->only(['search', 'merchant_id', 'status']);
+        $options = $this->_repo->formOptions($user);
+        if (! $options['isSuperAdmin'] && $options['merchants']->isNotEmpty() && empty($filters['merchant_id'])) {
+            $filters['merchant_id'] = $options['merchants']->first()->id;
+        }
         $data['all'] = $this->_repo->listWithFilters($filters);
-        $options = $this->_repo->formOptions(Auth::user());
         return view($this->_directory . '.all', array_merge(['data' => $data, 'filters' => $filters], $options));
     }
 
