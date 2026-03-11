@@ -25,7 +25,11 @@ class UserDto
         $this->email = isset($request['email']) ? $request['email'] : null;
         $this->about = isset($request['about']) ? $request['about'] : null;
         $this->role = isset($request['role']) ? $request['role'] : null;
-        $this->file = isset(request()->file) ? request()->file : null;
+        if (is_array($request) && isset($request['file']) && $request['file'] instanceof \Illuminate\Http\UploadedFile) {
+            $this->file = $request['file'];
+        } else {
+            $this->file = request()->file('file') ?? request()->file('profile') ?? request()->file('image');
+        }
         $this->date_of_birth = isset($request['date_of_birth']) ? $request['date_of_birth'] : null;
         $this->password = isset($request['password']) ? $request['password'] : null;
     }
